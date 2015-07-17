@@ -1,0 +1,92 @@
+Pre-Script Commands:
+-----------------
+00 - <nop> <nop> <nop> <nop> <nop> <nop> { Executes script on first entry of map }
+01 - <nop> <nop> <nop> <nop> <nop> <nop> { Executes script on entry of map }
+02 - <x> <y> <tile/sprite number> <nop> <nop> <nop> { Executes script on bumping into something }
+03 - <x> <y> <layer> <tile/sprite number> <item number> <nop> { Executes script on dragging an item onto a tile }
+04 - <x> <y> <nop> <nop> <nop> <nop> { Executes script on walking into something (cannot click or spacebar it) }
+05 - <value> <nop> <nop> <nop> <nop> <nop> { Checks if TempVar == value }
+06 - <value> <nop> <nop> <nop> <nop> <nop> { Checks if RandVar == value }
+07 - <value> <nop> <nop> <nop> <nop> <nop> { Checks if RandVar > Value }
+08 - <value> <nop> <nop> <nop> <nop> <nop> { Checks if RandVar < Value }
+09 - <nop> <nop> <nop> <nop> <nop> <nop> { Executes script on map entry (used for X-wings and transportation anims) }
+0a - <value> <x> <y> <layer> <nop> <nop> { Checks if map tile is set to a value, used for variable storage }
+0b - <enemy id> <nop> <nop> <nop> <nop> <nop> { Checks if enemy is dead }
+0c - <nop> <nop> <nop> <nop> <nop> <nop> { Checks if all enemies are dead }
+0d - <item num> <nop> <nop> <nop> <nop> <nop> { Checks if an item is in the player's inventory, does something unknown if the item num is FFFF (gets item currently equipped?) }
+0e - Used in map 192, 196. 'Reque'
+0f - 
+10 - Used in map 150
+11 - <nop> <nop> <nop> <nop> <nop> <nop> { Executes script if player has not beaten game yet? }
+12 - <nop> <nop> <nop> <nop> <nop> <nop> { Executes script is player has beaten game? }
+13 - <value> <nop> <nop> <nop> <nop> <nop> { Checks if Luke health < Value } 
+14 - <value> <nop> <nop> <nop> <nop> <nop> { Checks if Luke health > Value }
+15 - 
+16 - 
+17 - <x> <y> <layer> <tile/sprite number> <item number> <nop> { Executes script on dragging an incorrect item onto a tile }
+18 - <x> <y> <nop> <nop> <nop> <nop> { Checks if player is at position }
+19 - <value> <nop> <nop> <nop> <nop> <nop> { Checks if GlobalVar == value }
+1a - <value> <nop> <nop> <nop> <nop> <nop> { Checks if GlobalVar < value }
+1b - <value> <nop> <nop> <nop> <nop> <nop> { Checks if GlobalVar > value }
+1c - <value> <nop> <nop> <nop> <nop> <nop> { Checks if ExperienceVar == value, used in map 94 (Dagobah) a lot. }
+1d - <unk> <unk> <nop> <nop> <nop> <nop> { Used in map 57, 139, 160 a lot, related to script cmd 15/16? Checks goals? }
+1e - 
+1f - <value> <nop> <nop> <nop> <nop> <nop> { Checks if TempVar != value }
+20 - <value> <nop> <nop> <nop> <nop> <nop> { Checks if RandVar != value }
+21 - <value> <nop> <nop> <nop> <nop> <nop> { Checks if GlobalVar != value }
+22 - <value> <x> <y> <layer> <nop> <nop> { Checks if map tile is set to a value, used for variable storage }
+23 - <value> <nop> <nop> <nop> <nop> <nop> { Checks if ExperienceVar > Value }
+
+Zone - <x1> <y1> <x2> <y2> <tile/sprite number> { Executes script upon entering zone }
+
+Script Commands:
+-----------------
+00 - <x> <y> <layer> <value> <nop> <strlen> { Sets a map tile to a value, used for variable storage }
+01 - <x> <y> <layer> <nop> <nop> <strlen> { Sets map tile to 0xFFFF (cleared) }
+02 - <x from> <y from> <layer from> <x to> <y to> { Moves a map tile from one spot to another }
+03 - <x> <y> <tile> <nop> <nop> <strlen> { Draws/Overlays a tile on the map }
+04 - <x> <y> <Sh ow Te> <strlen> <string> { Shows text from Luke }
+05 - <x> <y> <Sh ow Te> <strlen> <string> { Shows text from coords }
+06 - <x> <y> <Re dr aw> <strlen> { Redraws the map tile at a position }
+07 - <x1> <y1> <x2> <y2> <nop> <strlen> { Redraws tiles from range x1,y1 to x2,y2 }
+08 - <unk> <nop> <nop> <nop> <nop> <strlen> { Triggers a draw call }
+09 - <seconds> <nop> <Wa it Fo> <strlen> { Waits a number of seconds }
+0a - <sound id> <nop> <nop> <nop> <nop> <strlen> { Plays a sound }
+0b - 
+0c - <highest number> <nop> <nop> <nop> <nop> <strlen> { Stores a random from 0 to a set number to RandVar }
+0d - <value> <nop> <nop> <nop> <nop> <strlen> { Sets TempVar to value }
+0e - <value> <nop> <nop> <nop> <nop> <strlen> { Adds value to TempVar }
+0f - <x> <y> <layer> <value> <nop> <strlen> { Sets a map tile to a value, used for variable storage }
+10 - <nop> <nop> <nop> <nop> <nop> <strlen> { Releases camera from player }
+11 - <nop> <nop> <nop> <nop> <nop> <strlen> { Locks camera to player }
+12 - <x> <y> <nop> <nop> <nop> <strlen> { Teleport/Move Player Position }
+13 - <x1> <y1> <x2> <y2> <time> { Moves camera from x1,y1 to x2,y2 in a set amount of time }
+14 - <nop> <nop> <nop> <nop> <nop> <strlen> { Redraws map }
+15 - <door num> <nop> <nop> <nop> <nop> <strlen> { Opens door? }
+16 - <door num> <nop> <nop> <nop> <nop> <strlen> { Closes door? }
+17 - <enemy num> <nop> <nop> <nop> <nop> <strlen> { Spawn enemy }
+18 - <npc num> <nop> <nop> <nop> <nop> <strlen> { Spawn NPC }
+19 - <nop> <nop> <nop> <nop> <nop> <strlen> { Remove dragged item }
+1a - <nop> <nop> <nop> <nop> <nop> <strlen> { Similar to 'Remove dragged item'? }
+1b - <item id> <x> <y> <nop> <nop> <nop> { Spawn item at coords }
+1c - <item id> <nop> <nop> <nop> <nop> <nop> { Adds item to inventory }
+1d - <item id> <nop> <nop> <nop> <nop> <nop> { Drop item from cursor }
+1e - 'Open'? 'Show'? Sets a bunch of values to 1. Used in map 52 on opening a box.
+1f - 
+20 - 
+21 - <map num> <x> <y> <unk> <nop> <strlen> { Warps player to pos on map }
+22 - <value> <nop> <nop> <nop> <nop> <strlen> { Sets GlobalVar to value }
+23 - <value> <nop> <nop> <nop> <nop> <strlen> { Adds GlobalVar to value }
+24 - <value> <nop> <nop> <nop> <nop> <strlen> { Sets RandVar to value }
+25 - <amt> <nop> <nop> <nop> <nop> <strlen> { Adds amt to player health }
+
+Notes:
+-----------------
+This is for Yoda Stories. I'd imagine commands are similar between Indianna Jones and Yoda Stories, possibly reordered or slightly different though.
+
+Arguments 3, 4, and 5 seem to leak a lot of what the original script was before compiling. Traces of command names can sometimes be found at, before, or after commands in these arguments as plaintext.
+
+TempVar is apparently stored at 8,8 layer 0 in the map. While there is a command to check the value directly, some maps use the CheckMapTile command (cmd 0) instead.
+
+GlobalVar seems to be a single variable per map which retains it's value across traveling? Seems to be used for setting blocks and stuff.
+

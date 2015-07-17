@@ -18,7 +18,7 @@ u32* tile;
 
 GLuint texture[0x1001];
 u32 tile_metadata[0x1000];
-u32 *map_file_locs;
+izon_data **zone_data;
 //TNAME **tile_names;
 
 u32 yodesk_seek = 0;
@@ -31,7 +31,7 @@ void load_resources()
 	yodesk = readFileToBytes(is_yoda ? (load_demo ? "YodaDemo.dta" : "YODESK.DTA") : "WhateverIndianaJonesUses.dta", &yodesk_size);
 	printf("YODESK.DTA loaded, %x bytes large\n", yodesk_size);
 
-	u16 izon_count = 0;
+	u16 izon_count = -1;
 	for(int i = 0; i < yodesk_size; i++)
 	{
 		seek(i);
@@ -56,21 +56,46 @@ void load_resources()
 			NUM_MAPS = *(u16*)(yodesk + i); i += 2;
 			u16 unknown = *(u16*)(yodesk + i); i += 2;
 			u32 ZONE_LENGTH = *(u32*)(yodesk + i);
-			map_file_locs = malloc(NUM_MAPS * 4);
+			zone_data = malloc(NUM_MAPS * 4 * 2);
+			for(int j = 0; j < NUM_MAPS; j++)
+				zone_data[j] = (izon_data*)malloc(sizeof(izon_data));
 
 			printf("%i maps in DAT\n", NUM_MAPS);
 		}
 		else if(!strncmp((yodesk + i), "IZON", 4)) //Internal ZONe? (map)
 		{
-			//printf("Found IZON %i at %x\n", izon_count, i);
-			map_file_locs[izon_count] = i;
-			izon_count++;
-		}
-		else if(!strncmp((yodesk + i), "IZON", 4)) //Internal ZONe? (map)
-		{
 			printf("Found IZON %i at %x\n", izon_count, i);
-			map_file_locs[izon_count] = i;
 			izon_count++;
+			zone_data[izon_count]->izon_offset = i;
+		}
+		else if(!strncmp((yodesk + i), "IZAX", 4)) //IZAX
+		{
+			//printf("Found IZAX at %x\n", i);
+			zone_data[izon_count]->izax_offset = i;
+		}
+		else if(!strncmp((yodesk + i), "IZX2", 4)) //IZX2
+		{
+			//printf("Found IZX2 at %x\n", i);
+			zone_data[izon_count]->izx2_offset = i;
+		}
+		else if(!strncmp((yodesk + i), "IZX3", 4)) //IZX3
+		{
+			//printf("Found IZX3 at %x\n", i);
+			zone_data[izon_count]->izx3_offset = i;
+		}
+		else if(!strncmp((yodesk + i), "IZX4", 4)) //IZX4
+		{
+			//printf("Found IZX4 at %x\n", i);
+			zone_data[izon_count]->izx4_offset = i;
+		}
+		else if(!strncmp((yodesk + i), "IACT", 4)) //IACT
+		{
+			if(zone_data[izon_count]->iact_offset == 0)
+			{
+				zone_data[izon_count]->num_iacts = *(u16*)(yodesk + i - 2);
+				zone_data[izon_count]->iact_offset = i;
+				printf("Found %u IACT%s at %x\n", zone_data[izon_count]->num_iacts, (zone_data[izon_count]->num_iacts > 1 && zone_data[izon_count]->num_iacts != 0 ? "s" : ""), i);
+			}
 		}
 		else if(!strncmp((yodesk + i), "TILE", 4)) //TILEs (graphics)
 		{
@@ -130,6 +155,7 @@ void load_resources()
 				char *name = malloc(25);
 				for (int i = 0; i < len; i++)
 					name[i] = read_byte();
+				//printf("%x, %s\n", j, name);
 
 			}
 		}
