@@ -5,6 +5,7 @@
 #include "palette.h"
 #include "map.h"
 #include "tile.h"
+#include "character.h"
 
 u8* yodesk;
 u32* gw;
@@ -94,6 +95,7 @@ void load_resources()
 			{
 				zone_data[izon_count]->num_iacts = *(u16*)(yodesk + i - 2);
 				zone_data[izon_count]->iact_offset = i;
+				read_iact_stats(izon_count, zone_data[izon_count]->iact_offset, zone_data[izon_count]->num_iacts);
 				printf("Found %u IACT%s at %x\n", zone_data[izon_count]->num_iacts, (zone_data[izon_count]->num_iacts > 1 && zone_data[izon_count]->num_iacts != 0 ? "s" : ""), i);
 			}
 		}
@@ -114,9 +116,23 @@ void load_resources()
 		{
 			printf("Found PUZ2 at %x\n", i);
 		}
-		else if(!strncmp((yodesk + i), "CHAR", 4))
+		else if(!strncmp((yodesk + i), "CHAR", 4) && strncmp((yodesk + i), "CHARGE", 6))
 		{
-			printf("Found CHAR at %x\n", i);
+			read_long(); //"CHAR"
+			u16 size = read_short();
+			read_short();
+			printf("%x\n", size);
+
+			char_data = malloc((size / 0x54) * 4 * 2);
+
+			for(int j = 0; j < (size / 0x54); j++)
+			{
+				u16 id = read_short();
+				char_data[id] = (ichr_data*)(yodesk + yodesk_seek);
+				printf("%x - %s\n", id, char_data[id]->name);
+				seek_add(0x54 - 2);
+			}
+			i += size + 6;
 		}
 		else if(!strncmp((yodesk + i), "CHWP", 4))
 		{
@@ -161,6 +177,7 @@ void load_resources()
 		}
 		else if(!strncmp((yodesk + i), "ENDF", 4))
 		{
+			print_iact_stats();
 			printf("Found ENDF at %x\n", i);
 		}
 	}

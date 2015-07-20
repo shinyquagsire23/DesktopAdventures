@@ -12,3 +12,6 @@ u16 height;
 
 void load_map(u16 map_id);
 void render_map();
+
+void read_iact_stats(u16 map_num, u32 location, u16 num_iacts);
+void print_iact_stats();

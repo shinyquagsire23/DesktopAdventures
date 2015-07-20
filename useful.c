@@ -13,7 +13,8 @@ char* readFileToBytes(char* file, long *size)
 	filelen = ftell(fileptr);
 	rewind(fileptr);
 
-	buffer = (char *) malloc((filelen + 1) * sizeof(char));
+	buffer = (char *) malloc((filelen + 4) * sizeof(char));
+	printf("%x\n", buffer);
 	fread(buffer, filelen, 1, fileptr);
 	fclose(fileptr);
 

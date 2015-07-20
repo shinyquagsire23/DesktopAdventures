@@ -17,11 +17,11 @@ Pre-Script Commands:
 0e - Used in map 192, 196. 'Reque'
 0f - 
 10 - Used in map 150
-11 - <nop> <nop> <nop> <nop> <nop> <nop> { Executes script if player has not beaten game yet? }
+11 - <nop> <nop> <nop> <nop> <nop> <nop> { Executes script if player has not beaten game yet? Never used. }
 12 - <nop> <nop> <nop> <nop> <nop> <nop> { Executes script is player has beaten game? }
 13 - <value> <nop> <nop> <nop> <nop> <nop> { Checks if Luke health < Value } 
 14 - <value> <nop> <nop> <nop> <nop> <nop> { Checks if Luke health > Value }
-15 - 
+15 - Never used.
 16 - 
 17 - <x> <y> <layer> <tile/sprite number> <item number> <nop> { Executes script on dragging an incorrect item onto a tile }
 18 - <x> <y> <nop> <nop> <nop> <nop> { Checks if player is at position }
@@ -73,7 +73,7 @@ Script Commands:
 1d - <item id> <nop> <nop> <nop> <nop> <nop> { Drop item from cursor }
 1e - 'Open'? 'Show'? Sets a bunch of values to 1. Used in map 52 on opening a box.
 1f - 
-20 - 
+20 - Never used.
 21 - <map num> <x> <y> <unk> <nop> <strlen> { Warps player to pos on map }
 22 - <value> <nop> <nop> <nop> <nop> <strlen> { Sets GlobalVar to value }
 23 - <value> <nop> <nop> <nop> <nop> <strlen> { Adds GlobalVar to value }
@@ -89,4 +89,84 @@ Arguments 3, 4, and 5 seem to leak a lot of what the original script was before 
 TempVar is apparently stored at 8,8 layer 0 in the map. While there is a command to check the value directly, some maps use the CheckMapTile command (cmd 0) instead.
 
 GlobalVar seems to be a single variable per map which retains it's value across traveling? Seems to be used for setting blocks and stuff.
+
+Stats:
+-----------------
+Number of uses of each action command:
+0: 1470,    
+1: 187,    
+2: 2925,    
+3: 737,    
+4: 193,    
+5: 1291,    
+6: 1972,    
+7: 101,    
+8: 75,    
+9: 277,    
+a: 1276,    
+b: 354,    
+c: 11,    67, 187, 215, 223, 285, 306, 416, 462, 631, 
+d: 143,    
+e: 285,    
+f: 24,    94, 95, 151, 263, 476, 477, 478, 535, 
+10: 4,    150, 416, 458, 621, 
+11: 0,    
+12: 26,    1, 94, 95, 151, 282, 344, 380, 417, 450, 476, 477, 535, 537, 552, 641, 
+13: 25,    1, 129, 273, 282, 330, 370, 380, 454, 477, 547, 640, 
+14: 38,    1, 129, 273, 282, 330, 370, 380, 454, 477, 547, 640, 642, 
+15: 0,    
+16: 4,    401, 
+17: 118,    
+18: 635,    
+19: 543,    
+1a: 92,    
+1b: 97,    
+1c: 37,    94, 95, 535, 
+1d: 19,    37, 42, 57, 139, 160, 488, 
+1e: 4,    465, 641, 
+1f: 121,    
+20: 152,    
+21: 121,    
+22: 1649,    
+23: 10,    1, 98, 223, 263, 424, 477, 478, 
+
+Number of uses of each script command:
+0: 5209,   
+1: 2772,   
+2: 2798,   
+3: 584,   
+4: 1030,   
+5: 1129,   
+6: 2574,   
+7: 2502,   
+8: 5137,   
+9: 4235,   
+a: 2523,   
+b: 31,   431, 432, 433, 434, 435, 465, 470, 537, 578, 629, 
+c: 436,   
+d: 1343,   
+e: 137,   
+f: 1293,   
+10: 456,   
+11: 287,   
+12: 890,   
+13: 123,   
+14: 986,   
+15: 403,   
+16: 502,   
+17: 423,   
+18: 248,   
+19: 10,   207, 432, 455, 475, 621, 631, 633, 643, 
+1a: 31,   26, 85, 101, 207, 222, 223, 232, 263, 265, 266, 276, 287, 296, 313, 379, 381, 409, 410, 432, 455, 475, 497, 498, 526, 570, 605, 621, 629, 631, 633, 
+1b: 690,   
+1c: 18,   156, 223, 247, 393, 578, 622, 624, 629, 641, 
+1d: 320,   
+1e: 145,   
+1f: 16,   287, 316, 345, 376, 398, 409, 416, 450, 473, 498, 539, 578, 580, 605, 626, 636, 
+20: 0,   
+21: 410,   
+22: 328,   
+23: 59,   
+24: 1475,   
+25: 61,   
 
