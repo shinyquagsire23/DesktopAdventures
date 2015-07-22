@@ -30,11 +30,21 @@ typedef struct izax_entry
 	u16 entity_id;
 	u16 x;
 	u16 y;
-	u16 unk1;
-	u16 unk2;
+	u16 item;
+	u16 num_items;
 	u16 unk3;
 	u16 unk4[0x10];
 } izax_entry;
+
+typedef struct izax_entry_2
+{
+	u16 unk;
+} izax_entry_2;
+
+typedef struct izax_entry_3
+{
+	u16 unk;
+} izax_entry_3;
 
 typedef struct izax_data_1
 {
@@ -44,6 +54,18 @@ typedef struct izax_data_1
 	u16 num_entries;
 	izax_entry entries[];
 } izax_data_1;
+
+typedef struct izax_data_2
+{
+	u16 num_entries;
+	izax_entry_2 entries[];
+} izax_data_2;
+
+typedef struct izax_data_3
+{
+	u16 num_entries;
+	izax_entry_3 entries[];
+} izax_data_3;
 
 u32 camera_x;
 u32 camera_y;

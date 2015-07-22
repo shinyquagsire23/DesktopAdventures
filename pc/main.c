@@ -116,6 +116,8 @@ int initGL(GLvoid)
 {
 	glEnable( GL_TEXTURE_2D);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glEnable (GL_BLEND);
 	glShadeModel( GL_SMOOTH);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);

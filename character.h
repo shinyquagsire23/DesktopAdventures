@@ -26,6 +26,8 @@ typedef struct entity
 	u16 x;
 	u16 y;
 	u16 current_frame;
+	u16 item;
+	u16 num_items;
 } entity;
 
 typedef struct char_data

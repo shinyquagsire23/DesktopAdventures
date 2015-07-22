@@ -27,6 +27,7 @@
 u16 *map_tiles_low;
 u16 *map_tiles_middle;
 u16 *map_tiles_high;
+u16 *map_overlay;
 u32 camera_x = 0;
 u32 camera_y = 0;
 
@@ -71,17 +72,19 @@ void load_map(u16 map_id)
 	map_tiles_low = malloc(width*height*2);
 	map_tiles_middle = malloc(width*height*2);
 	map_tiles_high = malloc(width*height*2);
+	map_overlay = malloc(width*height*2);
 	for(int i = 0; i < width*height; i++)
 	{
 		map_tiles_low[i] = read_short();
 		map_tiles_middle[i] = read_short();
 		map_tiles_high[i] = read_short();
+		map_overlay[i] = 0xFFFF;
 	}
 
 	printf("Loaded map %i, map type %x, width %i, height %i\n", map_id, planet, width, height);
 	load_izax(zone_data[map_id]->izax_offset);
 #ifndef _3DS
-	read_iact(zone_data[map_id]->iact_offset, zone_data[map_id]->num_iacts); //Prints out a bunch of stuff... This kills the 3DS.
+	//read_iact(zone_data[map_id]->iact_offset, zone_data[map_id]->num_iacts); //Prints out a bunch of stuff... This kills the 3DS.
 #endif
 }
 
@@ -102,7 +105,7 @@ void add_existing_entity(entity e)
 	entities[num_entities++] = &e;
 }
 
-void add_new_entity(u16 id, u16 x, u16 y, u16 frame)
+void add_new_entity(u16 id, u16 x, u16 y, u16 frame, u16 item, u16 num_items)
 {
 	entity *e = malloc(sizeof(entity));
 
@@ -110,6 +113,8 @@ void add_new_entity(u16 id, u16 x, u16 y, u16 frame)
 	e->x = x;
 	e->y = y;
 	e->current_frame = frame;
+	e->item = item;
+	e->num_items = num_items;
 
 	entities[num_entities++] = e;
 }
@@ -118,11 +123,26 @@ void load_izax(u32 location)
 {
 	seek(location);
 	izax_data_1 *first_section = (izax_data_1*)(current_file_pointer());
-	printf("Reading IZAX data, %u entries in first section\n", first_section->num_entries);
+	seek_add(0xC + (first_section->num_entries * sizeof(izax_entry)));
+	izax_data_2 *second_section = (izax_data_2*)(current_file_pointer());
+	seek_add(0x2 + (second_section->num_entries * sizeof(izax_entry_2)));
+	izax_data_3 *third_section = (izax_data_3*)(current_file_pointer());
+	printf("Reading IZAX data, %u entries in first section, %u in the second and %u in the third\n", first_section->num_entries, second_section->num_entries, third_section->num_entries);
 
 	for(int i = 0; i < first_section->num_entries; i++)
 	{
-		add_new_entity(first_section->entries[i].entity_id, first_section->entries[i].x, first_section->entries[i].y, DOWN);
+		printf("  entity: id=%x, x=%x, y=%x, item=%x, qty=%x, %x\n", first_section->entries[i].entity_id, first_section->entries[i].x, first_section->entries[i].y, first_section->entries[i].item, first_section->entries[i].num_items, first_section->entries[i].unk3);
+		add_new_entity(first_section->entries[i].entity_id, first_section->entries[i].x, first_section->entries[i].y, DOWN, first_section->entries[i].item, first_section->entries[i].num_items);
+	}
+
+	for(int i = 0; i < second_section->num_entries; i++)
+	{
+		printf("  second: %x\n", second_section->entries[i].unk);
+	}
+
+	for(int i = 0; i < third_section->num_entries; i++)
+	{
+		printf("   third: %x\n", third_section->entries[i].unk);
 	}
 }
 
@@ -308,6 +328,7 @@ void render_map()
 			tiles_low[(j*9)+i] = map_tiles_low[((camera_y+j)*width)+i+camera_x];
 			tiles_middle[(j*9)+i] = map_tiles_middle[((camera_y+j)*width)+i+camera_x];
 			tiles_high[(j*9)+i] = map_tiles_high[((camera_y+j)*width)+i+camera_x];
+			tiles_overlay[(j*9)+i] = map_overlay[((camera_y+j)*width)+i+camera_x];
 		}
 	}
 
@@ -334,6 +355,7 @@ void render_map()
 			e->x < camera_x + 9)
 		{
 			tiles_high[((e->y - camera_y)*9) + (e->x - camera_x)] = char_data[e->char_id]->frames[e->current_frame];
+			tiles_overlay[((e->y - camera_y)*9) + (e->x - camera_x)] = e->item;
 		}
 	}
 

@@ -28,6 +28,7 @@
 unsigned short tiles_low[0x100 * 0x100];
 unsigned short tiles_middle[0x100 * 0x100];
 unsigned short tiles_high[0x100 * 0x100];
+unsigned short tiles_overlay[0x100 * 0x100];
 
 void init_screen()
 {
@@ -46,8 +47,6 @@ int draw_screen()
 
 	glLoadIdentity();
 
-	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-
 #ifdef _3DS
 	glTranslatef((400 - SCREEN_WIDTH) / 2, (240 - SCREEN_WIDTH) / 2, 0.0f); //Center screen
 #endif
@@ -58,6 +57,7 @@ int draw_screen()
 		{
 			if (tiles_low[(y * SCREEN_TILE_WIDTH) + x] != 0xFFFF)
 			{
+				glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 				glBindTexture(GL_TEXTURE_2D, texture[tiles_low[(y * 9) + x]]);
 				glBegin(GL_QUADS);
 				{
@@ -78,6 +78,7 @@ int draw_screen()
 
 			if (tiles_middle[(y * SCREEN_TILE_WIDTH) + x] != 0xFFFF)
 			{
+				glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 				glBindTexture(GL_TEXTURE_2D, texture[tiles_middle[(y * 9) + x]]);
 				glBegin(GL_QUADS);
 				{
@@ -98,6 +99,7 @@ int draw_screen()
 
 			if (tiles_high[(y * SCREEN_TILE_WIDTH) + x] != 0xFFFF)
 			{
+				glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 				glBindTexture(GL_TEXTURE_2D, texture[tiles_high[(y * 9) + x]]);
 				glBegin(GL_QUADS);
 				{
@@ -112,6 +114,28 @@ int draw_screen()
 
 					glTexCoord2f(1.0f, 0.0f);
 					glVertex2f(32 * x, (32 * y) + 32);
+				}
+				glEnd();
+			}
+
+			if (tiles_overlay[(y * SCREEN_TILE_WIDTH) + x] != 0xFFFF)
+			{
+				glColor4f(1.0f, 1.0f, 1.0f, 0.6f);
+				glBindTexture(GL_TEXTURE_2D, texture[tiles_overlay[(y * 9) + x]]);
+				float scale = 1.0f;
+				glBegin(GL_QUADS);
+				{
+					glTexCoord2f(1.0f, 1.0f);
+					glVertex2f((32 * x), (32 * y));
+
+					glTexCoord2f(0.0f, 1.0f);
+					glVertex2f((32 * x) + (32 * scale), (32 * y));
+
+					glTexCoord2f(0.0f, 0.0f);
+					glVertex2f((32 * x) + (32 * scale), (32 * y) + (32 * scale));
+
+					glTexCoord2f(1.0f, 0.0f);
+					glVertex2f((32 * x), (32 * y) + (32 * scale));
 				}
 				glEnd();
 			}
