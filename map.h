@@ -25,12 +25,33 @@
 #define FOREST	0x3
 #define SWAMP	0x5
 
+typedef struct izax_entry
+{
+	u16 entity_id;
+	u16 x;
+	u16 y;
+	u16 unk1;
+	u16 unk2;
+	u16 unk3;
+	u16 unk4[0x10];
+} izax_entry;
+
+typedef struct izax_data_1
+{
+	u32 magic;
+	u32 size;
+	u16 pad;
+	u16 num_entries;
+	izax_entry entries[];
+} izax_data_1;
+
 u32 camera_x;
 u32 camera_y;
 u16 width;
 u16 height;
 
 void load_map(u16 map_id);
+void unload_map();
 void render_map();
 
 void read_iact_stats(u16 map_num, u32 location, u16 num_iacts);

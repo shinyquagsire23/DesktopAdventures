@@ -28,6 +28,7 @@ u32 get_location();
 u32 read_long();
 u16 read_short();
 u8 read_byte();
+void* current_file_pointer();
 
 typedef struct izon_data
 {

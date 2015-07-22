@@ -20,6 +20,14 @@
 
 #include "useful.h"
 
+typedef struct entity
+{
+	u16 char_id;
+	u16 x;
+	u16 y;
+	u16 current_frame;
+} entity;
+
 typedef struct char_data
 {
 	u32 magic;

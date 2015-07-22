@@ -25,7 +25,7 @@ The following currently need implementation and/or research:
 
 - SNDS
 - ZONE
-  - IZAX
+  - IZAX (last two sections need research, first section is partially implemented but some values are unknown)
   - IZX2
   - IZX3
   - IZX4

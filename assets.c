@@ -148,7 +148,7 @@ void load_resources()
 			for(int j = 0; j < (size / 0x54); j++)
 			{
 				u16 id = read_short();
-				char_data[id] = (ichr_data*)(yodesk + yodesk_seek);
+				char_data[id] = (ichr_data*)(current_file_pointer());
 				printf("%x - %s\n", id, char_data[id]->name);
 				seek_add(0x54 - 2);
 			}
@@ -267,4 +267,9 @@ u8 read_byte()
 	u32 value = *(u8*)(yodesk + yodesk_seek);
 	yodesk_seek += 1;
 	return value;
+}
+
+void* current_file_pointer()
+{
+	return (void*)(yodesk + yodesk_seek);
 }

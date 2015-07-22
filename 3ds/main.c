@@ -70,6 +70,7 @@ int main()
       {
     	  if(current_map < NUM_MAPS)
     	  {
+    		unload_map();
     	  	current_map++;
     	  	load_map(current_map);
     	  }
@@ -78,6 +79,7 @@ int main()
       {
     	  if(current_map > 0)
     	  {
+    		unload_map();
     	  	current_map--;
     	  	load_map(current_map);
     	  }

@@ -30,6 +30,10 @@ u16 *map_tiles_high;
 u32 camera_x = 0;
 u32 camera_y = 0;
 
+entity player_entity;
+entity *entities[512];
+u16 num_entities = 0;
+
 u32 unknown;
 u16 width;
 u16 height;
@@ -41,6 +45,7 @@ u16 id;
 char triggers[0x24][30] = { "FirstEnter", "Enter", "BumpTile", "DragItem", "Walk", "TempVarEq", "RandVarEq", "RandVarGt", "RandVarLs", "EnterVehicle", "CheckMapTile", "EnemyDead", "AllEnemiesDead", "HasItem", "Unk0e", "Unk0f", "Unk10", "GameInProgress?", "GameCompleted?", "HealthLs", "HealthGt", "Unk15", "Unk16", "DragWrongItem", "PlayerAtPos", "GlobalVarEq", "GlobalVarLs", "GlobalVarGt", "ExperienceEq", "Unk1d", "Unk1e", "TempVarNe", "RandVarNe", "GlobalVarNe", "CheckMapTileVar", "ExperienceGt"};
 char commands[0x26][30] = { "SetMapTile", "ClearTile", "MoveMapTile", "DrawOverlayTile", "SayText", "ShowText", "RedrawTile", "RedrawTiles", "RenderChanges", "WaitSecs", "PlaySound", "Unk0b", "Random", "SetTempVar", "AddTempVar", "SetMapTileVar", "ReleaseCamera", "LockCamera", "SetPlayerPos", "MoveCamera", "Redraw", "OpenDoor?", "CloseDoor?", "EnemySpawn", "NPCSpawn", "RemoveDraggedItem", "RemoveDraggedItemSimilar?", "SpawnItem", "AddItemToInv", "DropItem", "Open?Show?", "Unk1f", "Unk20", "WarpToMap", "SetGlobalVar", "AddGlobalVar", "SetRandVar", "AddHealth"};
 
+//TODO: Try to make this a struct or something, less allocating of data that's already in our RAM buffer of the .DAT
 void load_map(u16 map_id)
 {
 	id = map_id;
@@ -74,9 +79,51 @@ void load_map(u16 map_id)
 	}
 
 	printf("Loaded map %i, map type %x, width %i, height %i\n", map_id, planet, width, height);
+	load_izax(zone_data[map_id]->izax_offset);
 #ifndef _3DS
 	read_iact(zone_data[map_id]->iact_offset, zone_data[map_id]->num_iacts); //Prints out a bunch of stuff... This kills the 3DS.
 #endif
+}
+
+void unload_map()
+{
+	free(map_tiles_low);
+	free(map_tiles_middle);
+	free(map_tiles_high);
+
+	for(int i = 0; i < num_entities; i++)
+		free(entities[i]);
+
+	num_entities = 0;
+}
+
+void add_existing_entity(entity e)
+{
+	entities[num_entities++] = &e;
+}
+
+void add_new_entity(u16 id, u16 x, u16 y, u16 frame)
+{
+	entity *e = malloc(sizeof(entity));
+
+	e->char_id = id;
+	e->x = x;
+	e->y = y;
+	e->current_frame = frame;
+
+	entities[num_entities++] = e;
+}
+
+void load_izax(u32 location)
+{
+	seek(location);
+	izax_data_1 *first_section = (izax_data_1*)(current_file_pointer());
+	printf("Reading IZAX data, %u entries in first section\n", first_section->num_entries);
+
+	for(int i = 0; i < first_section->num_entries; i++)
+	{
+		add_new_entity(first_section->entries[i].entity_id, first_section->entries[i].x, first_section->entries[i].y, DOWN);
+	}
 }
 
 void read_iact(u32 location, u16 num_iacts)
@@ -132,6 +179,7 @@ void read_iact(u32 location, u16 num_iacts)
 					str[l] = read_byte();
 				}
 				printf("            \"%s\"\n", str);
+				free(str);
 			}
 		}
 	}
@@ -218,6 +266,7 @@ void read_iact_stats(u16 map_num, u32 location, u16 num_iacts)
 					str[l] = read_byte();
 				}
 				//printf("            \"%s\"\n", str);
+				free(str);
 			}
 		}
 	}
@@ -262,9 +311,35 @@ void render_map()
 		}
 	}
 
+	if(player_entity.current_frame >= 2)
+	{
+		if(player_entity.y >= camera_y &&
+		    player_entity.y < (camera_y + 9) &&
+		    player_entity.x >= camera_x &&
+		    player_entity.x < (camera_x + 9))
+		{
+			tiles_high[((player_entity.y - camera_y)*9) + (player_entity.x - camera_x)] = char_data[player_entity.char_id]->frames[player_entity.current_frame];
+		}
+	}
+
+	for(int i = 0; i < num_entities; i++)
+	{
+		entity *e = entities[i];
+		if(e->current_frame < 2)
+			continue; //These frames are transparent/unused in Yoda Stories, not sure for Indy
+
+		if(e->y >= camera_y &&
+			e->y < camera_y + 9 &&
+			e->x >= camera_x &&
+			e->x < camera_x + 9)
+		{
+			tiles_high[((e->y - camera_y)*9) + (e->x - camera_x)] = char_data[e->char_id]->frames[e->current_frame];
+		}
+	}
+
 	//Test for rendering characters
-	for(int i = 0; i < 26; i++)
+	/*for(int i = 0; i < 26; i++)
 	{
 		tiles_high[i] = char_data[id]->frames[i];
-	}
+	}*/
 }
