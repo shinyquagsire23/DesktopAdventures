@@ -43,7 +43,7 @@ u8 planet;
 u8 same;
 u16 id;
 
-char triggers[0x24][30] = { "FirstEnter", "Enter", "BumpTile", "DragItem", "Walk", "TempVarEq", "RandVarEq", "RandVarGt", "RandVarLs", "EnterVehicle", "CheckMapTile", "EnemyDead", "AllEnemiesDead", "HasItem", "Unk0e", "Unk0f", "Unk10", "GameInProgress?", "GameCompleted?", "HealthLs", "HealthGt", "Unk15", "Unk16", "DragWrongItem", "PlayerAtPos", "GlobalVarEq", "GlobalVarLs", "GlobalVarGt", "ExperienceEq", "Unk1d", "Unk1e", "TempVarNe", "RandVarNe", "GlobalVarNe", "CheckMapTileVar", "ExperienceGt"};
+char triggers[0x24][30] = { "FirstEnter", "Enter", "BumpTile", "DragItem", "Walk", "TempVarEq", "RandVarEq", "RandVarGt", "RandVarLs", "EnterVehicle", "CheckMapTile", "EnemyDead", "AllEnemiesDead", "HasItem", "HasEndItem", "Unk0f", "Unk10", "GameInProgress?", "GameCompleted?", "HealthLs", "HealthGt", "Unk15", "Unk16", "DragWrongItem", "PlayerAtPos", "GlobalVarEq", "GlobalVarLs", "GlobalVarGt", "ExperienceEq", "Unk1d", "Unk1e", "TempVarNe", "RandVarNe", "GlobalVarNe", "CheckMapTileVar", "ExperienceGt"};
 char commands[0x26][30] = { "SetMapTile", "ClearTile", "MoveMapTile", "DrawOverlayTile", "SayText", "ShowText", "RedrawTile", "RedrawTiles", "RenderChanges", "WaitSecs", "PlaySound", "Unk0b", "Random", "SetTempVar", "AddTempVar", "SetMapTileVar", "ReleaseCamera", "LockCamera", "SetPlayerPos", "MoveCamera", "Redraw", "OpenDoor?", "CloseDoor?", "EnemySpawn", "NPCSpawn", "RemoveDraggedItem", "RemoveDraggedItemSimilar?", "SpawnItem", "AddItemToInv", "DropItem", "Open?Show?", "Unk1f", "Unk20", "WarpToMap", "SetGlobalVar", "AddGlobalVar", "SetRandVar", "AddHealth"};
 
 //TODO: Try to make this a struct or something, less allocating of data that's already in our RAM buffer of the .DAT
@@ -84,7 +84,7 @@ void load_map(u16 map_id)
 	printf("Loaded map %i, map type %x, width %i, height %i\n", map_id, planet, width, height);
 	load_izax(zone_data[map_id]->izax_offset);
 #ifndef _3DS
-	//read_iact(zone_data[map_id]->iact_offset, zone_data[map_id]->num_iacts); //Prints out a bunch of stuff... This kills the 3DS.
+	read_iact(zone_data[map_id]->iact_offset, zone_data[map_id]->num_iacts); //Prints out a bunch of stuff... This kills the 3DS.
 #endif
 }
 
@@ -123,8 +123,18 @@ void load_izax(u32 location)
 {
 	seek(location);
 	izax_data_1 *first_section = (izax_data_1*)(current_file_pointer());
+
+	/* Possible items to be found and replaced in scripts
+	 * (some scripts have filler spots for these items)
+	 * Probably used for generating the maps.
+	 */
 	seek_add(0xC + (first_section->num_entries * sizeof(izax_entry)));
 	izax_data_2 *second_section = (izax_data_2*)(current_file_pointer());
+
+	/* Ending or transition to possible ending item(s). Usually takes one of a select
+	 * amount of items and turns it into a single ending item for a map.
+	 * Probably used to properly shape plot by end of the map generation.
+	 */
 	seek_add(0x2 + (second_section->num_entries * sizeof(izax_entry_2)));
 	izax_data_3 *third_section = (izax_data_3*)(current_file_pointer());
 	printf("Reading IZAX data, %u entries in first section, %u in the second and %u in the third\n", first_section->num_entries, second_section->num_entries, third_section->num_entries);
@@ -137,12 +147,12 @@ void load_izax(u32 location)
 
 	for(int i = 0; i < second_section->num_entries; i++)
 	{
-		printf("  second: %x\n", second_section->entries[i].unk);
+		printf("  item: %x\n", second_section->entries[i].item);
 	}
 
 	for(int i = 0; i < third_section->num_entries; i++)
 	{
-		printf("   third: %x\n", third_section->entries[i].unk);
+		printf("   end item: %x\n", third_section->entries[i].item);
 	}
 }
 
@@ -355,7 +365,9 @@ void render_map()
 			e->x < camera_x + 9)
 		{
 			tiles_high[((e->y - camera_y)*9) + (e->x - camera_x)] = char_data[e->char_id]->frames[e->current_frame];
-			tiles_overlay[((e->y - camera_y)*9) + (e->x - camera_x)] = e->item;
+
+			if(e->num_items > 0)
+				tiles_overlay[((e->y - camera_y)*9) + (e->x - camera_x)] = e->item;
 		}
 	}
 

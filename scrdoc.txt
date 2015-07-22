@@ -14,7 +14,7 @@ Pre-Script Commands:
 0b - <enemy id> <nop> <nop> <nop> <nop> <nop> { Checks if enemy is dead }
 0c - <nop> <nop> <nop> <nop> <nop> <nop> { Checks if all enemies are dead }
 0d - <item num> <nop> <nop> <nop> <nop> <nop> { Checks if an item is in the player's inventory, does something unknown if the item num is FFFF (gets item currently equipped?) }
-0e - Used in map 192, 196. 'Reque'
+0e - <item num> <nop> <nop> <nop> <nop> <nop> { Checks if player has an ending item? }
 0f - 
 10 - Used in map 150
 11 - <nop> <nop> <nop> <nop> <nop> <nop> { Executes script if player has not beaten game yet? Never used. }

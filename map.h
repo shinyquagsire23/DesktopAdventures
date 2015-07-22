@@ -38,12 +38,12 @@ typedef struct izax_entry
 
 typedef struct izax_entry_2
 {
-	u16 unk;
+	u16 item;
 } izax_entry_2;
 
 typedef struct izax_entry_3
 {
-	u16 unk;
+	u16 item;
 } izax_entry_3;
 
 typedef struct izax_data_1

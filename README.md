@@ -17,6 +17,7 @@ The majority of the work needed in this project is reverse engineering and the i
 - TILE
 - ZONE
   - IZON
+  - IZAX
 - CHAR
   - ICHA
 - TNAM
@@ -25,7 +26,6 @@ The following currently need implementation and/or research:
 
 - SNDS
 - ZONE
-  - IZAX (last two sections need research, first section is partially implemented but some values are unknown)
   - IZX2
   - IZX3
   - IZX4
@@ -34,8 +34,8 @@ The following currently need implementation and/or research:
   - IPUZ (seems to have all the scenario-specific strings)
 - CHWP
 - CAUX
-- ANAM (seems to have a lot of script command names? Looks to be debugging info for scripts, actually has a lot of fragments of leaked/overflowed command names seen in Yoda Stories)
-- PNAM
-- ZNAM
+- ANAM (seems to have a lot of script command names? Looks to be debugging info for scripts, actually has a lot of fragments of leaked/overflowed command names seen in Yoda Stories. Indy only.)
+- PNAM (Indy only)
+- ZNAM (Indy only)
 
 Most data on these sections can be implied and documented without the need of disassembly, however there are some aspects of the engine which will require this. IDA Pro is extremely useful for documenting certain aspects of various sections.
