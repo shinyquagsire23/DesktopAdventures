@@ -34,11 +34,10 @@ typedef struct char_data
 {
 	u32 magic;
 	u32 unk_1;
-	u8 name[10];
-	u32 unk_2;
-	u16 pad_1;
-	u16 unk_3;
+	u8 name[0x10];
+	u32 unk_3;
 	u16 unk_4;
+	u32 unk_5;
 	u16 frames[26];
 } ichr_data;
 

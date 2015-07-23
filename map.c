@@ -20,6 +20,7 @@
 
 #include "map.h"
 
+#include "tname.h"
 #include "screen.h"
 #include "assets.h"
 #include "character.h"
@@ -141,18 +142,18 @@ void load_izax(u32 location)
 
 	for(int i = 0; i < first_section->num_entries; i++)
 	{
-		printf("  entity: id=%x, x=%x, y=%x, item=%x, qty=%x, %x\n", first_section->entries[i].entity_id, first_section->entries[i].x, first_section->entries[i].y, first_section->entries[i].item, first_section->entries[i].num_items, first_section->entries[i].unk3);
+		printf("  entity: id=%x, x=%x, y=%x, item=%s, qty=%x, %x\n", first_section->entries[i].entity_id, first_section->entries[i].x, first_section->entries[i].y, tile_names[first_section->entries[i].item], first_section->entries[i].num_items, first_section->entries[i].unk3);
 		add_new_entity(first_section->entries[i].entity_id, first_section->entries[i].x, first_section->entries[i].y, DOWN, first_section->entries[i].item, first_section->entries[i].num_items);
 	}
 
 	for(int i = 0; i < second_section->num_entries; i++)
 	{
-		printf("  item: %x\n", second_section->entries[i].item);
+		printf("  item: %s\n", tile_names[second_section->entries[i].item]);
 	}
 
 	for(int i = 0; i < third_section->num_entries; i++)
 	{
-		printf("   end item: %x\n", third_section->entries[i].item);
+		printf("   end item: %s\n", tile_names[third_section->entries[i].item]);
 	}
 }
 

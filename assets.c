@@ -25,7 +25,9 @@
 #include "palette.h"
 #include "map.h"
 #include "tile.h"
+#include "tname.h"
 #include "character.h"
+#include "puzzle.h"
 
 u8* yodesk;
 u32* gw;
@@ -44,8 +46,9 @@ izon_data **zone_data;
 
 u32 yodesk_seek = 0;
 
-u8 load_demo = 0;
+u8 load_demo = 1;
 u8 is_yoda = 1;
+u16 ipuznum = 0;
 
 void load_resources()
 {
@@ -77,7 +80,7 @@ void load_resources()
 			NUM_MAPS = *(u16*)(yodesk + i); i += 2;
 			u16 unknown = *(u16*)(yodesk + i); i += 2;
 			u32 ZONE_LENGTH = *(u32*)(yodesk + i);
-			zone_data = malloc(NUM_MAPS * 4 * 2);
+			zone_data = malloc(NUM_MAPS * sizeof(char*));
 			for(int j = 0; j < NUM_MAPS; j++)
 				zone_data[j] = (izon_data*)malloc(sizeof(izon_data));
 
@@ -135,6 +138,48 @@ void load_resources()
 		else if(!strncmp((yodesk + i), "PUZ2", 4)) //Puzzle configurations maybe?
 		{
 			printf("Found PUZ2 at %x\n", i);
+			read_long(); //PUZ2
+			u32 length = read_long();
+			ipuz_data = malloc(512 * sizeof(char*));
+		}
+		else if(!strncmp((yodesk + i), "IPUZ", 4)) //Puzzle string
+		{
+			printf("Found IPUZ at %x\n", i);
+			u16 id = *(u16*)(yodesk + i - 2);
+			read_long(); //IPUZ
+
+			ipuz_element *e = malloc(sizeof(ipuz_element));
+			e->size = read_long();
+			e->unk1 = read_long();
+			e->unk2 = read_long();
+			e->unk3 = read_long();
+			e->unk4 = read_short();
+
+			e->string1_len = read_short();
+			for(int i = 0; i < e->string1_len; i++)
+				e->string1[i] = read_byte();
+
+			e->string2_len = read_short();
+			for(int i = 0; i < e->string2_len; i++)
+				e->string2[i] = read_byte();
+
+			e->string3_len = read_short();
+			for(int i = 0; i < e->string3_len; i++)
+				e->string3[i] = read_byte();
+
+			e->string4_len = read_short();
+			for(int i = 0; i < e->string4_len; i++)
+				e->string4[i] = read_byte();
+
+			e->unused_len = read_short();
+			for(int i = 0; i < e->unused_len; i++)
+				e->unused[i] = read_byte();
+
+			e->item_a = read_short();
+			e->item_b = read_short();
+
+			ipuz_data[id] = e;
+			ipuznum++;
 		}
 		else if(!strncmp((yodesk + i), "CHAR", 4) && strncmp((yodesk + i), "CHARGE", 6))
 		{
@@ -143,13 +188,13 @@ void load_resources()
 			read_short();
 			printf("%x\n", size);
 
-			char_data = malloc((size / 0x54) * 4 * 2);
+			char_data = malloc((size / 0x54) * sizeof(char*));
 
 			for(int j = 0; j < (size / 0x54); j++)
 			{
 				u16 id = read_short();
 				char_data[id] = (ichr_data*)(current_file_pointer());
-				printf("%x - %s\n", id, char_data[id]->name);
+				printf("%x - %-16s %x %x %x\n", id, char_data[id]->name, char_data[id]->unk_1, char_data[id]->unk_3, char_data[id]->unk_4, char_data[id]->unk_5);
 				seek_add(0x54 - 2);
 			}
 			i += size + 6;
@@ -174,30 +219,38 @@ void load_resources()
 			u32 size = read_long();
 			i += size - 1;
 
-			//tile_names = malloc((size / 26) * 8);
+			char *nop = "NO NAME";
 
-			for(int j = 0; j < size / 26; j++)
+			for(int j = 0; j < 0x10000; j++)
+				tile_names[j] = nop;
+
+			for(int j = 0; j < size / (is_yoda ? 26 : 18); j++)
 			{
 				u16 id = read_short();
+				char *name;
 				if (id == 0xFFFF)
-					continue;
-
-				u16 len;
-				if (is_yoda)
-					len = 24;
+					name = nop;
 				else
-					len = 16;
+					name = current_file_pointer();
 
-				char *name = malloc(25);
-				for (int i = 0; i < len; i++)
-					name[i] = read_byte();
-				//printf("%x, %s\n", j, name);
+				tile_names[id] = name;
 
+				printf("%x, %s\n", id, tile_names[id]);
+
+				if (is_yoda)
+					seek_add(24);
+				else
+					seek_add(16);
 			}
 		}
 		else if(!strncmp((yodesk + i), "ENDF", 4))
 		{
-			print_iact_stats();
+			//print_iact_stats();
+			for(int j = 0; j < ipuznum; j++)
+			{
+				ipuz_element *e = ipuz_data[j];
+				printf("%x %x %x %x \"%s\" \"%s\" \"%s\" \"%s\", %s (%x), %s (%x)\n", e->unk1, e->unk2, e->unk3, e->unk4, e->string1, e->string2, e->string3, e->string4, tile_names[e->item_a], e->item_a, tile_names[e->item_b], e->item_b);
+			}
 			printf("Found ENDF at %x\n", i);
 		}
 	}

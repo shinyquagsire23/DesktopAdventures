@@ -31,7 +31,7 @@ The following currently need implementation and/or research:
   - IZX4
   - IACT (see SCRIPTS.md)
 - PUZ2 (puzzle-specific data)
-  - IPUZ (seems to have all the scenario-specific strings)
+  - IPUZ (currently has reading implemented, needs more research)
 - CHWP
 - CAUX
 - ANAM (seems to have a lot of script command names? Looks to be debugging info for scripts, actually has a lot of fragments of leaked/overflowed command names seen in Yoda Stories. Indy only.)
