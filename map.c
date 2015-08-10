@@ -83,7 +83,9 @@ void load_map(u16 map_id)
 	}
 
 	printf("Loaded map %i, map type %x, width %i, height %i\n", map_id, planet, width, height);
-	load_izax(zone_data[map_id]->izax_offset);
+
+	if(is_yoda)
+		load_izax(zone_data[map_id]->izax_offset); //TODO: Indy IZAX is funky.
 #ifndef _3DS
 	read_iact(zone_data[map_id]->iact_offset, zone_data[map_id]->num_iacts); //Prints out a bunch of stuff... This kills the 3DS.
 #endif

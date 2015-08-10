@@ -144,7 +144,7 @@ int draw_screen()
 
 	if (ASSETS_LOADING)
 	{
-		glBindTexture(GL_TEXTURE_2D, texture[0x1000]);
+		glBindTexture(GL_TEXTURE_2D, texture[0x2000]);
 		glBegin(GL_QUADS);
 		{
 			glTexCoord2f(0.0f, 1.0f);

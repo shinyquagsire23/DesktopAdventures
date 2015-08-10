@@ -40,21 +40,22 @@ u16 NUM_MAPS = 0;
 u32 version = 4;
 u32* tile;
 
-GLuint texture[0x1001];
-u32 tile_metadata[0x1000];
+GLuint texture[0x2001];
+u32 tile_metadata[0x2000];
 izon_data **zone_data;
 //TNAME **tile_names;
 
 u32 yodesk_seek = 0;
 
 u8 load_demo = 0;
-u8 is_yoda = 1;
+u8 is_yoda = 0;
 u16 ipuznum = 0;
 
 void load_resources()
 {
-	yodesk = readFileToBytes(is_yoda ? (load_demo ? "YodaDemo.dta" : "YODESK.DTA") : "WhateverIndianaJonesUses.dta", &yodesk_size);
-	printf("YODESK.DTA loaded, %x bytes large\n", yodesk_size);
+	char *file_to_load = is_yoda ? (load_demo ? "YodaDemo.dta" : "YODESK.DTA") : "DESKTOP.DAW";
+	yodesk = readFileToBytes(file_to_load, &yodesk_size);
+	printf("%s loaded, %x bytes large\n", file_to_load, yodesk_size);
 
 	u16 izon_count = -1;
 	for(int i = 0; i < yodesk_size; i++)
@@ -67,16 +68,26 @@ void load_resources()
 		else if(!strncmp((yodesk + i), "STUP", 4)) //STartUP Graphic, uses yodesk_palette
 		{
 			printf("Found STUP at %x\n", i);
-			load_texture(288, yodesk+i+8, 0x1000); //Load Startup Texture past the last tile
+			load_texture(288, yodesk+i+8, 0x2000); //Load Startup Texture past the last tile
 		}
 		else if(!strncmp((yodesk + i), "ZONE", 4)) //ZONEs (maps)
 		{
 			printf("Found ZONE at %x\n", i);
-			i += 4; //"ZONE"
+			read_long(); i += 4; //"ZONE"
 
-			NUM_MAPS = *(u16*)(yodesk + i); i += 2;
-			u16 unknown = *(u16*)(yodesk + i); i += 2;
-			u32 ZONE_LENGTH = *(u32*)(yodesk + i);
+			u32 ZONE_LENGTH;
+
+			if(is_yoda)
+			{
+				NUM_MAPS = read_short(); i += 2;
+				u16 unknown = read_short(); i += 2;
+				ZONE_LENGTH = read_long();
+			}
+			else
+			{
+				ZONE_LENGTH = read_long(); i += 4;
+				NUM_MAPS = read_short(); i += 2;
+			}
 			zone_data = malloc(NUM_MAPS * sizeof(char*));
 			for(int j = 0; j < NUM_MAPS; j++)
 				zone_data[j] = (izon_data*)malloc(sizeof(izon_data));
@@ -85,8 +96,8 @@ void load_resources()
 		}
 		else if(!strncmp((yodesk + i), "IZON", 4)) //Internal ZONe? (map)
 		{
-			printf("Found IZON %i at %x\n", izon_count, i);
 			izon_count++;
+			printf("Found IZON %i at %x\n", izon_count, i);
 			zone_data[izon_count]->izon_offset = i;
 		}
 		else if(!strncmp((yodesk + i), "IZAX", 4)) //IZAX
@@ -140,7 +151,7 @@ void load_resources()
 			}
 			i -= 4;
 		}
-		else if(!strncmp((yodesk + i), "TILE", 4)) //TILEs (graphics)
+		else if(!strncmp((yodesk + i), "TILE", 4) && strncmp((yodesk + i), "TILEEDI", 7)) //TILEs (graphics)
 		{
 			printf("Found TILE at %x\n", i);
 			i+=4; //Section length + "TILE"
@@ -170,7 +181,10 @@ void load_resources()
 			e->size = read_long();
 			e->unk1 = read_long();
 			e->unk2 = read_long();
-			e->unk3 = read_long();
+			if(is_yoda)
+			{
+				e->unk3 = read_long();
+			}
 			e->unk4 = read_short();
 
 			e->string1_len = read_short();
@@ -194,7 +208,11 @@ void load_resources()
 				e->unused[i] = read_byte();
 
 			e->item_a = read_short();
-			e->item_b = read_short();
+
+			if(is_yoda)
+			{
+				e->item_b = read_short();
+			}
 
 			ipuz_data[id] = e;
 			ipuznum++;
@@ -213,7 +231,7 @@ void load_resources()
 				u16 id = read_short();
 				char_data[id] = (ichr_data*)(current_file_pointer());
 				printf("%x - %-16s %x %x %x\n", id, char_data[id]->name, char_data[id]->unk_1, char_data[id]->unk_3, char_data[id]->unk_4, char_data[id]->unk_5);
-				seek_add(0x54 - 2);
+				seek_add((is_yoda ? 0x54 : 0x4E) - 2);
 			}
 			i += size + 6;
 		}
@@ -267,7 +285,13 @@ void load_resources()
 			for(int j = 0; j < ipuznum; j++)
 			{
 				ipuz_element *e = ipuz_data[j];
-				printf("%x %x %x %x \"%s\" \"%s\" \"%s\" \"%s\", %s (%x), %s (%x)\n", e->unk1, e->unk2, e->unk3, e->unk4, e->string1, e->string2, e->string3, e->string4, tile_names[e->item_a], e->item_a, tile_names[e->item_b], e->item_b);
+				if(e == 0)
+					continue;
+
+				if(is_yoda)
+					printf("%x %x %x %x \"%s\" \"%s\" \"%s\" \"%s\", %s (%x), %s (%x)\n", e->unk1, e->unk2, e->unk3, e->unk4, e->string1, e->string2, e->string3, e->string4, tile_names[e->item_a], e->item_a, tile_names[e->item_b], e->item_b);
+				else
+					printf("%x %x %x \"%s\" \"%s\" \"%s\" \"%s\", %s (%x)\n", e->unk1, e->unk2, e->unk4, e->string1, e->string2, e->string3, e->string4, tile_names[e->item_a], e->item_a);
 			}
 			printf("Found ENDF at %x\n", i);
 		}
@@ -286,7 +310,11 @@ void load_texture(u16 width, u8 *data, u32 texture_num)
 	for(int i = 0; i < width * width; i++)
 	{
 		int color_index = data[index];
-		u32 color = ((u8)(yodesk_palette[(color_index * 4)]) << 16) + ((u8)(yodesk_palette[(color_index * 4) + 1]) << 8) + ((u8)(yodesk_palette[(color_index * 4) + 2]) << 0);
+		u32 color;
+		if(is_yoda)
+			color = ((u8)(yodesk_palette[(color_index * 4)]) << 16) + ((u8)(yodesk_palette[(color_index * 4) + 1]) << 8) + ((u8)(yodesk_palette[(color_index * 4) + 2]) << 0);
+		else
+			color = ((u8)(indy_palette[(color_index * 4)]) << 16) + ((u8)(indy_palette[(color_index * 4) + 1]) << 8) + ((u8)(indy_palette[(color_index * 4) + 2]) << 0);
 
 		if(color_index != 0)
 			color |= 0xFF000000; //Make sure it's not transparent

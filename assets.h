@@ -42,8 +42,10 @@ typedef struct izon_data
 } izon_data;
 
 //static const u8* yodesk_palette;
-GLuint texture[0x1001];
-u32 tile_metadata[0x1000];
+GLuint texture[0x2001];
+u32 tile_metadata[0x2000];
 u8 ASSETS_LOADING;
 izon_data **zone_data;
 u16 NUM_MAPS;
+u8 load_demo;
+u8 is_yoda;
