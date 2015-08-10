@@ -14,6 +14,7 @@ The majority of the work needed in this project is reverse engineering and the i
 
 - VERS
 - STUP
+- SNDS
 - TILE
 - ZONE
   - IZON
@@ -24,7 +25,6 @@ The majority of the work needed in this project is reverse engineering and the i
 
 The following currently need implementation and/or research:
 
-- SNDS
 - ZONE
   - IZX2
   - IZX3
