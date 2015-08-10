@@ -28,6 +28,7 @@
 #include "tname.h"
 #include "character.h"
 #include "puzzle.h"
+#include "sound.h"
 
 u8* yodesk;
 u32* gw;
@@ -46,7 +47,7 @@ izon_data **zone_data;
 
 u32 yodesk_seek = 0;
 
-u8 load_demo = 1;
+u8 load_demo = 0;
 u8 is_yoda = 1;
 u16 ipuznum = 0;
 
@@ -67,10 +68,6 @@ void load_resources()
 		{
 			printf("Found STUP at %x\n", i);
 			load_texture(288, yodesk+i+8, 0x1000); //Load Startup Texture past the last tile
-		}
-		else if(!strncmp((yodesk + i), "SNDS", 4)) //SouNDS
-		{
-			printf("Found SNDS at %x\n", i);
 		}
 		else if(!strncmp((yodesk + i), "ZONE", 4)) //ZONEs (maps)
 		{
@@ -121,6 +118,27 @@ void load_resources()
 				read_iact_stats(izon_count, zone_data[izon_count]->iact_offset, zone_data[izon_count]->num_iacts);
 				printf("Found %u IACT%s at %x\n", zone_data[izon_count]->num_iacts, (zone_data[izon_count]->num_iacts > 1 && zone_data[izon_count]->num_iacts != 0 ? "s" : ""), i);
 			}
+		}
+		else if(!strncmp((yodesk + i), "SNDS", 4)) //SouNDS
+		{
+			printf("Found SNDS at %x\n", i);
+			read_long(); //SNDS
+
+			u32 length = read_long();
+			u16 unk1 = read_short();
+			sound_files = malloc(256 * sizeof(char*));
+			i += 4+4+2;
+
+			u32 seed = i;
+
+			for(int j = 0; (i - seed) < (length - 2); j++)
+			{
+				u32 str_length = read_short(); i += 2;
+				sound_files[j] = yodesk + i;
+				printf("%x %s\n", str_length, sound_files[j]);
+				seek_add(str_length); i += str_length;
+			}
+			i -= 4;
 		}
 		else if(!strncmp((yodesk + i), "TILE", 4)) //TILEs (graphics)
 		{
