@@ -47,6 +47,7 @@ u8 planet;
 u8 same;
 u16 id;
 
+char obj_types[0x24][0x10] = {"QUEST_ITEM_SPOT", "SPAWN", "THE_FORCE", "VEHICLE_TO", "VEHICLE_FROM", "LOCATOR", "ITEM", "PUZZLE_NPC", "WEAPON,", "DOOR_IN", "DOOR_OUT", "UNKNOWN", "LOCK", "TELEPORTER", "XWING_FROM", "XWING_TO"};
 char triggers[0x24][30] = { "FirstEnter", "Enter", "BumpTile", "DragItem", "Walk", "TempVarEq", "RandVarEq", "RandVarGt", "RandVarLs", "EnterVehicle", "CheckMapTile", "EnemyDead", "AllEnemiesDead", "HasItem", "HasEndItem", "Unk0f", "Unk10", "GameInProgress?", "GameCompleted?", "HealthLs", "HealthGt", "Unk15", "Unk16", "DragWrongItem", "PlayerAtPos", "GlobalVarEq", "GlobalVarLs", "GlobalVarGt", "ExperienceEq", "Unk1d", "Unk1e", "TempVarNe", "RandVarNe", "GlobalVarNe", "CheckMapTileVar", "ExperienceGt"};
 char commands[0x26][30] = { "SetMapTile", "ClearTile", "MoveMapTile", "DrawOverlayTile", "SayText", "ShowText", "RedrawTile", "RedrawTiles", "RenderChanges", "WaitSecs", "PlaySound", "Unk0b", "Random", "SetTempVar", "AddTempVar", "SetMapTileVar", "ReleaseCamera", "LockCamera", "SetPlayerPos", "MoveCamera", "Redraw", "OpenDoor?", "CloseDoor?", "EnemySpawn", "NPCSpawn", "RemoveDraggedItem", "RemoveDraggedItemSimilar?", "SpawnItem", "AddItemToInv", "DropItem", "Open?Show?", "Unk1f", "Unk20", "WarpToMap", "SetGlobalVar", "AddGlobalVar", "SetRandVar", "AddHealth"};
 
@@ -98,13 +99,15 @@ void load_map(u16 map_id)
 		object_info[i]->unk1 = read_short();
 		object_info[i]->arg = read_short();
 
+		printf("  obj_info: %s, %u, %u, %u, %x (%s?)\n", obj_types[object_info[i]->type], object_info[i]->x, object_info[i]->y, object_info[i]->unk1, object_info[i]->arg, tile_names[object_info[i]->arg]);
+
 		//Display items and NPCs for debug purposes
 		switch(object_info[i]->type)
 		{
-			case CRATE_ITEM:
+			case ITEM:
 				map_overlay[object_info[i]->x+(object_info[i]->y*width)] = object_info[i]->arg;
 				break;
-			case CRATE_WEAPON:
+			case WEAPON:
 				map_overlay[object_info[i]->x+(object_info[i]->y*width)] = object_info[i]->arg;
 				break;
 			case PUZZLE_NPC:
@@ -118,7 +121,7 @@ void load_map(u16 map_id)
 	if(is_yoda)
 		load_izax(zone_data[map_id]->izax_offset); //TODO: Indy IZAX is funky.
 #ifndef _3DS
-	read_iact(zone_data[map_id]->iact_offset, zone_data[map_id]->num_iacts); //Prints out a bunch of stuff... This kills the 3DS.
+	//read_iact(zone_data[map_id]->iact_offset, zone_data[map_id]->num_iacts); //Prints out a bunch of stuff... This kills the 3DS.
 #endif
 }
 
