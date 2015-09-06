@@ -48,7 +48,7 @@ izon_data **zone_data;
 u32 yodesk_seek = 0;
 
 u8 load_demo = 0;
-u8 is_yoda = 0;
+u8 is_yoda = 1;
 u16 ipuznum = 0;
 
 void load_resources()
