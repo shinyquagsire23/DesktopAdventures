@@ -205,9 +205,9 @@ void read_iact(u32 location, u16 num_iacts)
 	for(int i = 0; i < num_iacts; i++)
 	{
 		read_long(); //IACT
-		u32 ignored6 = read_long();
+		u32 length = read_long();
 		u16 iactItemCount1 = read_short();
-		printf("\n    Action: unknown %08x, actions %d\n", ignored6, iactItemCount1);
+		printf("\n    Action: size %08x, actions %d\n", length, iactItemCount1);
 		for (u16 k = 0; k < iactItemCount1; k++)
 		{
 			char pos_str[7];
