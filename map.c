@@ -24,6 +24,7 @@
 #include "screen.h"
 #include "assets.h"
 #include "character.h"
+#include "objectinfo.h"
 
 u16 *map_tiles_low;
 u16 *map_tiles_middle;
@@ -34,6 +35,8 @@ u32 camera_y = 0;
 
 entity player_entity;
 entity *entities[512];
+obj_info **object_info;
+u16 object_info_qty = 0;
 u16 num_entities = 0;
 
 u32 unknown;
@@ -82,6 +85,34 @@ void load_map(u16 map_id)
 		map_overlay[i] = 0xFFFF;
 	}
 
+	//Process Object Info
+	object_info_qty = read_short();
+	object_info = malloc(object_info_qty * sizeof(obj_info*));
+	for(int i = 0; i < object_info_qty; i++)
+	{
+		object_info[i] = malloc(sizeof(obj_info));
+
+		object_info[i]->type = read_long();
+		object_info[i]->x = read_short();
+		object_info[i]->y = read_short();
+		object_info[i]->unk1 = read_short();
+		object_info[i]->arg = read_short();
+
+		//Display items and NPCs for debug purposes
+		switch(object_info[i]->type)
+		{
+			case CRATE_ITEM:
+				map_overlay[object_info[i]->x+(object_info[i]->y*width)] = object_info[i]->arg;
+				break;
+			case CRATE_WEAPON:
+				map_overlay[object_info[i]->x+(object_info[i]->y*width)] = object_info[i]->arg;
+				break;
+			case PUZZLE_NPC:
+				map_overlay[object_info[i]->x+(object_info[i]->y*width)] = object_info[i]->arg;
+				break;
+		}
+	}
+
 	printf("Loaded map %i, map type %x, width %i, height %i\n", map_id, planet, width, height);
 
 	if(is_yoda)
@@ -99,6 +130,11 @@ void unload_map()
 
 	for(int i = 0; i < num_entities; i++)
 		free(entities[i]);
+
+	for(int i = 0; i < object_info_qty; i++)
+		free(object_info[i]);
+
+	free(object_info);
 
 	num_entities = 0;
 }
