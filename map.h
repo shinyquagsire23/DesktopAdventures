@@ -22,7 +22,7 @@
 
 enum area_types
 {
- DESERT	= 0x1,
+ DESERT = 0x1,
  SNOW,
  FOREST,
  SWAMP = 0x5
