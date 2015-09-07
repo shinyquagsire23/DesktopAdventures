@@ -20,10 +20,13 @@
 
 #include "useful.h"
 
-#define DESERT	0x1
-#define SNOW	0x2
-#define FOREST	0x3
-#define SWAMP	0x5
+enum area_types
+{
+ DESERT	= 0x1,
+ SNOW,
+ FOREST,
+ SWAMP = 0x5
+};
 
 enum map_flags
 {
