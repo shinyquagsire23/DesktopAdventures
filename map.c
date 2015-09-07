@@ -47,7 +47,9 @@ u8 planet;
 u8 same;
 u16 id;
 
-char obj_types[0x24][0x10] = {"QUEST_ITEM_SPOT", "SPAWN", "THE_FORCE", "VEHICLE_TO", "VEHICLE_FROM", "LOCATOR", "ITEM", "PUZZLE_NPC", "WEAPON", "DOOR_IN", "DOOR_OUT", "UNKNOWN", "LOCK", "TELEPORTER", "XWING_FROM", "XWING_TO"};
+char planet_type[0x6][10] = { "UNUSED", "DESERT", "SNOW", "FOREST", "UNUSED", "SWAMP" };
+char map_flags[0x13][32] = {"NOP", "ENEMY_TERRITORY", "FINAL_DESTINATION", "ITEM_FOR_ITEM", "FIND_SOMETHING_USEFUL_NPC", "ITEM_TO_PASS", "FROM_ANOTHER_MAP", "TO_ANOTHER_MAP", "INDOORS", "INTRO_SCREEN", "FINAL_ITEM", "MAP_START_AREA", "UNUSED_C", "VICTORY_SCREEN", "LOSS_SCREEN", "MAP_TO_ITEM_FOR_LOCK", "FIND_SOMETHING_USEFUL_DROP", "FIND_SOMETHING_USEFUL_BUILDING", "FIND_THE_FORCE"};
+char obj_types[0x10][32] = {"QUEST_ITEM_SPOT", "SPAWN", "THE_FORCE", "VEHICLE_TO", "VEHICLE_FROM", "LOCATOR", "ITEM", "PUZZLE_NPC", "WEAPON", "DOOR_IN", "DOOR_OUT", "UNKNOWN", "LOCK", "TELEPORTER", "XWING_FROM", "XWING_TO"};
 char triggers[0x24][30] = { "FirstEnter", "Enter", "BumpTile", "DragItem", "Walk", "TempVarEq", "RandVarEq", "RandVarGt", "RandVarLs", "EnterVehicle", "CheckMapTile", "EnemyDead", "AllEnemiesDead", "HasItem", "HasEndItem", "Unk0f", "Unk10", "GameInProgress?", "GameCompleted?", "HealthLs", "HealthGt", "Unk15", "Unk16", "DragWrongItem", "PlayerAtPos", "GlobalVarEq", "GlobalVarLs", "GlobalVarGt", "ExperienceEq", "Unk1d", "Unk1e", "TempVarNe", "RandVarNe", "GlobalVarNe", "CheckMapTileVar", "ExperienceGt"};
 char commands[0x26][30] = { "SetMapTile", "ClearTile", "MoveMapTile", "DrawOverlayTile", "SayText", "ShowText", "RedrawTile", "RedrawTiles", "RenderChanges", "WaitSecs", "PlaySound", "Unk0b", "Random", "SetTempVar", "AddTempVar", "SetMapTileVar", "ReleaseCamera", "LockCamera", "SetPlayerPos", "MoveCamera", "Redraw", "OpenDoor?", "CloseDoor?", "EnemySpawn", "NPCSpawn", "RemoveDraggedItem", "RemoveDraggedItemSimilar?", "SpawnItem", "AddItemToInv", "DropItem", "Open?Show?", "Unk1f", "Unk20", "WarpToMap", "SetGlobalVar", "AddGlobalVar", "SetRandVar", "AddHealth"};
 
@@ -64,9 +66,26 @@ void load_map(u16 map_id)
 	camera_y = 0;
 
 	seek(location);
+
+	/*
+	 * The unknown value can be either 0x1FA or 0x7AC. 0x7AC denotes
+	 * that certain 0xFFFF values need replacement in the scripts or
+	 * object info sections, specifically for quest items which can
+	 * change within the map (ie 'Find Something Useful...').
+	 */
 	unknown = read_long();
+
 	width = read_short();
 	height = read_short();
+
+	/*
+	 * Used for determining how to piece the maps together. During
+	 * map generation, there must be a specific amount of certain maps,
+	 * with other maps placed in between as fillers. The item chain in
+	 * the map must also check out properly. This value assists the
+	 * generator by allowing specific selection of certain maps at
+	 * generation time.
+	 */
 	flags = read_byte();
 
 	seek_add(5);
@@ -85,6 +104,8 @@ void load_map(u16 map_id)
 		map_tiles_high[i] = read_short();
 		map_overlay[i] = 0xFFFF;
 	}
+
+	printf("Loading map %i, %s, %s, %s, width %i, height %i\n", map_id, (unknown == 0x7AC ? "DYNAMIC" : "STATIC"), map_flags[flags], planet_type[planet], width, height);
 
 	//Process Object Info
 	object_info_qty = read_short();
@@ -115,8 +136,6 @@ void load_map(u16 map_id)
 				break;
 		}
 	}
-
-	printf("Loaded map %i, map type %x, width %i, height %i\n", map_id, planet, width, height);
 
 	if(is_yoda)
 		load_izax(zone_data[map_id]->izax_offset); //TODO: Indy IZAX is funky.
