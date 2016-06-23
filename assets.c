@@ -172,7 +172,7 @@ void load_resources()
             {
                 u32 str_length = read_short(); i += 2;
                 sound_files[j] = (void*)yodesk + i;
-                //printf("%x %s\n", str_length, sound_files[j]);
+                //printf("%x: %x %s\n", j, str_length, sound_files[j]);
                 seek_add(str_length); i += str_length;
             }
             i -= 1;
@@ -262,7 +262,7 @@ void load_resources()
             {
                 u16 id = read_short();
                 char_data[id] = (ichr_data*)(current_file_pointer());
-                //printf("%x - %-16s %x %x %x %x\n", id, char_data[id]->name, char_data[id]->unk_1, char_data[id]->unk_3, char_data[id]->unk_4, char_data[id]->unk_5);
+                printf("%x - %-16s %x %x %x %x\n", id, char_data[id]->name, char_data[id]->unk_1, char_data[id]->flags, char_data[id]->unk_4, char_data[id]->unk_5);
                 seek_add((u32)(is_yoda ? 0x54 : 0x4E) - 2);
             }
             i += size + 8-1;
@@ -273,6 +273,21 @@ void load_resources()
 
             read_long(); //CHWP
             i += read_long()+8-1;
+
+            while(1)
+            {
+                u16 id_1 = read_short();
+                u16 id_2 = read_short();
+                u16 idk = read_short();
+
+                if(id_1 == 0xFFFF)
+                    break;
+
+                if(char_data[id_1]->flags & ICHR_IS_WEAPON)
+                    printf("%-16s is a weapon with sound %-14s, unk %x\n", char_data[id_1]->name, sound_files[id_2], idk);
+                else
+                    printf("%-16s gets weapon %-25s, unk %x\n", char_data[id_1]->name, id_2 == 0xFFFF ? "none" : char_data[id_2]->name, idk);
+            }
         }
         else if(!strncmp(((void*)yodesk + i), "CAUX", 4))
         {

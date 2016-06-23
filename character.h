@@ -30,12 +30,25 @@ typedef struct entity
     u16 num_items;
 } entity;
 
+enum ICHR_FLAGS
+{
+    ICHR_FRIENDLY  = 0x1,
+    ICHR_ENEMY     = 0x2,
+    ICHR_IS_WEAPON = 0x4,
+
+    ICHR_BEHAVIOR_HARD    = 0x10000,
+    ICHR_BEHAVIOR_MEDIUM  = 0x20000,
+    ICHR_BEHAVIOR_RANDOM  = 0x30000,
+    ICHR_BEHAVIOR_SITTING = 0x40000,
+    ICHR_BEHAVIOR_PATROL  = 0x80000,
+};
+
 typedef struct char_data
 {
     u32 magic;
     u32 unk_1;
     u8 name[0x10];
-    u32 unk_3;
+    u32 flags;
     u16 unk_4;
     u32 unk_5;
     u16 frames[26];
