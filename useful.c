@@ -25,20 +25,20 @@
 
 u8 *readFileToBytes(char* file, long *size)
 {
-	FILE *fileptr;
-	u8 *buffer;
-	long filelen;
+    FILE *fileptr;
+    u8 *buffer;
+    long filelen;
 
-	fileptr = fopen(file, "rb");
-	fseek(fileptr, 0, SEEK_END);
-	filelen = ftell(fileptr);
-	rewind(fileptr);
+    fileptr = fopen(file, "rb");
+    fseek(fileptr, 0, SEEK_END);
+    filelen = ftell(fileptr);
+    rewind(fileptr);
 
-	buffer = (char *) malloc((filelen + 4) * sizeof(char));
-	printf("%x\n", buffer);
-	fread(buffer, filelen, 1, fileptr);
-	fclose(fileptr);
+    buffer = (char *) malloc((filelen + 4) * sizeof(char));
+    printf("%x\n", buffer);
+    fread(buffer, filelen, 1, fileptr);
+    fclose(fileptr);
 
-	*size = filelen;
-	return buffer;
+    *size = filelen;
+    return buffer;
 }

@@ -68,46 +68,46 @@ int main()
 
       if(keysDown() & KEY_X)
       {
-    	  if(current_map < NUM_MAPS)
-    	  {
-    		unload_map();
-    	  	current_map++;
-    	  	load_map(current_map);
-    	  }
+          if(current_map < NUM_MAPS)
+          {
+            unload_map();
+            current_map++;
+            load_map(current_map);
+          }
       }
       else if(keysDown() & KEY_Y)
       {
-    	  if(current_map > 0)
-    	  {
-    		unload_map();
-    	  	current_map--;
-    	  	load_map(current_map);
-    	  }
+          if(current_map > 0)
+          {
+            unload_map();
+            current_map--;
+            load_map(current_map);
+          }
       }
 
       if(keysDown() & KEY_UP)
       {
-    	  if(camera_y > 0)
-    	  	camera_y--;
+          if(camera_y > 0)
+            camera_y--;
       }
       else if(keysDown() & KEY_DOWN)
       {
-    	  if(camera_y < height - 9)
-    	  	camera_y++;
+          if(camera_y < height - 9)
+            camera_y++;
       }
       else if(keysDown() & KEY_LEFT)
       {
-    	  if(camera_x > 0)
-    	  	camera_x--;
+          if(camera_x > 0)
+            camera_x--;
       }
       else if(keysDown() & KEY_RIGHT)
       {
-    	  if(camera_x < width - 9)
-    	  	camera_x++;
+          if(camera_x < width - 9)
+            camera_x++;
       }
 
-	  render_map();
-	  draw_screen();
+      render_map();
+      draw_screen();
 
       gfxFlush(gfxGetFramebuffer(GFX_TOP, GFX_LEFT, NULL, NULL), 240, 400, GX_TRANSFER_FMT_RGB8);
       

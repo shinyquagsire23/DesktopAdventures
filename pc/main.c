@@ -45,162 +45,162 @@ u16 current_map = 0;
 
 int main(int argc, char **argv)
 {
-	int done = FALSE;
-	SDL_Event event;
-	SDL_Init(SDL_INIT_VIDEO);
-	SDL_Window* displayWindow;
-	SDL_Renderer* displayRenderer;
-	SDL_RendererInfo displayRendererInfo;
+    int done = FALSE;
+    SDL_Event event;
+    SDL_Init(SDL_INIT_VIDEO);
+    SDL_Window* displayWindow;
+    SDL_Renderer* displayRenderer;
+    SDL_RendererInfo displayRendererInfo;
 
-	SDL_CreateWindowAndRenderer(SCREEN_WIDTH, SCREEN_WIDTH, SDL_WINDOW_OPENGL, &displayWindow, &displayRenderer);
-	SDL_GetRendererInfo(displayRenderer, &displayRendererInfo);
+    SDL_CreateWindowAndRenderer(SCREEN_WIDTH, SCREEN_WIDTH, SDL_WINDOW_OPENGL, &displayWindow, &displayRenderer);
+    SDL_GetRendererInfo(displayRenderer, &displayRendererInfo);
 
-	if ((displayRendererInfo.flags & SDL_RENDERER_ACCELERATED) == 0 ||
-		(displayRendererInfo.flags & SDL_RENDERER_TARGETTEXTURE) == 0)
-	{
-		fprintf( stderr, "Video init failed: %s\n", SDL_GetError());
-		Quit(1);
-	}
+    if ((displayRendererInfo.flags & SDL_RENDERER_ACCELERATED) == 0 ||
+        (displayRendererInfo.flags & SDL_RENDERER_TARGETTEXTURE) == 0)
+    {
+        fprintf( stderr, "Video init failed: %s\n", SDL_GetError());
+        Quit(1);
+    }
 
-	initGL();
-	resizeWindow(SCREEN_WIDTH, SCREEN_WIDTH);
-	load_resources();
+    initGL();
+    resizeWindow(SCREEN_WIDTH, SCREEN_WIDTH);
+    load_resources();
 
-	while (!done)
-	{
-		while (SDL_PollEvent(&event))
-		{
-			switch (event.type)
-			{
-				case SDL_KEYDOWN:
-					handleKeyPress(&event.key.keysym);
-				break;
-				case SDL_QUIT:
-					done = TRUE;
-				break;
-				default:
-				break;
-			}
-		}
+    while (!done)
+    {
+        while (SDL_PollEvent(&event))
+        {
+            switch (event.type)
+            {
+                case SDL_KEYDOWN:
+                    handleKeyPress(&event.key.keysym);
+                break;
+                case SDL_QUIT:
+                    done = TRUE;
+                break;
+                default:
+                break;
+            }
+        }
 
-		handleKeyDown();
-		render_map();
-		draw_screen();
-		SDL_GL_SwapWindow(displayWindow);
-	}
+        handleKeyDown();
+        render_map();
+        draw_screen();
+        SDL_GL_SwapWindow(displayWindow);
+    }
 
-	Quit(0);
-	return (0);
+    Quit(0);
+    return (0);
 }
 
 int initGL()
 {
-	glEnable( GL_TEXTURE_2D);
-	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glEnable (GL_BLEND);
-	glShadeModel(GL_SMOOTH);
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glEnable( GL_TEXTURE_2D);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glEnable (GL_BLEND);
+    glShadeModel(GL_SMOOTH);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
-	return 1;
+    return 1;
 }
 
 int resizeWindow(int width, int height)
 {
-	if (height == 0)
-		height = 1;
+    if (height == 0)
+        height = 1;
 
-	glViewport(0, 0, (GLsizei) width, (GLsizei) height);
-	glMatrixMode( GL_PROJECTION);
-	glLoadIdentity();
-	gluOrtho2D(0, 288, 288, 0);
-	glMatrixMode( GL_MODELVIEW);
-	glLoadIdentity();
+    glViewport(0, 0, (GLsizei) width, (GLsizei) height);
+    glMatrixMode( GL_PROJECTION);
+    glLoadIdentity();
+    gluOrtho2D(0, 288, 288, 0);
+    glMatrixMode( GL_MODELVIEW);
+    glLoadIdentity();
 
-	return ( TRUE);
+    return ( TRUE);
 }
 
 /* function to handle key press events */
 void handleKeyPress(SDL_Keysym *keysym)
 {
-	switch (keysym->sym)
-	{
-		case SDLK_ESCAPE:
-			/* ESC key was pressed */
-			Quit(0);
-		break;
-		case SDLK_F1:
-			/* F1 key was pressed
-			 * this toggles fullscreen mode
-			 */
-			//SDL_WM_ToggleFullScreen(surface);
-		break;
-		case SDLK_p:
-			if(current_map < NUM_MAPS)
-			{
-				unload_map();
-				current_map++;
-				load_map(current_map);
-			}
-		break;
-		case SDLK_o:
-			if(current_map > 0)
-			{
-				unload_map();
-				current_map--;
-				load_map(current_map);
-			}
-		break;
-		case SDLK_UP:
-			if(camera_y > 0)
-				camera_y--;
-		break;
-		case SDLK_DOWN:
-			if(camera_y < height - 9)
-				camera_y++;
-		break;
-		case SDLK_LEFT:
-			if(camera_x > 0)
-				camera_x--;
-		break;
-		case SDLK_RIGHT:
-			if(camera_x < width - 9)
-				camera_x++;
-		break;
-		default:
-		break;
-	}
-	return;
+    switch (keysym->sym)
+    {
+        case SDLK_ESCAPE:
+            /* ESC key was pressed */
+            Quit(0);
+        break;
+        case SDLK_F1:
+            /* F1 key was pressed
+             * this toggles fullscreen mode
+             */
+            //SDL_WM_ToggleFullScreen(surface);
+        break;
+        case SDLK_p:
+            if(current_map < NUM_MAPS)
+            {
+                unload_map();
+                current_map++;
+                load_map(current_map);
+            }
+        break;
+        case SDLK_o:
+            if(current_map > 0)
+            {
+                unload_map();
+                current_map--;
+                load_map(current_map);
+            }
+        break;
+        case SDLK_UP:
+            if(camera_y > 0)
+                camera_y--;
+        break;
+        case SDLK_DOWN:
+            if(camera_y < height - 9)
+                camera_y++;
+        break;
+        case SDLK_LEFT:
+            if(camera_x > 0)
+                camera_x--;
+        break;
+        case SDLK_RIGHT:
+            if(camera_x < width - 9)
+                camera_x++;
+        break;
+        default:
+        break;
+    }
+    return;
 }
 
 void handleKeyDown()
 {
-	const Uint8* keystate = SDL_GetKeyboardState(NULL);
+    const Uint8* keystate = SDL_GetKeyboardState(NULL);
 
-	//continuous-response keys
-	if (keystate[SDL_SCANCODE_LEFT])
-	{
+    //continuous-response keys
+    if (keystate[SDL_SCANCODE_LEFT])
+    {
 
-	}
-	if (keystate[SDL_SCANCODE_RIGHT])
-	{
+    }
+    if (keystate[SDL_SCANCODE_RIGHT])
+    {
 
-	}
-	if (keystate[SDL_SCANCODE_UP])
-	{
+    }
+    if (keystate[SDL_SCANCODE_UP])
+    {
 
-	}
-	if (keystate[SDL_SCANCODE_DOWN])
-	{
+    }
+    if (keystate[SDL_SCANCODE_DOWN])
+    {
 
-	}
+    }
 }
 
 void Quit(int returnCode)
 {
-	SDL_Quit();
-	exit(returnCode);
+    SDL_Quit();
+    exit(returnCode);
 }
 
 #endif

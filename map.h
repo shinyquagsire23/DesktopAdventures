@@ -30,66 +30,66 @@ enum area_types
 
 enum map_flags
 {
-	ENEMY_TERRITORY = 0x1,
-	FINAL_DESTINATION,
-	ITEM_FOR_ITEM,
-	FIND_SOMETHING_USEFUL_NPC,
-	ITEM_TO_PASS, //Seen in map 99
-	FROM_ANOTHER_MAP,
-	TO_ANOTHER_MAP,
-	INDOORS,
-	INTRO_SCREEN,
-	FINAL_ITEM,
-	MAP_START_AREA,
-	UNUSED_C,
-	VICTORY_SCREEN,
-	LOSS_SCREEN,
-	MAP_TO_ITEM_FOR_LOCK,
-	FIND_SOMETHING_USEFUL_DROP, //Or building?
-	FIND_SOMETHING_USEFUL_BUILDING,
-	FIND_THE_FORCE,
+    ENEMY_TERRITORY = 0x1,
+    FINAL_DESTINATION,
+    ITEM_FOR_ITEM,
+    FIND_SOMETHING_USEFUL_NPC,
+    ITEM_TO_PASS, //Seen in map 99
+    FROM_ANOTHER_MAP,
+    TO_ANOTHER_MAP,
+    INDOORS,
+    INTRO_SCREEN,
+    FINAL_ITEM,
+    MAP_START_AREA,
+    UNUSED_C,
+    VICTORY_SCREEN,
+    LOSS_SCREEN,
+    MAP_TO_ITEM_FOR_LOCK,
+    FIND_SOMETHING_USEFUL_DROP, //Or building?
+    FIND_SOMETHING_USEFUL_BUILDING,
+    FIND_THE_FORCE,
 };
 
 typedef struct izax_entry
 {
-	u16 entity_id;
-	u16 x;
-	u16 y;
-	u16 item;
-	u16 num_items;
-	u16 unk3;
-	u16 unk4[0x10];
+    u16 entity_id;
+    u16 x;
+    u16 y;
+    u16 item;
+    u16 num_items;
+    u16 unk3;
+    u16 unk4[0x10];
 } izax_entry;
 
 typedef struct izax_entry_2
 {
-	u16 item;
+    u16 item;
 } izax_entry_2;
 
 typedef struct izax_entry_3
 {
-	u16 item;
+    u16 item;
 } izax_entry_3;
 
 typedef struct izax_data_1
 {
-	u32 magic;
-	u32 size;
-	u16 pad;
-	u16 num_entries;
-	izax_entry entries[];
+    u32 magic;
+    u32 size;
+    u16 pad;
+    u16 num_entries;
+    izax_entry entries[];
 } izax_data_1;
 
 typedef struct izax_data_2
 {
-	u16 num_entries;
-	izax_entry_2 entries[];
+    u16 num_entries;
+    izax_entry_2 entries[];
 } izax_data_2;
 
 typedef struct izax_data_3
 {
-	u16 num_entries;
-	izax_entry_3 entries[];
+    u16 num_entries;
+    izax_entry_3 entries[];
 } izax_data_3;
 
 u32 camera_x;

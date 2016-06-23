@@ -22,23 +22,23 @@
 
 typedef struct ipuz_element
 {
-	u32 size;
-	u32 unk1;
-	u32 unk2;
-	u32 unk3;
-	u16 unk4;
-	u16 string1_len;
-	char string1[0x800];
-	u16 string2_len;
-	char string2[0x800];
-	u16 string3_len;
-	char string3[0x800];
-	u16 string4_len;
-	char string4[0x800];
-	u16 unused_len;
-	char unused[0x800];
-	u32 item_a;
-	u32 item_b;
+    u32 size;
+    u32 unk1;
+    u32 unk2;
+    u32 unk3;
+    u16 unk4;
+    u16 string1_len;
+    char string1[0x800];
+    u16 string2_len;
+    char string2[0x800];
+    u16 string3_len;
+    char string3[0x800];
+    u16 string4_len;
+    char string4[0x800];
+    u16 unused_len;
+    char unused[0x800];
+    u32 item_a;
+    u32 item_b;
 } ipuz_element;
 
 ipuz_element **ipuz_data;

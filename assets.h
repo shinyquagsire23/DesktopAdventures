@@ -34,13 +34,13 @@ void* current_file_pointer();
 
 typedef struct izon_data
 {
-	u32 izon_offset;
-	u32 izax_offset;
-	u32 izx2_offset;
-	u32 izx3_offset;
-	u32 izx4_offset;
-	u16 num_iacts;
-	u32 iact_offset;
+    u32 izon_offset;
+    u32 izax_offset;
+    u32 izx2_offset;
+    u32 izx3_offset;
+    u32 izx4_offset;
+    u16 num_iacts;
+    u32 iact_offset;
 } izon_data;
 
 //static const u8* yodesk_palette;

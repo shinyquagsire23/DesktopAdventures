@@ -22,30 +22,30 @@
 
 enum OBJ_TYPE
 {
-	QUEST_ITEM_SPOT,
-	SPAWN,
-	THE_FORCE,
-	VEHICLE_TO,
-	VEHICLE_FROM,
-	LOCATOR,
-	ITEM,
-	PUZZLE_NPC,
-	WEAPON,
-	DOOR_IN,
-	DOOR_OUT,
-	UNKNOWN,
-	LOCK,
-	TELEPORTER,
-	XWING_FROM,
-	XWING_TO,
+    QUEST_ITEM_SPOT,
+    SPAWN,
+    THE_FORCE,
+    VEHICLE_TO,
+    VEHICLE_FROM,
+    LOCATOR,
+    ITEM,
+    PUZZLE_NPC,
+    WEAPON,
+    DOOR_IN,
+    DOOR_OUT,
+    UNKNOWN,
+    LOCK,
+    TELEPORTER,
+    XWING_FROM,
+    XWING_TO,
 };
 
 typedef struct obj_info
 {
-	u32 type;
-	u16 x;
-	u16 y;
-	u16 unk1;
-	u16 arg;
+    u32 type;
+    u16 x;
+    u16 y;
+    u16 unk1;
+    u16 arg;
 } obj_info;
 
