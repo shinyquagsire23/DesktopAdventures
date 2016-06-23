@@ -11,27 +11,29 @@ include_directories(${SDL2_INCLUDE_DIR})
 find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
 
+include_directories(${DesktopAdventures_SOURCE_DIR}/src/include)
+
 set(SOURCE_FILES
-    pc/main.c
-    pc/main.h
-    assets.c
-    assets.h
-    character.c
-    character.h
-    input.h
-    map.c
-    map.h
-    objectinfo.h
-    palette.h
-    puzzle.c
-    puzzle.h
-    screen.c
-    screen.h
-    sound.h
-    tile.h
-    tname.h
-    useful.c
-    useful.h)
+    src/pc/main.c
+    src/pc/main.h
+    src/assets.c
+    src/include/assets.h
+    src/character.c
+    src/include/character.h
+    src/include/input.h
+    src/map.c
+    src/include/map.h
+    src/include/objectinfo.h
+    src/include/palette.h
+    src/puzzle.c
+    src/include/puzzle.h
+    src/screen.c
+    src/include/screen.h
+    src/include/sound.h
+    src/include/tile.h
+    src/include/tname.h
+    src/useful.c
+    src/include/useful.h)
 
 add_definitions(-DPC_BUILD)
 set( CMAKE_VERBOSE_MAKEFILE on )

@@ -24,11 +24,11 @@
 #include <GL/gl.h>
 #include <gfx_device.h>
 
-#include "../useful.h"
-#include "../assets.h"
-#include "../screen.h"
-#include "../input.h"
-#include "../map.h"
+#include "useful.h"
+#include "assets.h"
+#include "screen.h"
+#include "input.h"
+#include "map.h"
 
 u16 current_map = 0;
 

@@ -30,7 +30,7 @@ TARGET		:=	$(notdir $(CURDIR))
 BUILD		:=	build
 SOURCES		:=	. ..
 DATA		:=	data
-INCLUDES	:=	..
+INCLUDES	:=	.. ../include
 
 #---------------------------------------------------------------------------------
 # options for code generation

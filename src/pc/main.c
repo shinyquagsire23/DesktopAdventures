@@ -27,11 +27,11 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 
-#include "../useful.h"
-#include "../assets.h"
-#include "../screen.h"
-#include "../input.h"
-#include "../map.h"
+#include "useful.h"
+#include "assets.h"
+#include "screen.h"
+#include "input.h"
+#include "map.h"
 
 #define TRUE  1
 #define FALSE 0
@@ -41,7 +41,7 @@ int resizeWindow(int width, int height);
 
 SDL_Surface *surface;
 
-u16 current_map = 0;
+u16 current_map = 266-1;
 
 int main(int argc, char **argv)
 {
