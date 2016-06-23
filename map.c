@@ -212,7 +212,7 @@ void load_izax()
     seek(zone_data[id]->izx4_offset);
     izax_data_4 *fourth_section = (izax_data_4*)(current_file_pointer());
 
-    printf("Reading IZAX data, %u entries in first section, %u in the second and %u in the third. %s\n", first_section->num_entries, second_section->num_entries, third_section->num_entries, !fourth_section->is_intermediate ? "This map is either a seed item map or an ending item map!" : "");
+    printf("Reading IZAX data, %u entries in first section, %u in the second and %u in the third. %s %s\n", first_section->num_entries, second_section->num_entries, third_section->num_entries, !fourth_section->is_intermediate ? "This map is either a seed item map or an end item consuming map!" : "", first_section->has_item ? "This map has an item and advances the plot!" : "");
 
     for(int i = 0; i < first_section->num_entries; i++)
     {
