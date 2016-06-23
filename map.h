@@ -98,6 +98,7 @@ u16 width;
 u16 height;
 
 void load_map(u16 map_id);
+void load_izax(u32 location);
 void unload_map();
 void render_map();
 

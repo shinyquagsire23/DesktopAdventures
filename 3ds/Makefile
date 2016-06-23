@@ -30,7 +30,7 @@ TARGET		:=	$(notdir $(CURDIR))
 BUILD		:=	build
 SOURCES		:=	. ..
 DATA		:=	data
-INCLUDES	:=	.. caelina/include
+INCLUDES	:=	..
 
 #---------------------------------------------------------------------------------
 # options for code generation
@@ -48,7 +48,7 @@ CXXFLAGS	:= -std=c++11 -lstdc++ $(CFLAGS) -fno-rtti -fno-exceptions
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=3dsx.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 
-LIBS	:= ../caelina/lib/libcaelina.a -lctru -lm
+LIBS	:= -lcaelina -lGL -lctru -lm
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing

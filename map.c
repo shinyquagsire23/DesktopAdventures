@@ -20,9 +20,12 @@
 
 #include "map.h"
 
+#include <stdlib.h>
+#include <stdio.h>
 #include "tname.h"
 #include "screen.h"
 #include "assets.h"
+#include "useful.h"
 #include "character.h"
 #include "objectinfo.h"
 

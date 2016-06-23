@@ -162,9 +162,5 @@ int draw_screen()
 		glEnd();
 	}
 
-#ifdef PC_BUILD
-	SDL_GL_SwapBuffers();
-#elif _3DS
-#endif
 	return 1;
 }

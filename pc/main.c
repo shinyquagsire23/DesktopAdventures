@@ -26,7 +26,6 @@
 #include <stdlib.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include "SDL.h"
 
 #include "../useful.h"
 #include "../assets.h"
@@ -37,48 +36,29 @@
 #define TRUE  1
 #define FALSE 0
 
+int initGL();
+int resizeWindow(int width, int height);
+
 SDL_Surface *surface;
 
 u16 current_map = 0;
 
 int main(int argc, char **argv)
 {
-	int videoFlags;
 	int done = FALSE;
 	SDL_Event event;
-	const SDL_VideoInfo *videoInfo;
+	SDL_Init(SDL_INIT_VIDEO);
+	SDL_Window* displayWindow;
+	SDL_Renderer* displayRenderer;
+	SDL_RendererInfo displayRendererInfo;
 
-	if (SDL_Init( SDL_INIT_VIDEO) < 0)
+	SDL_CreateWindowAndRenderer(SCREEN_WIDTH, SCREEN_WIDTH, SDL_WINDOW_OPENGL, &displayWindow, &displayRenderer);
+	SDL_GetRendererInfo(displayRenderer, &displayRendererInfo);
+
+	if ((displayRendererInfo.flags & SDL_RENDERER_ACCELERATED) == 0 ||
+		(displayRendererInfo.flags & SDL_RENDERER_TARGETTEXTURE) == 0)
 	{
-		fprintf( stderr, "Video initialization failed: %s\n", SDL_GetError());
-		Quit(1);
-	}
-
-	videoInfo = SDL_GetVideoInfo();
-
-	if (!videoInfo)
-	{
-		fprintf( stderr, "Video query failed: %s\n", SDL_GetError());
-		Quit(1);
-	}
-
-	videoFlags = SDL_OPENGL | SDL_GL_DOUBLEBUFFER | SDL_HWPALETTE;
-
-	if (videoInfo->hw_available)
-		videoFlags |= SDL_HWSURFACE;
-	else
-		videoFlags |= SDL_SWSURFACE;
-
-	if (videoInfo->blit_hw)
-		videoFlags |= SDL_HWACCEL;
-
-	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-
-	surface = SDL_SetVideoMode( SCREEN_WIDTH, SCREEN_WIDTH, SCREEN_BPP, videoFlags);
-
-	if (!surface)
-	{
-		fprintf( stderr, "Video mode set failed: %s\n", SDL_GetError());
+		fprintf( stderr, "Video init failed: %s\n", SDL_GetError());
 		Quit(1);
 	}
 
@@ -106,20 +86,21 @@ int main(int argc, char **argv)
 		handleKeyDown();
 		render_map();
 		draw_screen();
+		SDL_GL_SwapWindow(displayWindow);
 	}
 
 	Quit(0);
 	return (0);
 }
 
-int initGL(GLvoid)
+int initGL()
 {
 	glEnable( GL_TEXTURE_2D);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glEnable (GL_BLEND);
-	glShadeModel( GL_SMOOTH);
+	glShadeModel(GL_SMOOTH);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
 	return 1;
@@ -141,7 +122,7 @@ int resizeWindow(int width, int height)
 }
 
 /* function to handle key press events */
-void handleKeyPress(SDL_keysym *keysym)
+void handleKeyPress(SDL_Keysym *keysym)
 {
 	switch (keysym->sym)
 	{
@@ -153,7 +134,7 @@ void handleKeyPress(SDL_keysym *keysym)
 			/* F1 key was pressed
 			 * this toggles fullscreen mode
 			 */
-			SDL_WM_ToggleFullScreen(surface);
+			//SDL_WM_ToggleFullScreen(surface);
 		break;
 		case SDLK_p:
 			if(current_map < NUM_MAPS)
@@ -195,22 +176,22 @@ void handleKeyPress(SDL_keysym *keysym)
 
 void handleKeyDown()
 {
-	Uint8* keystate = SDL_GetKeyState(NULL);
+	const Uint8* keystate = SDL_GetKeyboardState(NULL);
 
 	//continuous-response keys
-	if (keystate[SDLK_LEFT])
+	if (keystate[SDL_SCANCODE_LEFT])
 	{
 
 	}
-	if (keystate[SDLK_RIGHT])
+	if (keystate[SDL_SCANCODE_RIGHT])
 	{
 
 	}
-	if (keystate[SDLK_UP])
+	if (keystate[SDL_SCANCODE_UP])
 	{
 
 	}
-	if (keystate[SDLK_DOWN])
+	if (keystate[SDL_SCANCODE_DOWN])
 	{
 
 	}

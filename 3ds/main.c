@@ -36,10 +36,10 @@ int main()
 {
    gfxInitDefault();
    consoleInit(GFX_BOTTOM, NULL);
-   hidInit(NULL);
+   hidInit();
 
-   void* device = gfxCreateDevice(240, 400);
-   gfxMakeCurrent(device);
+   void* device_top = gfxCreateDevice(480, 400, 0);
+   gfxMakeCurrent(device_top);
 
    glEnable(GL_TEXTURE_2D);
    glEnable (GL_BLEND);
@@ -109,8 +109,8 @@ int main()
 	  render_map();
 	  draw_screen();
 
-      gfxFlush(gfxGetFramebuffer(GFX_TOP, GFX_LEFT, NULL, NULL));
-      gfxFlushBuffers();
+      gfxFlush(gfxGetFramebuffer(GFX_TOP, GFX_LEFT, NULL, NULL), 240, 400, GX_TRANSFER_FMT_RGB8);
+      
       gfxSwapBuffersGpu();
       gspWaitForVBlank();
    }

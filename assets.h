@@ -22,6 +22,8 @@
 #include <GL/gl.h>
 
 void load_resources();
+void load_texture(u16 width, u8 *data, u32 texture_num);
+
 void seek(u32 location);
 void seek_add(u32 amount);
 u32 get_location();

@@ -20,12 +20,13 @@
 
 #include "useful.h"
 
+#include <stdlib.h>
 #include <stdio.h>
 
-char* readFileToBytes(char* file, long *size)
+u8 *readFileToBytes(char* file, long *size)
 {
 	FILE *fileptr;
-	char *buffer;
+	u8 *buffer;
 	long filelen;
 
 	fileptr = fopen(file, "rb");
