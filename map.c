@@ -141,7 +141,7 @@ void load_map(u16 map_id)
 	}
 
 	if(is_yoda)
-		load_izax(zone_data[map_id]->izax_offset); //TODO: Indy IZAX is funky.
+		load_izax(); //TODO: Indy IZAX is funky.
 #ifndef _3DS
 	//read_iact(zone_data[map_id]->iact_offset, zone_data[map_id]->num_iacts); //Prints out a bunch of stuff... This kills the 3DS.
 #endif
@@ -183,9 +183,9 @@ void add_new_entity(u16 id, u16 x, u16 y, u16 frame, u16 item, u16 num_items)
 	entities[num_entities++] = e;
 }
 
-void load_izax(u32 location)
+void load_izax()
 {
-	seek(location);
+	seek(zone_data[id]->izax_offset);
 	izax_data_1 *first_section = (izax_data_1*)(current_file_pointer());
 
 	/* Possible items to be found and replaced in scripts
