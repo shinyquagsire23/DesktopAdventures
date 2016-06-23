@@ -272,10 +272,16 @@ void load_resources()
             printf("Found CHWP at %x\n", i);
 
             read_long(); //CHWP
-            i += read_long()+8-1;
+            u32 len = read_long();
+            i += len+8-1;
 
+            chwp_data = malloc(((len/sizeof(chwp_entry))+1) * sizeof(chwp_entry*));
+
+            u16 entry_index = 0;
             while(1)
             {
+                chwp_data[entry_index++] = (chwp_entry*)(current_file_pointer());
+
                 u16 id_1 = read_short();
                 u16 id_2 = read_short();
                 u16 idk = read_short();

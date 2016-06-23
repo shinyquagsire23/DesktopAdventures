@@ -43,7 +43,7 @@ enum ICHR_FLAGS
     ICHR_BEHAVIOR_PATROL  = 0x80000,
 };
 
-typedef struct char_data
+typedef struct ichr_data
 {
     u32 magic;
     u32 unk_1;
@@ -53,6 +53,13 @@ typedef struct char_data
     u32 unk_5;
     u16 frames[26];
 } ichr_data;
+
+typedef struct chwp_entry
+{
+    u16 id_1;
+    u16 id_2;
+    u16 unk;
+} chwp_entry;
 
 enum CHAR_FRAME
 {
@@ -108,3 +115,4 @@ enum CHAR_FRAME
 };
 
 ichr_data **char_data;
+chwp_entry **chwp_data;
