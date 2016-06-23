@@ -192,16 +192,27 @@ void load_izax()
      * (some scripts have filler spots for these items)
      * Probably used for generating the maps.
      */
-    seek_add(0xC + (first_section->num_entries * sizeof(izax_entry)));
+    seek(zone_data[id]->izx2_offset);
     izax_data_2 *second_section = (izax_data_2*)(current_file_pointer());
 
     /* Ending or transition to possible ending item(s). Usually takes one of a select
      * amount of items and turns it into a single ending item for a map.
      * Probably used to properly shape plot by end of the map generation.
      */
-    seek_add(0x2 + (second_section->num_entries * sizeof(izax_entry_2)));
+    seek(zone_data[id]->izx3_offset);
     izax_data_3 *third_section = (izax_data_3*)(current_file_pointer());
-    printf("Reading IZAX data, %u entries in first section, %u in the second and %u in the third\n", first_section->num_entries, second_section->num_entries, third_section->num_entries);
+
+    /*
+     * If the value in IZX4 is zero, this map is a static map used for
+     * entering or exiting a randomized set of zones using set items,
+     * ie Dagobah in Yoda Stories is set zero to start a plot, and
+     * the map where the last item is used is also set zero and requires
+     * a certain item.
+     */
+    seek(zone_data[id]->izx4_offset);
+    izax_data_4 *fourth_section = (izax_data_4*)(current_file_pointer());
+
+    printf("Reading IZAX data, %u entries in first section, %u in the second and %u in the third. %s\n", first_section->num_entries, second_section->num_entries, third_section->num_entries, !fourth_section->is_intermediate ? "This map is either a seed item map or an ending item map!" : "");
 
     for(int i = 0; i < first_section->num_entries; i++)
     {

@@ -82,15 +82,26 @@ typedef struct izax_data_1
 
 typedef struct izax_data_2
 {
+    u32 magic;
+    u32 size;
     u16 num_entries;
     izax_entry_2 entries[];
 } izax_data_2;
 
 typedef struct izax_data_3
 {
+    u32 magic;
+    u32 size;
     u16 num_entries;
     izax_entry_3 entries[];
 } izax_data_3;
+
+typedef struct izax_data_4
+{
+    u32 magic;
+    u32 size;
+    u16 is_intermediate;
+} izax_data_4;
 
 u32 camera_x;
 u32 camera_y;
