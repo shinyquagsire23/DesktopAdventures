@@ -61,6 +61,12 @@ typedef struct chwp_entry
     u16 unk;
 } chwp_entry;
 
+typedef struct caux_entry
+{
+    u16 id_1;
+    u16 damage_health;
+} caux_entry;
+
 enum CHAR_FRAME
 {
     BLNK1 = 0,
@@ -116,3 +122,4 @@ enum CHAR_FRAME
 
 ichr_data **char_data;
 chwp_entry **chwp_data;
+caux_entry **caux_data;

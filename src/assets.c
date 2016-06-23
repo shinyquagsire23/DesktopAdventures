@@ -300,7 +300,27 @@ void load_resources()
             printf("Found CAUX at %x\n", i);
 
             read_long(); //CHWP
-            i += read_long()+8-1;
+            u32 len = read_long();
+            i += len+8-1;
+
+            caux_data = malloc(((len/sizeof(caux_entry))+1) * sizeof(caux_entry*));
+
+            u16 entry_index = 0;
+            while(1)
+            {
+                caux_data[entry_index++] = (caux_entry*)(current_file_pointer());
+
+                u16 id_1 = read_short();
+                u16 idk = read_short();
+
+                if(id_1 == 0xFFFF)
+                    break;
+
+                if(char_data[id_1]->flags & ICHR_IS_WEAPON)
+                    printf("%-16s is a weapon,  damage: %x\n", char_data[id_1]->name, idk);
+                else
+                    printf("%-16s not a weapon, health: %x\n", char_data[id_1]->name, idk);
+            }
         }
         else if (!strncmp(((void*)yodesk + i), "ANAM", 4)) //Tile names
         {

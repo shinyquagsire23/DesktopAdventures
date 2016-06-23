@@ -23,6 +23,7 @@ The majority of the work needed in this project is reverse engineering and the i
 - CHAR
   - ICHA
 - CHWP
+- CAUX
 - TNAM
 
 The following currently need implementation and/or research:
@@ -33,7 +34,6 @@ The following currently need implementation and/or research:
   - IACT (see SCRIPTS.md)
 - PUZ2 (puzzle-specific data)
   - IPUZ (currently has reading implemented, needs more research)
-- CAUX
 - ANAM (seems to have a lot of script command names? Looks to be debugging info for scripts, actually has a lot of fragments of leaked/overflowed command names seen in Yoda Stories. Indy only.)
 - PNAM (Indy only)
 - ZNAM (Indy only)
