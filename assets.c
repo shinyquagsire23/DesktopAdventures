@@ -112,7 +112,7 @@ void load_resources()
         }
         else if(!strncmp(((void*)yodesk + i), "IZAX", 4)) //IZAX
         {
-            printf("Found IZAX at %x\n", i);
+            //printf("Found IZAX at %x\n", i);
             zone_data[izon_count-1]->izax_offset = i;
 
             read_long(); //IZAX
@@ -120,7 +120,7 @@ void load_resources()
         }
         else if(!strncmp(((void*)yodesk + i), "IZX2", 4)) //IZX2
         {
-            printf("Found IZX2 at %x\n", i);
+            //printf("Found IZX2 at %x\n", i);
             zone_data[izon_count-1]->izx2_offset = i;
 
             read_long(); //IZX2
@@ -128,7 +128,7 @@ void load_resources()
         }
         else if(!strncmp(((void*)yodesk + i), "IZX3", 4)) //IZX3
         {
-            printf("Found IZX3 at %x\n", i);
+            //printf("Found IZX3 at %x\n", i);
             zone_data[izon_count-1]->izx3_offset = i;
 
             read_long(); //IZX3
@@ -136,7 +136,7 @@ void load_resources()
         }
         else if(!strncmp(((void*)yodesk + i), "IZX4", 4)) //IZX4
         {
-            printf("Found IZX4 at %x\n", i);
+            //printf("Found IZX4 at %x\n", i);
             zone_data[izon_count-1]->izx4_offset = i;
 
             read_long(); //IZX4
@@ -151,10 +151,7 @@ void load_resources()
                 read_iact_stats((u16)(izon_count-1), zone_data[izon_count-1]->iact_offset, zone_data[izon_count-1]->num_iacts);
                 printf("Found %u IACT%s at %x\n", zone_data[izon_count-1]->num_iacts, (zone_data[izon_count-1]->num_iacts > 1 && zone_data[izon_count-1]->num_iacts != 0 ? "s" : ""), i);
             }
-            else
-            {
-                printf("Found IACT at %x\n", i);
-            }
+
             seek(i);
             read_long();
             i += read_long()+0x8-1;
@@ -256,8 +253,7 @@ void load_resources()
         else if(!strncmp(((void*)yodesk + i), "CHAR", 4) && strncmp(((void*)yodesk + i), "CHARGE", 6))
         {
             read_long(); //"CHAR"
-            u16 size = read_short();
-            read_short();
+            u32 size = read_long();
             printf("Found CHAR at %x, size %x\n", i, size);
 
             char_data = malloc((size / 0x54) * sizeof(char*));
