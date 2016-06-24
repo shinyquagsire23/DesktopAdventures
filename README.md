@@ -19,6 +19,8 @@ The majority of the work needed in this project is reverse engineering and the i
 - ZONE
   - IZON
   - IZAX
+  - IZX2
+  - IZX3
   - IZX4
 - CHAR
   - ICHA
@@ -29,8 +31,6 @@ The majority of the work needed in this project is reverse engineering and the i
 The following currently need implementation and/or research:
 
 - ZONE
-  - IZX2 (currently reading, needs research)
-  - IZX3 (currently reading, needs research)
   - IACT (see SCRIPTS.md)
 - PUZ2 (puzzle-specific data)
   - IPUZ (currently has reading implemented, needs more research)
