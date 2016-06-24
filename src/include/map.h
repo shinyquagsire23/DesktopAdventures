@@ -75,7 +75,7 @@ typedef struct izax_data_1
 {
     u32 magic;
     u32 size;
-    u16 has_item;
+    u16 mission_specific;
     u16 num_entries;
     izax_entry entries[];
 } izax_data_1;
