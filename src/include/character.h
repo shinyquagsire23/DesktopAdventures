@@ -58,13 +58,13 @@ typedef struct chwp_entry
 {
     u16 id_1;
     u16 id_2;
-    u16 unk;
+    u16 health;
 } chwp_entry;
 
 typedef struct caux_entry
 {
     u16 id_1;
-    u16 damage_health;
+    u16 damage;
 } caux_entry;
 
 enum CHAR_FRAME

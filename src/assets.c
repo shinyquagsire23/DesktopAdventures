@@ -284,15 +284,15 @@ void load_resources()
 
                 u16 id_1 = read_short();
                 u16 id_2 = read_short();
-                u16 idk = read_short();
+                u16 health = read_short();
 
                 if(id_1 == 0xFFFF)
                     break;
 
                 if(char_data[id_1]->flags & ICHR_IS_WEAPON)
-                    printf("%-16s is a weapon with sound %-14s, unk %x\n", char_data[id_1]->name, sound_files[id_2], idk);
+                    printf("%-16s is a weapon with sound %-14s, health %x?\n", char_data[id_1]->name, sound_files[id_2], health);
                 else
-                    printf("%-16s gets weapon %-25s, unk %x\n", char_data[id_1]->name, id_2 == 0xFFFF ? "none" : char_data[id_2]->name, idk);
+                    printf("%-16s gets weapon %-25s, health %x\n", char_data[id_1]->name, id_2 == 0xFFFF ? "none" : char_data[id_2]->name, health);
             }
         }
         else if(!strncmp(((void*)yodesk + i), "CAUX", 4))
@@ -311,15 +311,15 @@ void load_resources()
                 caux_data[entry_index++] = (caux_entry*)(current_file_pointer());
 
                 u16 id_1 = read_short();
-                u16 idk = read_short();
+                u16 damage = read_short();
 
                 if(id_1 == 0xFFFF)
                     break;
 
                 if(char_data[id_1]->flags & ICHR_IS_WEAPON)
-                    printf("%-16s is a weapon,  damage: %x\n", char_data[id_1]->name, idk);
+                    printf("%-16s is a weapon,          damage: %x\n", char_data[id_1]->name, damage);
                 else
-                    printf("%-16s not a weapon, health: %x\n", char_data[id_1]->name, idk);
+                    printf("%-16s not a weapon, ambient damage: %x\n", char_data[id_1]->name, damage);
             }
         }
         else if (!strncmp(((void*)yodesk + i), "ANAM", 4)) //Tile names
