@@ -64,89 +64,85 @@ void load_resources()
     for(u32 i = 0; i < yodesk_size; i++)
     {
         seek(i);
-        if(!strncmp(((void*)yodesk + i), "VERS", 4)) //VERSion
+        char *tag = get_strn(4);
+        if(!strncmp(tag, "VERS", 4)) //VERSion
         {
-            printf("Found VERS at %x, version number %x\n", i, *(u32*)(yodesk + i + 4));
+            printf("Found VERS at %x, version number %x\n", i, read_long());
             i+=8-1;
         }
-        else if(!strncmp(((void*)yodesk + i), "STUP", 4)) //STartUP Graphic, uses yodesk_palette
+        else if(!strncmp(tag, "STUP", 4)) //STartUP Graphic, uses yodesk_palette
         {
             printf("Found STUP at %x\n", i);
-            load_texture(288, yodesk+i+8, 0x2000); //Load Startup Texture past the last tile
+            load_texture(288, current_file_pointer()+sizeof(u32), 0x2000); //Load Startup Texture past the last tile
 
-            read_long(); //STUP
-            i += read_long()+8-1;
+            i += read_long()+sizeof(u64)-1;
         }
-        else if(!strncmp(((void*)yodesk + i), "ZONE", 4)) //ZONEs (maps)
+        else if(!strncmp(tag, "ZONE", 4)) //ZONEs (maps)
         {
             printf("Found ZONE at %x\n", i);
-            read_long(); i += 4; //"ZONE"
 
             u32 ZONE_LENGTH;
 
             if(is_yoda)
             {
-                NUM_MAPS = read_short(); i += 2;
-                u16 unknown = read_short(); i += 2;
+                NUM_MAPS = read_short();
+                u16 unknown = read_short();
                 ZONE_LENGTH = read_long();
             }
             else
             {
-                ZONE_LENGTH = read_long(); i += 4;
-                NUM_MAPS = read_short(); i += 2;
+                ZONE_LENGTH = read_long();
+                NUM_MAPS = read_short();
             }
             zone_data = malloc(NUM_MAPS * sizeof(char*));
             for(int j = 0; j < NUM_MAPS; j++)
                 zone_data[j] = (izon_data*)calloc(sizeof(izon_data), sizeof(u8));
 
             printf("%i maps in DAT\n", NUM_MAPS);
+
+            i += sizeof(u32)+sizeof(u32)+sizeof(u32)+sizeof(u16)-1;
         }
-        else if(!strncmp(((void*)yodesk + i), "IZON", 4)) //Internal ZONe? (map)
+        else if(!strncmp(tag, "IZON", 4)) //Internal ZONe? (map)
         {
             izon_count++;
             printf("Found IZON %i at %x\n", izon_count-1, i);
             zone_data[izon_count-1]->izon_offset = i;
 
-            read_long(); //IZON
             i += read_long()-1; //len
         }
-        else if(!strncmp(((void*)yodesk + i), "IZAX", 4)) //IZAX
+        else if(!strncmp(tag, "IZAX", 4)) //IZAX
         {
             //printf("Found IZAX at %x\n", i);
             zone_data[izon_count-1]->izax_offset = i;
 
-            read_long(); //IZAX
             i += read_long()-1;
         }
-        else if(!strncmp(((void*)yodesk + i), "IZX2", 4)) //IZX2
+        else if(!strncmp(tag, "IZX2", 4)) //IZX2
         {
             //printf("Found IZX2 at %x\n", i);
             zone_data[izon_count-1]->izx2_offset = i;
 
-            read_long(); //IZX2
             i += read_long()-1;
         }
-        else if(!strncmp(((void*)yodesk + i), "IZX3", 4)) //IZX3
+        else if(!strncmp(tag, "IZX3", 4)) //IZX3
         {
             //printf("Found IZX3 at %x\n", i);
             zone_data[izon_count-1]->izx3_offset = i;
 
-            read_long(); //IZX3
             i += read_long()-1;
         }
-        else if(!strncmp(((void*)yodesk + i), "IZX4", 4)) //IZX4
+        else if(!strncmp(tag, "IZX4", 4)) //IZX4
         {
             //printf("Found IZX4 at %x\n", i);
             zone_data[izon_count-1]->izx4_offset = i;
 
-            read_long(); //IZX4
             i += read_long()-1;
         }
-        else if(!strncmp(((void*)yodesk + i), "IACT", 4)) //IACT
+        else if(!strncmp(tag, "IACT", 4)) //IACT
         {
             if(zone_data[izon_count-1]->iact_offset == 0)
             {
-                zone_data[izon_count-1]->num_iacts = *(u16*)(yodesk + i - 2);
+                zone_data[izon_count-1]->num_iacts = read_prefix();
                 zone_data[izon_count-1]->iact_offset = i;
                 read_iact_stats((u16)(izon_count-1), zone_data[izon_count-1]->iact_offset, zone_data[izon_count-1]->num_iacts);
                 printf("Found %u IACT%s at %x\n", zone_data[izon_count-1]->num_iacts, (zone_data[izon_count-1]->num_iacts > 1 && zone_data[izon_count-1]->num_iacts != 0 ? "s" : ""), i);
@@ -156,10 +152,9 @@ void load_resources()
             read_long();
             i += read_long()+0x8-1;
         }
-        else if(!strncmp(((void*)yodesk + i), "SNDS", 4)) //SouNDS
+        else if(!strncmp(tag, "SNDS", 4)) //SouNDS
         {
             printf("Found SNDS at %x\n", i);
-            read_long(); //SNDS
 
             u32 length = read_long();
             u16 unk1 = read_short();
@@ -170,43 +165,43 @@ void load_resources()
 
             for(int j = 0; (i - seed) < (length - 2); j++)
             {
-                u32 str_length = read_short(); i += 2;
-                sound_files[j] = (void*)yodesk + i;
-                //printf("%x: %x %s\n", j, str_length, sound_files[j]);
-                seek_add(str_length); i += str_length;
+                u32 str_length = read_short();
+                sound_files[j] = get_strn(str_length);
+                printf("%x: %x %s\n", j, str_length, sound_files[j]);
+                i += str_length + 2;
             }
             i -= 1;
         }
-        else if(!strncmp(((void*)yodesk + i), "TILE", 4) && strncmp(((void*)yodesk + i), "TILEEDI", 7)) //TILEs (graphics)
+        else if(!strncmp(tag, "TILE", 4)) //TILEs (graphics)
         {
             printf("Found TILE at %x\n", i);
-            read_long(); i+=4; //Section length + "TILE"
+            i+=4; //Section length + "TILE"
             int section_length = read_long(); i+=4;
             printf("0x%x tiles in TILES\n", section_length / ((32*32)+4));
             for(u32 j = 0; j < section_length / ((32*32)+4); j++)
             {
                 if(j % 0x100 == 0 || j == (section_length / ((32*32)+4))-1)
                     printf("%x of %x...\n", j, section_length / ((32*32)+4));
-                u32 tile_stuff = *(u32*)(yodesk + i);
+
+                u32 tile_stuff = read_long();
                 tile_metadata[j] = tile_stuff;
-                load_texture(32, yodesk+i+4+(j * ((32*32) + 4)), j);
+                load_texture(32, current_file_pointer(), j);
+                seek_add(32*32*sizeof(u8));
             }
             i += section_length-1;
         }
-        else if(!strncmp(((void*)yodesk + i), "PUZ2", 4)) //Puzzle configurations maybe?
+        else if(!strncmp(tag, "PUZ2", 4)) //Puzzle configurations maybe?
         {
             printf("Found PUZ2 at %x\n", i);
-            read_long(); //PUZ2
             u32 length = read_long();
             ipuz_data = malloc(512 * sizeof(char*));
 
             i += 4+4+2-1;
         }
-        else if(!strncmp(((void*)yodesk + i), "IPUZ", 4)) //Puzzle string
+        else if(!strncmp(tag, "IPUZ", 4)) //Puzzle string
         {
             printf("Found IPUZ at %x\n", i);
-            u16 id = *(u16*)(yodesk + i - 2);
-            read_long(); //IPUZ
+            u16 id = read_prefix();
 
             ipuz_element *e = malloc(sizeof(ipuz_element));
             e->size = read_long();
@@ -250,9 +245,8 @@ void load_resources()
 
             i += e->size+0xA-1;
         }
-        else if(!strncmp(((void*)yodesk + i), "CHAR", 4) && strncmp(((void*)yodesk + i), "CHARGE", 6))
+        else if(!strncmp(tag, "CHAR", 4))
         {
-            read_long(); //"CHAR"
             u32 size = read_long();
             printf("Found CHAR at %x, size %x\n", i, size);
 
@@ -267,11 +261,10 @@ void load_resources()
             }
             i += size + 8-1;
         }
-        else if(!strncmp(((void*)yodesk + i), "CHWP", 4))
+        else if(!strncmp(tag, "CHWP", 4))
         {
             printf("Found CHWP at %x\n", i);
 
-            read_long(); //CHWP
             u32 len = read_long();
             i += len+8-1;
 
@@ -295,11 +288,10 @@ void load_resources()
                     printf("%-16s gets weapon %-25s, health %x\n", char_data[id_1]->name, id_2 == 0xFFFF ? "none" : char_data[id_2]->name, health);
             }
         }
-        else if(!strncmp(((void*)yodesk + i), "CAUX", 4))
+        else if(!strncmp(tag, "CAUX", 4))
         {
             printf("Found CAUX at %x\n", i);
 
-            read_long(); //CHWP
             u32 len = read_long();
             i += len+8-1;
 
@@ -322,19 +314,18 @@ void load_resources()
                     printf("%-16s not a weapon, ambient damage: %x\n", char_data[id_1]->name, damage);
             }
         }
-        else if (!strncmp(((void*)yodesk + i), "ANAM", 4)) //Tile names
+        else if (!strncmp(tag, "ANAM", 4)) //Tile names
         {
             printf("Found ANAM at %x\n", i);
         }
-        else if (!strncmp(((void*)yodesk + i), "PNAM", 4)) //Tile names
+        else if (!strncmp(tag, "PNAM", 4)) //Tile names
         {
             printf("Found PNAM at %x\n", i);
         }
-        else if(!strncmp(((void*)yodesk + i), "TNAM", 4)) //Tile names
+        else if(!strncmp(tag, "TNAM", 4)) //Tile names
         {
             printf("Found TNAM at %x\n", i);
 
-            read_long(); //"TNAM"
             u32 size = read_long();
             i += size+8-1;
 
@@ -362,7 +353,7 @@ void load_resources()
                     seek_add(16);
             }
         }
-        else if(!strncmp(((void*)yodesk + i), "ENDF", 4))
+        else if(!strncmp(tag, "ENDF", 4))
         {
             i += 8;
             //print_iact_stats();
@@ -426,9 +417,27 @@ void seek_add(u32 amount)
     yodesk_seek += amount;
 }
 
+void seek_sub(u32 amount)
+{
+    yodesk_seek -= amount;
+}
+
 u32 get_location()
 {
     return yodesk_seek;
+}
+
+char *get_str()
+{
+    u32 len = strlen((char*)(yodesk + yodesk_seek));
+    yodesk_seek += len;
+    return (char*)(yodesk + yodesk_seek - len);
+}
+
+char *get_strn(size_t len)
+{
+    yodesk_seek += len;
+    return (char*)(yodesk + yodesk_seek - len);
 }
 
 u32 read_long()
@@ -443,6 +452,15 @@ u16 read_short()
     u16 value = *(u16*)(yodesk + yodesk_seek);
     yodesk_seek += 2;
     return value;
+}
+
+u16 read_prefix()
+{
+    seek_sub(sizeof(u32)+sizeof(u16));
+    u16 prefix = read_short();
+    seek_add(sizeof(u32));
+
+    return prefix;
 }
 
 u8 read_byte()

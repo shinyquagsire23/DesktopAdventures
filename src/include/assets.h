@@ -26,9 +26,13 @@ void load_texture(u16 width, u8 *data, u32 texture_num);
 
 void seek(u32 location);
 void seek_add(u32 amount);
+void seek_sub(u32 amount);
 u32 get_location();
+char *get_str();
+char *get_strn(size_t len);
 u32 read_long();
 u16 read_short();
+u16 read_prefix();
 u8 read_byte();
 void* current_file_pointer();
 
