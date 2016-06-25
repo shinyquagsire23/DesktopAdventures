@@ -121,4 +121,9 @@ int main()
    return 0;
 }
 
+void draw_STUP()
+{
+    //TODO
+}
+
 #endif

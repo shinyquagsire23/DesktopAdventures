@@ -24,6 +24,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
+#include <unistd.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
 
@@ -39,18 +41,17 @@
 int initGL();
 int resizeWindow(int width, int height);
 
-SDL_Surface *surface;
+SDL_Window* displayWindow;
+SDL_Renderer* displayRenderer;
+SDL_RendererInfo displayRendererInfo;
 
-u16 current_map = 266-1;
+u16 current_map = 0;
 
 int main(int argc, char **argv)
 {
     int done = FALSE;
     SDL_Event event;
     SDL_Init(SDL_INIT_VIDEO);
-    SDL_Window* displayWindow;
-    SDL_Renderer* displayRenderer;
-    SDL_RendererInfo displayRendererInfo;
 
     SDL_CreateWindowAndRenderer(SCREEN_WIDTH, SCREEN_WIDTH, SDL_WINDOW_OPENGL, &displayWindow, &displayRenderer);
     SDL_GetRendererInfo(displayRenderer, &displayRendererInfo);
@@ -66,6 +67,8 @@ int main(int argc, char **argv)
     resizeWindow(SCREEN_WIDTH, SCREEN_WIDTH);
     load_resources();
 
+    clock_t last_time = clock();
+    double test = 0.0;
     while (!done)
     {
         while (SDL_PollEvent(&event))
@@ -201,6 +204,12 @@ void Quit(int returnCode)
 {
     SDL_Quit();
     exit(returnCode);
+}
+
+void draw_STUP()
+{
+    draw_screen();
+    SDL_GL_SwapWindow(displayWindow);
 }
 
 #endif

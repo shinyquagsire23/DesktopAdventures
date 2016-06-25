@@ -51,97 +51,6 @@ int draw_screen()
     glTranslatef((400 - SCREEN_WIDTH) / 2, (240 - SCREEN_WIDTH) / 2, 0.0f); //Center screen
 #endif
 
-    for(int y = 0; y < SCREEN_TILE_WIDTH; y++)
-    {
-        for (int x = 0; x < SCREEN_TILE_WIDTH; x++)
-        {
-            if (tiles_low[(y * SCREEN_TILE_WIDTH) + x] != 0xFFFF)
-            {
-                glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-                glBindTexture(GL_TEXTURE_2D, texture[tiles_low[(y * 9) + x]]);
-                glBegin(GL_QUADS);
-                {
-                    glTexCoord2f(1.0f, 1.0f);
-                    glVertex2f(32 * x, 32 * y);
-
-                    glTexCoord2f(0.0f, 1.0f);
-                    glVertex2f((32 * x) + 32, 32 * y);
-
-                    glTexCoord2f(0.0f, 0.0f);
-                    glVertex2f((32 * x) + 32, (32 * y) + 32);
-
-                    glTexCoord2f(1.0f, 0.0f);
-                    glVertex2f(32 * x, (32 * y) + 32);
-                }
-                glEnd();
-            }
-
-            if (tiles_middle[(y * SCREEN_TILE_WIDTH) + x] != 0xFFFF)
-            {
-                glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-                glBindTexture(GL_TEXTURE_2D, texture[tiles_middle[(y * 9) + x]]);
-                glBegin(GL_QUADS);
-                {
-                    glTexCoord2f(1.0f, 1.0f);
-                    glVertex2f(32 * x, 32 * y);
-
-                    glTexCoord2f(0.0f, 1.0f);
-                    glVertex2f((32 * x) + 32, 32 * y);
-
-                    glTexCoord2f(0.0f, 0.0f);
-                    glVertex2f((32 * x) + 32, (32 * y) + 32);
-
-                    glTexCoord2f(1.0f, 0.0f);
-                    glVertex2f(32 * x, (32 * y) + 32);
-                }
-                glEnd();
-            }
-
-            if (tiles_high[(y * SCREEN_TILE_WIDTH) + x] != 0xFFFF)
-            {
-                glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-                glBindTexture(GL_TEXTURE_2D, texture[tiles_high[(y * 9) + x]]);
-                glBegin(GL_QUADS);
-                {
-                    glTexCoord2f(1.0f, 1.0f);
-                    glVertex2f(32 * x, 32 * y);
-
-                    glTexCoord2f(0.0f, 1.0f);
-                    glVertex2f((32 * x) + 32, 32 * y);
-
-                    glTexCoord2f(0.0f, 0.0f);
-                    glVertex2f((32 * x) + 32, (32 * y) + 32);
-
-                    glTexCoord2f(1.0f, 0.0f);
-                    glVertex2f(32 * x, (32 * y) + 32);
-                }
-                glEnd();
-            }
-
-            if (tiles_overlay[(y * SCREEN_TILE_WIDTH) + x] != 0xFFFF)
-            {
-                glColor4f(1.0f, 1.0f, 1.0f, 0.6f);
-                glBindTexture(GL_TEXTURE_2D, texture[tiles_overlay[(y * 9) + x]]);
-                float scale = 1.0f;
-                glBegin(GL_QUADS);
-                {
-                    glTexCoord2f(1.0f, 1.0f);
-                    glVertex2f((32 * x), (32 * y));
-
-                    glTexCoord2f(0.0f, 1.0f);
-                    glVertex2f((32 * x) + (32 * scale), (32 * y));
-
-                    glTexCoord2f(0.0f, 0.0f);
-                    glVertex2f((32 * x) + (32 * scale), (32 * y) + (32 * scale));
-
-                    glTexCoord2f(1.0f, 0.0f);
-                    glVertex2f((32 * x), (32 * y) + (32 * scale));
-                }
-                glEnd();
-            }
-        }
-    }
-
     if (ASSETS_LOADING)
     {
         glBindTexture(GL_TEXTURE_2D, texture[0x2000]);
@@ -160,6 +69,93 @@ int draw_screen()
             glVertex2f(0, 288);
         }
         glEnd();
+    }
+    else
+    {
+        for (int y = 0; y < SCREEN_TILE_WIDTH; y++) {
+            for (int x = 0; x < SCREEN_TILE_WIDTH; x++) {
+                if (tiles_low[(y * SCREEN_TILE_WIDTH) + x] != 0xFFFF) {
+                    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+                    glBindTexture(GL_TEXTURE_2D, texture[tiles_low[(y * 9) + x]]);
+                    glBegin(GL_QUADS);
+                    {
+                        glTexCoord2f(1.0f, 1.0f);
+                        glVertex2f(32 * x, 32 * y);
+
+                        glTexCoord2f(0.0f, 1.0f);
+                        glVertex2f((32 * x) + 32, 32 * y);
+
+                        glTexCoord2f(0.0f, 0.0f);
+                        glVertex2f((32 * x) + 32, (32 * y) + 32);
+
+                        glTexCoord2f(1.0f, 0.0f);
+                        glVertex2f(32 * x, (32 * y) + 32);
+                    }
+                    glEnd();
+                }
+
+                if (tiles_middle[(y * SCREEN_TILE_WIDTH) + x] != 0xFFFF) {
+                    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+                    glBindTexture(GL_TEXTURE_2D, texture[tiles_middle[(y * 9) + x]]);
+                    glBegin(GL_QUADS);
+                    {
+                        glTexCoord2f(1.0f, 1.0f);
+                        glVertex2f(32 * x, 32 * y);
+
+                        glTexCoord2f(0.0f, 1.0f);
+                        glVertex2f((32 * x) + 32, 32 * y);
+
+                        glTexCoord2f(0.0f, 0.0f);
+                        glVertex2f((32 * x) + 32, (32 * y) + 32);
+
+                        glTexCoord2f(1.0f, 0.0f);
+                        glVertex2f(32 * x, (32 * y) + 32);
+                    }
+                    glEnd();
+                }
+
+                if (tiles_high[(y * SCREEN_TILE_WIDTH) + x] != 0xFFFF) {
+                    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+                    glBindTexture(GL_TEXTURE_2D, texture[tiles_high[(y * 9) + x]]);
+                    glBegin(GL_QUADS);
+                    {
+                        glTexCoord2f(1.0f, 1.0f);
+                        glVertex2f(32 * x, 32 * y);
+
+                        glTexCoord2f(0.0f, 1.0f);
+                        glVertex2f((32 * x) + 32, 32 * y);
+
+                        glTexCoord2f(0.0f, 0.0f);
+                        glVertex2f((32 * x) + 32, (32 * y) + 32);
+
+                        glTexCoord2f(1.0f, 0.0f);
+                        glVertex2f(32 * x, (32 * y) + 32);
+                    }
+                    glEnd();
+                }
+
+                if (tiles_overlay[(y * SCREEN_TILE_WIDTH) + x] != 0xFFFF) {
+                    glColor4f(1.0f, 1.0f, 1.0f, 0.6f);
+                    glBindTexture(GL_TEXTURE_2D, texture[tiles_overlay[(y * 9) + x]]);
+                    float scale = 1.0f;
+                    glBegin(GL_QUADS);
+                    {
+                        glTexCoord2f(1.0f, 1.0f);
+                        glVertex2f((32 * x), (32 * y));
+
+                        glTexCoord2f(0.0f, 1.0f);
+                        glVertex2f((32 * x) + (32 * scale), (32 * y));
+
+                        glTexCoord2f(0.0f, 0.0f);
+                        glVertex2f((32 * x) + (32 * scale), (32 * y) + (32 * scale));
+
+                        glTexCoord2f(1.0f, 0.0f);
+                        glVertex2f((32 * x), (32 * y) + (32 * scale));
+                    }
+                    glEnd();
+                }
+            }
+        }
     }
 
     return 1;

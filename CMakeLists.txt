@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.4)
 project(DesktopAdventures)
 
+set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 file(MAKE_DIRECTORY ${DesktopAdventures_SOURCE_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${DesktopAdventures_SOURCE_DIR}/bin)
@@ -12,6 +13,7 @@ find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
 
 include_directories(${DesktopAdventures_SOURCE_DIR}/src/include)
+include_directories(${DesktopAdventures_SOURCE_DIR}/src/pc/)
 
 set(SOURCE_FILES
     src/pc/main.c
@@ -33,7 +35,7 @@ set(SOURCE_FILES
     src/include/tile.h
     src/include/tname.h
     src/useful.c
-    src/include/useful.h)
+    src/include/useful.h src/3ds/main.h)
 
 add_definitions(-DPC_BUILD)
 set( CMAKE_VERBOSE_MAKEFILE on )
