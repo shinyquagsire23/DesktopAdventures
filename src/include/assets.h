@@ -44,6 +44,7 @@ typedef struct izon_data
     u32 izx3_offset;
     u32 izx4_offset;
     u16 num_iacts;
+    u32 htsp_offset;
     u32 iact_offset;
 } izon_data;
 
