@@ -90,8 +90,11 @@ int main(int argc, char **argv)
         }
 
         handleKeyDown();
+
+        update_world(delta);
+
         render_map();
-        draw_screen();
+        draw_screen(delta);
         SDL_GL_SwapWindow(displayWindow);
     }
 
@@ -158,22 +161,6 @@ void handleKeyPress(SDL_Keysym *keysym)
                 load_map(current_map);
             }
         break;
-        case SDLK_UP:
-            if(camera_y > 0)
-                camera_y--;
-        break;
-        case SDLK_DOWN:
-            if(camera_y < height - 9)
-                camera_y++;
-        break;
-        case SDLK_LEFT:
-            if(camera_x > 0)
-                camera_x--;
-        break;
-        case SDLK_RIGHT:
-            if(camera_x < width - 9)
-                camera_x++;
-        break;
         default:
         break;
     }
@@ -187,19 +174,23 @@ void handleKeyDown()
     //continuous-response keys
     if (keystate[SDL_SCANCODE_LEFT])
     {
-
+        if(camera_x > 0)
+            camera_x--;
     }
     if (keystate[SDL_SCANCODE_RIGHT])
     {
-
+        if(camera_x < width - 9)
+            camera_x++;
     }
     if (keystate[SDL_SCANCODE_UP])
     {
-
+        if(camera_y > 0)
+            camera_y--;
     }
     if (keystate[SDL_SCANCODE_DOWN])
     {
-
+        if(camera_y < height - 9)
+            camera_y++;
     }
 }
 
@@ -211,7 +202,7 @@ void Quit(int returnCode)
 
 void draw_STUP()
 {
-    draw_screen();
+    draw_screen(1000.0f / (float)TARGET_TICK_FPS); //Fake delta so that we don't usleep during loading
     SDL_GL_SwapWindow(displayWindow);
 }
 

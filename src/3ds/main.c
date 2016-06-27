@@ -23,6 +23,7 @@
 #include <3ds.h>
 #include <GL/gl.h>
 #include <gfx_device.h>
+#include <time.h>
 
 #include "useful.h"
 #include "assets.h"
@@ -59,8 +60,13 @@ int main()
 
    load_resources();
 
+   clock_t last_time = clock();
    while (aptMainLoop())
    {
+      clock_t time = clock();
+      double delta = (double)(time - last_time)/(CLOCKS_PER_SEC/1000.0);
+      last_time = time;
+
       hidScanInput();
 
       if (keysDown() & KEY_START)
@@ -106,8 +112,10 @@ int main()
             camera_x++;
       }
 
+      update_world(delta);
+
       render_map();
-      draw_screen();
+      draw_screen(delta);
 
       gfxFlush(gfxGetFramebuffer(GFX_TOP, GFX_LEFT, NULL, NULL), 240, 400, GX_TRANSFER_FMT_RGB8);
       
@@ -123,7 +131,7 @@ int main()
 
 void draw_STUP()
 {
-    draw_screen();
+    draw_screen(1000.0f / (float)TARGET_TICK_FPS); //Fake delta so that we don't usleep during loading
 
     gfxFlush(gfxGetFramebuffer(GFX_TOP, GFX_LEFT, NULL, NULL), 240, 400, GX_TRANSFER_FMT_RGB8);
 

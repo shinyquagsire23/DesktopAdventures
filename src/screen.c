@@ -21,6 +21,7 @@
 #include "screen.h"
 
 #include <GL/gl.h>
+#include <unistd.h>
 
 #include "useful.h"
 #include "assets.h"
@@ -29,6 +30,9 @@ unsigned short tiles_low[0x100 * 0x100];
 unsigned short tiles_middle[0x100 * 0x100];
 unsigned short tiles_high[0x100 * 0x100];
 unsigned short tiles_overlay[0x100 * 0x100];
+
+//Default game uses 10fps for "Normal" speed, +- 5fps for Slow/Fast
+u16 TARGET_TICK_FPS = 10;
 
 void init_screen()
 {
@@ -40,7 +44,7 @@ void init_screen()
     }
 }
 
-int draw_screen()
+int draw_screen(double delta)
 {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -181,6 +185,9 @@ int draw_screen()
             }
         }
     }
+
+    //Limit our FPS so that each frame corresponds to a game tick for "Game Speed"
+    usleep(((1000/TARGET_TICK_FPS) - (int)delta)*1000);
 
     return 1;
 }

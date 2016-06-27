@@ -456,3 +456,8 @@ void render_map()
         tiles_high[i] = char_data[id]->frames[i];
     }*/
 }
+
+void update_world(double delta)
+{
+    //TODO
+}

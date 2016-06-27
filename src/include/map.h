@@ -112,6 +112,7 @@ void load_map(u16 map_id);
 void load_izax();
 void unload_map();
 void render_map();
+void update_world(double delta);
 
 void read_iact_stats(u16 map_num, u32 location, u16 num_iacts);
 void print_iact_stats();
