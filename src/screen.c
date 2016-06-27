@@ -54,6 +54,7 @@ int draw_screen()
     if (ASSETS_LOADING)
     {
         glBindTexture(GL_TEXTURE_2D, texture[0x2000]);
+        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
         glBegin(GL_QUADS);
         {
             glTexCoord2f(0.0f, 1.0f);
@@ -69,6 +70,29 @@ int draw_screen()
             glVertex2f(0, 288);
         }
         glEnd();
+
+#ifdef _3DS
+        glTranslatef(0, -16.0f, 0.0f);
+#endif
+
+        glDisable(GL_TEXTURE_2D);
+        glColor4f(0.0f, 0.0f, 0.5f, 1.0f);
+        glBegin(GL_QUADS);
+        {
+            glTexCoord2f(0.0f, 1.0f);
+            glVertex2f(8, 264);
+
+            glTexCoord2f(-1.0f, 1.0f);
+            glVertex2f(280*ASSETS_PERCENT, 264);
+
+            glTexCoord2f(-1.0f, 0.0f);
+            glVertex2f(280*ASSETS_PERCENT, 280);
+
+            glTexCoord2f(0.0f, 0.0f);
+            glVertex2f(8, 280);
+        }
+        glEnd();
+        glEnable(GL_TEXTURE_2D);
     }
     else
     {

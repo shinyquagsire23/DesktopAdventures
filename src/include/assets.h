@@ -52,6 +52,7 @@ typedef struct izon_data
 GLuint texture[0x2001];
 u32 tile_metadata[0x2000];
 u8 ASSETS_LOADING;
+float ASSETS_PERCENT;
 izon_data **zone_data;
 u16 NUM_MAPS;
 u8 load_demo;

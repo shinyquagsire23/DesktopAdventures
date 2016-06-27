@@ -123,7 +123,12 @@ int main()
 
 void draw_STUP()
 {
-    //TODO
+    draw_screen();
+
+    gfxFlush(gfxGetFramebuffer(GFX_TOP, GFX_LEFT, NULL, NULL), 240, 400, GX_TRANSFER_FMT_RGB8);
+
+    gfxSwapBuffersGpu();
+    gspWaitForVBlank();
 }
 
 #endif

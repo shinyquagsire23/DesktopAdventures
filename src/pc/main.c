@@ -68,9 +68,12 @@ int main(int argc, char **argv)
     load_resources();
 
     clock_t last_time = clock();
-    double test = 0.0;
     while (!done)
     {
+        clock_t time = clock();
+        double delta = (double)(time - last_time)/(CLOCKS_PER_SEC/1000.0);
+        last_time = time;
+
         while (SDL_PollEvent(&event))
         {
             switch (event.type)

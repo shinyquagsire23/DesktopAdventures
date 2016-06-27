@@ -38,6 +38,7 @@
 u8* yodesk;
 long yodesk_size = 0;
 
+float ASSETS_PERCENT = 0.0f;
 u8 ASSETS_LOADING = 1;
 u16 NUM_MAPS = 0;
 
@@ -52,27 +53,44 @@ izon_data **zone_data;
 u32 yodesk_seek = 0;
 
 u8 load_demo = 0;
-u8 is_yoda = 0;
+u8 is_yoda = 1;
 u16 ipuznum = 0;
+
+#ifdef PC_BUILD
+    #define log(f_, ...) printf((f_), __VA_ARGS__)
+#else
+    #define log(f_, ...)
+#endif
 
 void load_resources()
 {
     char *file_to_load = is_yoda ? (load_demo ? "YodaDemo.dta" : "YODESK.DTA") : "DESKTOP.DAW";
     yodesk = readFileToBytes(file_to_load, &yodesk_size);
-    printf("%s loaded, %lx bytes large\n", file_to_load, yodesk_size);
+    log("%s loaded, %lx bytes large\n", file_to_load, yodesk_size);
 
     u16 izon_count = 0;
+    u8 found = 1;
+    float last_percent = 0.0f;
     while(1)
     {
         u32 tag_seek = get_location();
         char *tag = get_strn(4);
+
+        ASSETS_PERCENT = ((float)tag_seek / (float)yodesk_size);
+        if(found && ASSETS_PERCENT - last_percent > 0.1)
+        {
+            draw_STUP();
+            last_percent = ASSETS_PERCENT;
+        }
+
+        found = 1;
         if(!strncmp(tag, "VERS", 4)) //VERSion
         {
-            printf("Found VERS at %x, version number %x\n", tag_seek, read_long());
+            log("Found VERS at %x, version number %x\n", tag_seek, read_long());
         }
         else if(!strncmp(tag, "STUP", 4)) //STartUP Graphic, uses yodesk_palette
         {
-            printf("Found STUP at %x\n", tag_seek);
+            log("Found STUP at %x\n", tag_seek);
             load_texture(288, current_file_pointer()+sizeof(u32), 0x2000); //Load Startup Texture past the last tile
 
             u32 len = read_long();
@@ -81,7 +99,7 @@ void load_resources()
         }
         else if(!strncmp(tag, "ZONE", 4)) //ZONEs (maps)
         {
-            printf("Found ZONE at %x\n", tag_seek);
+            log("Found ZONE at %x\n", tag_seek);
 
             u32 ZONE_LENGTH;
 
@@ -102,12 +120,12 @@ void load_resources()
             for(int j = 0; j < NUM_MAPS; j++)
                 zone_data[j] = (izon_data*)calloc(sizeof(izon_data), sizeof(u8));
 
-            printf("%i maps in DAT\n", NUM_MAPS);
+            log("%i maps in DAT\n", NUM_MAPS);
         }
         else if(!strncmp(tag, "IZON", 4)) //Index of ZONE
         {
             izon_count++;
-            printf("Found IZON %i at %x\n", izon_count-1, tag_seek);
+            log("Found IZON %i at %x\n", izon_count-1, tag_seek);
             zone_data[izon_count-1]->izon_offset = tag_seek;
 
             u32 len = read_long();
@@ -115,14 +133,14 @@ void load_resources()
         }
         else if(!strncmp(tag, "ZAUX", 4)) //Zone AuXiliary
         {
-            printf("Found ZAUX at %x\n", tag_seek);
+            log("Found ZAUX at %x\n", tag_seek);
             izon_count = 1;
 
             u32 len = read_long();
         }
         else if(!strncmp(tag, "IZAX", 4)) //Index of ZAUX
         {
-            printf("Found IZAX at %x\n", tag_seek);
+            log("Found IZAX at %x\n", tag_seek);
             zone_data[izon_count-1]->izax_offset = tag_seek;
 
             if(!is_yoda)
@@ -133,14 +151,14 @@ void load_resources()
         }
         else if(!strncmp(tag, "ZAX2", 4)) //Zone AuXiliary 2
         {
-            printf("Found ZAX2 at %x\n", tag_seek);
+            log("Found ZAX2 at %x\n", tag_seek);
             izon_count = 1;
 
             u32 len = read_long();
         }
         else if(!strncmp(tag, "IZX2", 4)) //Index of ZAX2
         {
-            printf("Found IZX2 at %x\n", tag_seek);
+            log("Found IZX2 at %x\n", tag_seek);
             zone_data[izon_count-1]->izx2_offset = tag_seek;
 
             u32 len = read_long();
@@ -148,14 +166,14 @@ void load_resources()
         }
         else if(!strncmp(tag, "ZAX3", 4)) //Zone AuXiliary 3
         {
-            printf("Found ZAX3 at %x\n", tag_seek);
+            log("Found ZAX3 at %x\n", tag_seek);
             izon_count = 1;
 
             u32 len = read_long();
         }
         else if(!strncmp(tag, "IZX3", 4)) //Index of ZAX3
         {
-            printf("Found IZX3 at %x\n", tag_seek);
+            log("Found IZX3 at %x\n", tag_seek);
             zone_data[izon_count-1]->izx3_offset = tag_seek;
 
             u32 len = read_long();
@@ -163,14 +181,14 @@ void load_resources()
         }
         else if(!strncmp(tag, "ZAX4", 4)) //Zone AuXiliary 4
         {
-            printf("Found ZAX4 at %x\n", tag_seek);
+            log("Found ZAX4 at %x\n", tag_seek);
             izon_count = 1;
 
             u32 len = read_long();
         }
         else if(!strncmp(tag, "IZX4", 4)) //Index of ZAX4
         {
-            printf("Found IZX4 at %x\n", tag_seek);
+            log("Found IZX4 at %x\n", tag_seek);
             zone_data[izon_count-1]->izx4_offset = tag_seek;
 
             u32 len = read_long();
@@ -178,7 +196,7 @@ void load_resources()
         }
         else if(!strncmp(tag, "HTSP", 4)) //HoTSPot
         {
-            printf("Found HTSP at %x\n", tag_seek);
+            log("Found HTSP at %x\n", tag_seek);
             izon_count = 1;
 
             u32 len = read_long();
@@ -188,7 +206,7 @@ void load_resources()
                 u16 id = read_short();
                 u32 offset = get_location();
 
-                printf("Found Zone %x HTSP at %x\n", id, offset);
+                log("Found Zone %x HTSP at %x\n", id, offset);
 
                 if(id == 0xFFFF)
                     break;
@@ -202,7 +220,7 @@ void load_resources()
         }
         else if(!strncmp(tag, "ACTN", 4)) //ACToNs
         {
-            printf("Found ACTN at %x\n", tag_seek);
+            log("Found ACTN at %x\n", tag_seek);
             izon_count = 1;
 
             u32 len = read_long();
@@ -214,7 +232,7 @@ void load_resources()
                 zone_data[izon_count-1]->num_iacts = read_prefix();
                 zone_data[izon_count-1]->iact_offset = tag_seek;
                 read_iact_stats((u16)(izon_count-1), zone_data[izon_count-1]->iact_offset, zone_data[izon_count-1]->num_iacts);
-                printf("Found %u IACT%s at %x\n", zone_data[izon_count-1]->num_iacts, (zone_data[izon_count-1]->num_iacts > 1 && zone_data[izon_count-1]->num_iacts != 0 ? "s" : ""), tag_seek);
+                log("Found %u IACT%s at %x\n", zone_data[izon_count-1]->num_iacts, (zone_data[izon_count-1]->num_iacts > 1 && zone_data[izon_count-1]->num_iacts != 0 ? "s" : ""), tag_seek);
 
                 //Indy lumps all their IACTs into one giant section
                 //so we have to sift through them to link them to zones
@@ -253,7 +271,7 @@ void load_resources()
         }
         else if(!strncmp(tag, "SNDS", 4)) //SouNDS
         {
-            printf("Found SNDS at %x\n", tag_seek);
+            log("Found SNDS at %x\n", tag_seek);
 
             u32 length = read_long();
             u16 unk1 = read_short();
@@ -263,19 +281,23 @@ void load_resources()
             {
                 u32 str_length = read_short();
                 sound_files[j] = get_strn(str_length);
-                printf("%x: %x %s\n", j, str_length, sound_files[j]);
+                log("%x: %x %s\n", j, str_length, sound_files[j]);
             }
             seek(tag_seek+length+0x8);
         }
         else if(!strncmp(tag, "TILE", 4)) //TILEs (graphics)
         {
-            printf("Found TILE at %x\n", tag_seek);
+            log("Found TILE at %x\n", tag_seek);
             int section_length = read_long();
-            printf("0x%x tiles in TILES\n", section_length / ((32*32)+4));
+            log("0x%x tiles in TILES\n", section_length / ((32*32)+4));
             for(u32 j = 0; j < section_length / ((32*32)+4); j++)
             {
                 if(j % 0x100 == 0 || j == (section_length / ((32*32)+4))-1)
-                    printf("%x of %x...\n", j, section_length / ((32*32)+4));
+                {
+                    log("%x of %x...\n", j, section_length / ((32 * 32) + 4));
+                    ASSETS_PERCENT = ((float)get_location() / (float)yodesk_size);
+                    draw_STUP();
+                }
 
                 u32 tile_stuff = read_long();
                 tile_metadata[j] = tile_stuff;
@@ -286,7 +308,7 @@ void load_resources()
         }
         else if(!strncmp(tag, "PUZ2", 4)) //Puzzle configurations maybe?
         {
-            printf("Found PUZ2 at %x\n", tag_seek);
+            log("Found PUZ2 at %x\n", tag_seek);
             u32 length = read_long();
             ipuz_data = malloc(512 * sizeof(char*));
 
@@ -294,7 +316,7 @@ void load_resources()
         }
         else if(!strncmp(tag, "IPUZ", 4)) //Index of PUZ2
         {
-            printf("Found IPUZ at %x\n", tag_seek);
+            log("Found IPUZ at %x\n", tag_seek);
             u16 id = read_prefix();
 
             ipuz_element *e = malloc(sizeof(ipuz_element));
@@ -342,7 +364,7 @@ void load_resources()
         else if(!strncmp(tag, "CHAR", 4)) //CHARacters
         {
             u32 size = read_long();
-            printf("Found CHAR at %x, size %x\n", tag_seek, size);
+            log("Found CHAR at %x, size %x\n", tag_seek, size);
 
             char_data = malloc((size / (is_yoda ? 0x54 : 0x4E)) * sizeof(char*));
 
@@ -350,14 +372,14 @@ void load_resources()
             {
                 u16 id = read_short();
                 char_data[id] = (ichr_data*)(current_file_pointer());
-                printf("%x - %-16s %x %x %x %x\n", id, char_data[id]->name, char_data[id]->unk_1, char_data[id]->flags, char_data[id]->unk_4, char_data[id]->unk_5);
+                log("%x - %-16s %x %x %x %x\n", id, char_data[id]->name, char_data[id]->unk_1, char_data[id]->flags, char_data[id]->unk_4, char_data[id]->unk_5);
                 seek_add((u32)(is_yoda ? 0x54 : 0x4E) - 2);
             }
             seek(tag_seek+size+8);
         }
         else if(!strncmp(tag, "CHWP", 4)) //CHaracter WeaPons
         {
-            printf("Found CHWP at %x\n", tag_seek);
+            log("Found CHWP at %x\n", tag_seek);
 
             u32 len = read_long();
 
@@ -376,15 +398,15 @@ void load_resources()
                     break;
 
                 if(char_data[id_1]->flags & ICHR_IS_WEAPON)
-                    printf("%-16s is a weapon with sound %-14s, health %x?\n", char_data[id_1]->name, sound_files[id_2], health);
+                    log("%-16s is a weapon with sound %-14s, health %x?\n", char_data[id_1]->name, sound_files[id_2], health);
                 else
-                    printf("%-16s gets weapon %-25s, health %x\n", char_data[id_1]->name, id_2 == 0xFFFF ? "none" : char_data[id_2]->name, health);
+                    log("%-16s gets weapon %-25s, health %x\n", char_data[id_1]->name, id_2 == 0xFFFF ? "none" : char_data[id_2]->name, health);
             }
             seek(tag_seek+len+8);
         }
         else if(!strncmp(tag, "CAUX", 4)) //Character AUXiliary
         {
-            printf("Found CAUX at %x\n", tag_seek);
+            log("Found CAUX at %x\n", tag_seek);
 
             u32 len = read_long();
 
@@ -402,23 +424,23 @@ void load_resources()
                     break;
 
                 if(char_data[id_1]->flags & ICHR_IS_WEAPON)
-                    printf("%-16s is a weapon,          damage: %x\n", char_data[id_1]->name, damage);
+                    log("%-16s is a weapon,          damage: %x\n", char_data[id_1]->name, damage);
                 else
-                    printf("%-16s not a weapon, ambient damage: %x\n", char_data[id_1]->name, damage);
+                    log("%-16s not a weapon, ambient damage: %x\n", char_data[id_1]->name, damage);
             }
             seek(tag_seek+len+8);
         }
         else if (!strncmp(tag, "ANAM", 4)) //Action names
         {
-            printf("Found ANAM at %x\n", tag_seek);
+            log("Found ANAM at %x\n", tag_seek);
         }
         else if (!strncmp(tag, "PNAM", 4)) //Prize names?
         {
-            printf("Found PNAM at %x\n", tag_seek);
+            log("Found PNAM at %x\n", tag_seek);
         }
         else if(!strncmp(tag, "TNAM", 4)) //Tile names
         {
-            printf("Found TNAM at %x\n", tag_seek);
+            log("Found TNAM at %x\n", tag_seek);
 
             u32 len = read_long();
 
@@ -438,7 +460,7 @@ void load_resources()
 
                 tile_names[id] = name;
 
-                //printf("%x, %s\n", id, tile_names[id]);
+                //log("%x, %s\n", id, tile_names[id]);
 
                 if (is_yoda)
                     seek_add(24);
@@ -457,16 +479,17 @@ void load_resources()
                     continue;
 
                 //if(is_yoda)
-                //	printf("%x: %x %x %x %x \"%s\" \"%s\" \"%s\" \"%s\", %s (%x), %s (%x)\n", j, e->unk1, e->unk2, e->unk3, e->unk4, e->string1, e->string2, e->string3, e->string4, tile_names[e->item_a], e->item_a, tile_names[e->item_b], e->item_b);
+                //	log("%x: %x %x %x %x \"%s\" \"%s\" \"%s\" \"%s\", %s (%x), %s (%x)\n", j, e->unk1, e->unk2, e->unk3, e->unk4, e->string1, e->string2, e->string3, e->string4, tile_names[e->item_a], e->item_a, tile_names[e->item_b], e->item_b);
                 //else
-                //	printf("%x: %x %x %x \"%s\" \"%s\" \"%s\" \"%s\", %s (%x)\n", j, e->unk1, e->unk2, e->unk4, e->string1, e->string2, e->string3, e->string4, tile_names[e->item_a], e->item_a);
+                //	log("%x: %x %x %x \"%s\" \"%s\" \"%s\" \"%s\", %s (%x)\n", j, e->unk1, e->unk2, e->unk4, e->string1, e->string2, e->string3, e->string4, tile_names[e->item_a], e->item_a);
             }
-            printf("Found ENDF at %x\n", tag_seek);
+            log("Found ENDF at %x\n", tag_seek);
             break;
         }
         else
         {
             seek_sub(sizeof(u32)-sizeof(u8));
+            found = 0;
         }
     }
 
