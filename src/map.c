@@ -465,29 +465,16 @@ void update_world(double delta)
     if(world_timer > (1000/TARGET_TICK_FPS))
     {
         if (BUTTON_LEFT_STATE)
-        {
             player_move(LEFT);
-            if(camera_x > 0)
-                camera_x--;
-        }
         if (BUTTON_RIGHT_STATE)
-        {
             player_move(RIGHT);
-            if(camera_x < width - 9)
-                camera_x++;
-        }
         if (BUTTON_UP_STATE)
-        {
             player_move(UP);
-            if(camera_y > 0)
-                camera_y--;
-        }
         if (BUTTON_DOWN_STATE)
-        {
             player_move(DOWN);
-            if(camera_y < height - 9)
-                camera_y++;
-        }
+        
+        camera_x = MIN(MAX(0, player_entity.x - 4), width - 9);
+        camera_y = MIN(MAX(0, player_entity.y - 4), height - 9);
 
         player_update();
 
