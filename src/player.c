@@ -307,7 +307,7 @@ void player_bump(int dir, int x, int y)
             break;
     }
     meta = map_get_meta(LAYER_MIDDLE, bump_x, bump_y);
-    printf("Bump! %x\n", meta);
+
     int object_index = 0;
     bool locked;
     bool remove_tile = false;
