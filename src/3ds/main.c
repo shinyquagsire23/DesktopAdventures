@@ -67,6 +67,7 @@ int main()
       double delta = (double)(time - last_time)/(CLOCKS_PER_SEC/1000.0);
       last_time = time;
 
+      reset_input_state();
       hidScanInput();
 
       if (keysDown() & KEY_START)
@@ -92,30 +93,15 @@ int main()
       }
 
       if(keysDown() & KEY_UP)
-      {
-          if(camera_y > 0)
-            camera_y--;
-      }
+          button_move_up();
       else if(keysDown() & KEY_DOWN)
-      {
-          if(camera_y < height - 9)
-            camera_y++;
-      }
+          button_move_down();
       else if(keysDown() & KEY_LEFT)
-      {
-          if(camera_x > 0)
-            camera_x--;
-      }
+          button_move_left();
       else if(keysDown() & KEY_RIGHT)
-      {
-          if(camera_x < width - 9)
-            camera_x++;
-      }
+          button_move_right();
 
       update_world(delta);
-
-      render_map();
-      draw_screen(delta);
 
       gfxFlush(gfxGetFramebuffer(GFX_TOP, GFX_LEFT, NULL, NULL), 240, 400, GX_TRANSFER_FMT_RGB8);
       
@@ -131,7 +117,7 @@ int main()
 
 void draw_STUP()
 {
-    draw_screen(1000.0f / (float)TARGET_TICK_FPS); //Fake delta so that we don't usleep during loading
+    draw_screen();
 
     gfxFlush(gfxGetFramebuffer(GFX_TOP, GFX_LEFT, NULL, NULL), 240, 400, GX_TRANSFER_FMT_RGB8);
 

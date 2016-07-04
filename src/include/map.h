@@ -103,11 +103,6 @@ typedef struct izax_data_4
     u16 is_intermediate;
 } izax_data_4;
 
-u32 camera_x;
-u32 camera_y;
-u16 width;
-u16 height;
-
 void load_map(u16 map_id);
 void load_izax();
 void unload_map();

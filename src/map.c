@@ -22,12 +22,16 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include "input.h"
 #include "tname.h"
 #include "screen.h"
 #include "assets.h"
+#include "player.h"
 #include "useful.h"
 #include "character.h"
 #include "objectinfo.h"
+
+double world_timer = 0.0;
 
 u16 *map_tiles_low;
 u16 *map_tiles_middle;
@@ -36,7 +40,6 @@ u16 *map_overlay;
 u32 camera_x = 0;
 u32 camera_y = 0;
 
-entity player_entity;
 entity *entities[512];
 obj_info **object_info;
 u16 object_info_qty = 0;
@@ -221,7 +224,7 @@ void load_izax()
     for(int i = 0; i < first_section->num_entries; i++)
     {
         printf("  entity: id=%x, x=%x, y=%x, item=%s, qty=%x, %x\n", first_section->entries[i].entity_id, first_section->entries[i].x, first_section->entries[i].y, tile_names[first_section->entries[i].item], first_section->entries[i].num_items, first_section->entries[i].unk3);
-        add_new_entity(first_section->entries[i].entity_id, first_section->entries[i].x, first_section->entries[i].y, DOWN, first_section->entries[i].item, first_section->entries[i].num_items);
+        add_new_entity(first_section->entries[i].entity_id, first_section->entries[i].x, first_section->entries[i].y, FRAME_DOWN, first_section->entries[i].item, first_section->entries[i].num_items);
     }
 
     for(int i = 0; i < second_section->num_entries; i++)
@@ -421,15 +424,13 @@ void render_map()
         }
     }
 
-    if(player_entity.current_frame >= 2)
+    if(player_entity.y >= camera_y &&
+       player_entity.y < (camera_y + 9) &&
+       player_entity.x >= camera_x &&
+       player_entity.x < (camera_x + 9))
     {
-        if(player_entity.y >= camera_y &&
-            player_entity.y < (camera_y + 9) &&
-            player_entity.x >= camera_x &&
-            player_entity.x < (camera_x + 9))
-        {
-            tiles_high[((player_entity.y - camera_y)*9) + (player_entity.x - camera_x)] = char_data[player_entity.char_id]->frames[player_entity.current_frame];
-        }
+        printf("%u\n", player_entity.current_frame);
+        tiles_high[((player_entity.y - camera_y)*9) + (player_entity.x - camera_x)] = char_data[player_entity.char_id]->frames[player_entity.current_frame];
     }
 
     for(int i = 0; i < num_entities; i++)
@@ -451,13 +452,47 @@ void render_map()
     }
 
     //Test for rendering characters
-    /*for(int i = 0; i < 26; i++)
+    for(int i = 0; i < 26; i++)
     {
-        tiles_high[i] = char_data[id]->frames[i];
-    }*/
+        //tiles_high[i] = char_data[id]->frames[i];
+    }
 }
 
 void update_world(double delta)
 {
-    //TODO
+    //Limit our FPS so that each frame corresponds to a game tick for "Game Speed"
+    world_timer += delta;
+    if(world_timer > (1000/TARGET_TICK_FPS))
+    {
+        if (BUTTON_LEFT_STATE)
+        {
+            player_move(LEFT);
+            if(camera_x > 0)
+                camera_x--;
+        }
+        if (BUTTON_RIGHT_STATE)
+        {
+            player_move(RIGHT);
+            if(camera_x < width - 9)
+                camera_x++;
+        }
+        if (BUTTON_UP_STATE)
+        {
+            player_move(UP);
+            if(camera_y > 0)
+                camera_y--;
+        }
+        if (BUTTON_DOWN_STATE)
+        {
+            player_move(DOWN);
+            if(camera_y < height - 9)
+                camera_y++;
+        }
+
+        player_update();
+
+        render_map();
+        draw_screen();
+        world_timer = 0.0;
+    }
 }

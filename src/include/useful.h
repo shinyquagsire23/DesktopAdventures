@@ -39,6 +39,10 @@ typedef volatile s8 vs8;
 typedef volatile s16 vs16;
 typedef volatile s32 vs32;
 typedef volatile s64 vs64;
+
+typedef u8 bool;
+#define true 0x1
+#define false 0x0
 #elif defined _3DS
 #include <3ds.h>
 #endif

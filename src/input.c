@@ -18,24 +18,9 @@
  *  License along with this library; if not, see <http://www.gnu.org/licenses/>
  */
 
-#ifndef INPUT_H
-#define INPUT_H
-
 #include "useful.h"
 
-void button_move_down();
-void button_move_up();
-void button_move_left();
-void button_move_right();
-void button_push();
-void button_fire();
-void mouse_move(u16 x, u16 y);
-void mouse_left();
-void mouse_right();
-void item_dragging(u16 item);
-void reset_input_state();
-
-u16 CURRENT_ITEM_DRAGGED;
+u16 CURRENT_ITEM_DRAGGED = 0;
 
 u8 BUTTON_DOWN_STATE;
 u8 BUTTON_UP_STATE;
@@ -46,4 +31,70 @@ u8 BUTTON_FIRE_STATE;
 u8 BUTTON_LCLICK_STATE;
 u8 BUTTON_RCLICK_STATE;
 
-#endif
+void button_move_down()
+{
+    BUTTON_DOWN_STATE = 1;
+}
+
+void button_move_up()
+{
+    BUTTON_UP_STATE = 1;
+}
+
+void button_move_left()
+{
+    BUTTON_LEFT_STATE = 1;
+}
+
+void button_move_right()
+{
+    BUTTON_RIGHT_STATE = 1;
+}
+
+void button_push()
+{
+    BUTTON_PUSH_STATE = 1;
+}
+
+void button_fire()
+{
+    BUTTON_FIRE_STATE = 1;
+}
+
+void mouse_move(u16 x, u16 y)
+{
+    //TODO
+}
+
+void mouse_left()
+{
+    BUTTON_LCLICK_STATE = 1;
+    if(CURRENT_ITEM_DRAGGED)
+    {
+        CURRENT_ITEM_DRAGGED = 0;
+        //TODO
+    }
+}
+
+void mouse_right()
+{
+    BUTTON_RCLICK_STATE = 1;
+    //TODO: Use FORCE, not sure if Indy binds anything to RClick
+}
+
+void item_dragging(u16 item)
+{
+    CURRENT_ITEM_DRAGGED = item;
+}
+
+void reset_input_state()
+{
+    BUTTON_DOWN_STATE = 0;
+    BUTTON_UP_STATE = 0;
+    BUTTON_LEFT_STATE = 0;
+    BUTTON_RIGHT_STATE = 0;
+    BUTTON_PUSH_STATE = 0;
+    BUTTON_FIRE_STATE = 0;
+    BUTTON_LCLICK_STATE = 0;
+    BUTTON_RCLICK_STATE = 0;
+}

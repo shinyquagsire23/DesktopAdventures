@@ -74,6 +74,7 @@ int main(int argc, char **argv)
         double delta = (double)(time - last_time)/(CLOCKS_PER_SEC/1000.0);
         last_time = time;
 
+        reset_input_state();
         while (SDL_PollEvent(&event))
         {
             switch (event.type)
@@ -88,13 +89,10 @@ int main(int argc, char **argv)
                 break;
             }
         }
-
         handleKeyDown();
 
         update_world(delta);
 
-        render_map();
-        draw_screen(delta);
         SDL_GL_SwapWindow(displayWindow);
     }
 
@@ -174,23 +172,19 @@ void handleKeyDown()
     //continuous-response keys
     if (keystate[SDL_SCANCODE_LEFT])
     {
-        if(camera_x > 0)
-            camera_x--;
+        button_move_left();
     }
     if (keystate[SDL_SCANCODE_RIGHT])
     {
-        if(camera_x < width - 9)
-            camera_x++;
+        button_move_right();
     }
     if (keystate[SDL_SCANCODE_UP])
     {
-        if(camera_y > 0)
-            camera_y--;
+        button_move_up();
     }
     if (keystate[SDL_SCANCODE_DOWN])
     {
-        if(camera_y < height - 9)
-            camera_y++;
+        button_move_down();
     }
 }
 
@@ -202,7 +196,7 @@ void Quit(int returnCode)
 
 void draw_STUP()
 {
-    draw_screen(1000.0f / (float)TARGET_TICK_FPS); //Fake delta so that we don't usleep during loading
+    draw_screen();
     SDL_GL_SwapWindow(displayWindow);
 }
 

@@ -27,6 +27,8 @@ set(SOURCE_FILES
     src/include/map.h
     src/include/objectinfo.h
     src/include/palette.h
+    src/player.c
+    src/include/player.h
     src/puzzle.c
     src/include/puzzle.h
     src/screen.c
@@ -35,7 +37,7 @@ set(SOURCE_FILES
     src/include/tile.h
     src/include/tname.h
     src/useful.c
-    src/include/useful.h src/3ds/main.h)
+    src/include/useful.h src/3ds/main.h src/include/input.h src/input.c)
 
 add_definitions(-DPC_BUILD)
 set( CMAKE_VERBOSE_MAKEFILE on )

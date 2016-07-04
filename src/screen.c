@@ -44,7 +44,7 @@ void init_screen()
     }
 }
 
-int draw_screen(double delta)
+int draw_screen()
 {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -185,9 +185,6 @@ int draw_screen(double delta)
             }
         }
     }
-
-    //Limit our FPS so that each frame corresponds to a game tick for "Game Speed"
-    usleep(((1000/TARGET_TICK_FPS) - (int)delta)*1000);
 
     return 1;
 }
