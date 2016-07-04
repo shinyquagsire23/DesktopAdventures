@@ -97,11 +97,13 @@ void player_move(int dir)
             {
                 player_entity.y--;
                 player_entity.x--;
+                last_dir = UP_LEFT;
             }
             else if(!player_collides(DOWN_LEFT, player_entity.x,player_entity.y) && player_collides(UP_LEFT, player_entity.x,player_entity.y))
             {
                 player_entity.y++;
                 player_entity.x--;
+                last_dir = DOWN_LEFT;
             }
             break;
         case RIGHT:
@@ -111,11 +113,13 @@ void player_move(int dir)
             {
                 player_entity.y--;
                 player_entity.x++;
+                last_dir = UP_RIGHT;
             }
             else if(!player_collides(DOWN_RIGHT, player_entity.x,player_entity.y) && player_collides(UP_RIGHT, player_entity.x,player_entity.y))
             {
                 player_entity.y++;
                 player_entity.x++;
+                last_dir = DOWN_RIGHT;
             }
             break;
         case UP:
@@ -125,11 +129,13 @@ void player_move(int dir)
             {
                 player_entity.y--;
                 player_entity.x--;
+                last_dir = UP_LEFT;
             }
             else if(!player_collides(UP_RIGHT, player_entity.x,player_entity.y) && player_collides(UP_LEFT, player_entity.x,player_entity.y))
             {
                 player_entity.y--;
                 player_entity.x++;
+                last_dir = UP_RIGHT;
             }
             break;
         case DOWN:
@@ -139,11 +145,13 @@ void player_move(int dir)
             {
                 player_entity.y++;
                 player_entity.x--;
+                last_dir = DOWN_LEFT;
             }
             else if(!player_collides(DOWN_RIGHT, player_entity.x,player_entity.y) && player_collides(DOWN_LEFT, player_entity.x,player_entity.y))
             {
                 player_entity.y++;
                 player_entity.x++;
+                last_dir = DOWN_RIGHT;
             }
             break;
         case UP_LEFT:
@@ -198,6 +206,18 @@ void player_handle_walk_animation()
             break;
         case DOWN:
             player_entity.current_frame = CHAR_WALK_DOWN_ANIM[anim_count];
+            break;
+        case UP_LEFT:
+            player_entity.current_frame = CHAR_WALK_UP_LEFT_ANIM[anim_count];
+            break;
+        case UP_RIGHT:
+            player_entity.current_frame = CHAR_WALK_UP_RIGHT_ANIM[anim_count];
+            break;
+        case DOWN_LEFT:
+            player_entity.current_frame = CHAR_WALK_DOWN_LEFT_ANIM[anim_count];
+            break;
+        case DOWN_RIGHT:
+            player_entity.current_frame = CHAR_WALK_DOWN_RIGHT_ANIM[anim_count];
             break;
         default:
             break;
