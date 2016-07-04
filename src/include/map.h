@@ -23,6 +23,8 @@
 
 #include "useful.h"
 
+#include "objectinfo.h"
+
 enum area_types
 {
  DESERT = 0x1,
@@ -122,7 +124,10 @@ void update_world(double delta);
 
 u32 map_get_width();
 u32 map_get_height();
+u16 map_get_id();
+obj_info *map_get_object(int index, int x, int y);
 u16 map_get_tile(u8 layer, int x, int y);
+void map_set_tile(u8 layer, int x, int y, u16 tile);
 u32 map_get_meta(u8 layer, int x, int y);
 
 void read_iact_stats(u16 map_num, u32 location, u16 num_iacts);

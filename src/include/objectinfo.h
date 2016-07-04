@@ -20,24 +20,27 @@
 
 #include "useful.h"
 
+#ifndef OBJECTINFO_H
+#define OBJECTINFO_H
+
 enum OBJ_TYPE
 {
-    QUEST_ITEM_SPOT,
-    SPAWN,
-    THE_FORCE,
-    VEHICLE_TO,
-    VEHICLE_FROM,
-    LOCATOR,
-    ITEM,
-    PUZZLE_NPC,
-    WEAPON,
-    DOOR_IN,
-    DOOR_OUT,
-    UNKNOWN,
-    LOCK,
-    TELEPORTER,
-    XWING_FROM,
-    XWING_TO,
+    OBJ_QUEST_ITEM_SPOT,
+    OBJ_SPAWN,
+    OBJ_THE_FORCE,
+    OBJ_VEHICLE_TO,
+    OBJ_VEHICLE_FROM,
+    OBJ_LOCATOR,
+    OBJ_ITEM,
+    OBJ_PUZZLE_NPC,
+    OBJ_WEAPON,
+    OBJ_DOOR_IN,
+    OBJ_DOOR_OUT,
+    OBJ_UNKNOWN,
+    OBJ_LOCK,
+    OBJ_TELEPORTER,
+    OBJ_XWING_FROM,
+    OBJ_XWING_TO,
 };
 
 typedef struct obj_info
@@ -49,3 +52,4 @@ typedef struct obj_info
     u16 arg;
 } obj_info;
 
+#endif

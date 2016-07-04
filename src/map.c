@@ -22,6 +22,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stddef.h>
 #include "input.h"
 #include "tile.h"
 #include "tname.h"
@@ -69,9 +70,6 @@ void load_map(u16 map_id)
     init_screen();
     u32 location = zone_data[map_id]->izon_offset;
     location += 4; //IZON
-
-    camera_x = 0;
-    camera_y = 0;
 
     seek(location);
 
@@ -136,17 +134,30 @@ void load_map(u16 map_id)
         //Display items and NPCs for debug purposes
         switch(object_info[i]->type)
         {
-            case ITEM:
+            case OBJ_ITEM:
                 map_overlay[object_info[i]->x+(object_info[i]->y*width)] = object_info[i]->arg;
                 break;
-            case WEAPON:
+            case OBJ_WEAPON:
                 map_overlay[object_info[i]->x+(object_info[i]->y*width)] = object_info[i]->arg;
                 break;
-            case PUZZLE_NPC:
+            case OBJ_PUZZLE_NPC:
                 map_overlay[object_info[i]->x+(object_info[i]->y*width)] = object_info[i]->arg;
+                break;
+            case OBJ_DOOR_OUT:
+                player_entity.x = object_info[i]->x;
+                player_entity.y = object_info[i]->y;
                 break;
         }
     }
+
+    switch(PLAYER_MAP_CHANGE_REASON)
+    {
+        case MAP_CHANGE_DOOR_OUT:
+            player_goto_door_in();
+            map_set_tile(LAYER_MIDDLE, player_entity.x, player_entity.y, TILE_NONE); //TODO: This should be handled by map tile storage
+            break;
+    }
+    PLAYER_MAP_CHANGE_REASON = MAP_CHANGE_NONE;
 
     load_izax(); //TODO: Indy IZAX is funky.
 #ifndef _3DS
@@ -469,6 +480,26 @@ u32 map_get_height()
     return height;
 }
 
+u16 map_get_id()
+{
+    return id;
+}
+
+obj_info *map_get_object(int index, int x, int y)
+{
+    int seek_index = index;
+    for(int i = 0; i < object_info_qty; i++)
+    {
+        if(object_info[i]->x == (u16)x && object_info[i]->y == (u16)y)
+        {
+            if(seek_index == 0)
+                return object_info[i];
+            seek_index--;
+        }
+    }
+    return NULL;
+}
+
 u16 map_get_tile(u8 layer, int x, int y)
 {
     switch(layer)
@@ -482,6 +513,22 @@ u16 map_get_tile(u8 layer, int x, int y)
         default:
         case LAYER_OVERLAY:
             return map_overlay[(y*width)+x];
+    }
+}
+
+void map_set_tile(u8 layer, int x, int y, u16 tile)
+{
+    switch(layer)
+    {
+        case LAYER_LOW:
+            map_tiles_low[(y*width)+x] = tile;
+        case LAYER_MIDDLE:
+            map_tiles_middle[(y*width)+x] = tile;
+        case LAYER_HIGH:
+            map_tiles_high[(y*width)+x] = tile;
+        default:
+        case LAYER_OVERLAY:
+            map_overlay[(y*width)+x] = tile;
     }
 }
 

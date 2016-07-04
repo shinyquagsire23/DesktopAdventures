@@ -18,10 +18,29 @@
  *  License along with this library; if not, see <http://www.gnu.org/licenses/>
  */
 
+#ifndef PLAYER_H
+#define PLAYER_H
+
 #include "character.h"
+
+enum MAP_CHANGE_REASON
+{
+    MAP_CHANGE_NONE,
+    MAP_CHANGE_DOOR_IN,
+    MAP_CHANGE_DOOR_OUT,
+    MAP_CHANGE_VEHICLE_TO,
+    MAP_CHANGE_VEHICLE_FROM,
+    MAP_CHANGE_XWING_TO,
+    MAP_CHANGE_XWING_FROM,
+    MAP_CHANGE_SCRIPT,
+} MAP_SWAP_REASON;
 
 bool player_collides(int dir, int x, int y);
 void player_move(int dir);
+void player_goto_door_in();
 void player_update();
 
 entity player_entity;
+u8 PLAYER_MAP_CHANGE_REASON;
+
+#endif
