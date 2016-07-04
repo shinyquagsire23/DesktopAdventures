@@ -27,6 +27,61 @@ int last_dir = -1;
 int anim_count = 0;
 bool moving = false;
 
+bool player_collides(int dir, int x, int y)
+{
+    switch(dir) {
+        case LEFT:
+            if(((map_get_meta(LAYER_MIDDLE, player_entity.x-1,player_entity.y) & TILE_MIDDLE_LAYER_COLLIDING == 0)
+                || map_get_tile(LAYER_MIDDLE, player_entity.x-1, player_entity.y) == TILE_NONE)
+               && player_entity.x != 0)
+                return false;
+            break;
+        case RIGHT:
+            if(((map_get_meta(LAYER_MIDDLE,player_entity.x+1, player_entity.y) & TILE_MIDDLE_LAYER_COLLIDING == 0)
+                || map_get_tile(LAYER_MIDDLE,player_entity.x+1, player_entity.y) == TILE_NONE)
+               && player_entity.x != map_get_width()-1)
+                return false;
+            break;
+        case UP:
+            if(((map_get_meta(LAYER_MIDDLE,player_entity.x, player_entity.y-1) & TILE_MIDDLE_LAYER_COLLIDING == 0)
+                || map_get_tile(LAYER_MIDDLE,player_entity.x, player_entity.y-1) == TILE_NONE)
+               && player_entity.y != 0)
+                return false;
+            break;
+        case DOWN:
+            if(((map_get_meta(LAYER_MIDDLE,player_entity.x, player_entity.y+1) & TILE_MIDDLE_LAYER_COLLIDING == 0)
+                || map_get_tile(LAYER_MIDDLE,player_entity.x, player_entity.y+1) == TILE_NONE)
+               && player_entity.y != map_get_height()-1)
+                return false;
+            break;
+        case UP_LEFT:
+            if(((map_get_meta(LAYER_MIDDLE, player_entity.x-1,player_entity.y-1) & TILE_MIDDLE_LAYER_COLLIDING == 0)
+                || map_get_tile(LAYER_MIDDLE, player_entity.x-1, player_entity.y-1) == TILE_NONE)
+               && (player_entity.x != 0 && player_entity.y != 0))
+                return false;
+            break;
+        case UP_RIGHT:
+            if(((map_get_meta(LAYER_MIDDLE,player_entity.x+1, player_entity.y-1) & TILE_MIDDLE_LAYER_COLLIDING == 0)
+                || map_get_tile(LAYER_MIDDLE,player_entity.x+1, player_entity.y-1) == TILE_NONE)
+               && (player_entity.x != map_get_width()-1 && player_entity.y != 0))
+                return false;
+            break;
+        case DOWN_LEFT:
+            if(((map_get_meta(LAYER_MIDDLE, player_entity.x-1,player_entity.y+1) & TILE_MIDDLE_LAYER_COLLIDING == 0)
+                || map_get_tile(LAYER_MIDDLE, player_entity.x-1, player_entity.y+1) == TILE_NONE)
+               && (player_entity.x != 0&& player_entity.y != map_get_height()-1))
+                return false;
+            break;
+        case DOWN_RIGHT:
+            if(((map_get_meta(LAYER_MIDDLE,player_entity.x+1, player_entity.y+1) & TILE_MIDDLE_LAYER_COLLIDING == 0)
+                || map_get_tile(LAYER_MIDDLE,player_entity.x+1, player_entity.y+1) == TILE_NONE)
+               && (player_entity.x != map_get_width()-1 && player_entity.y != map_get_height()-1))
+                return false;
+            break;
+    }
+    return true;
+}
+
 void player_move(int dir)
 {
     if(dir != last_dir)
@@ -36,28 +91,60 @@ void player_move(int dir)
 
     switch(dir) {
         case LEFT:
-            if(((map_get_meta(LAYER_MIDDLE, player_entity.x-1,player_entity.y) & TILE_MIDDLE_LAYER_COLLIDING == 0)
-                || map_get_tile(LAYER_MIDDLE, player_entity.x-1, player_entity.y) == TILE_NONE)
-               && player_entity.x != 0)
+            if(!player_collides(LEFT, player_entity.x,player_entity.y))
                 player_entity.x--;
+            else if(!player_collides(UP_LEFT, player_entity.x,player_entity.y) && player_collides(DOWN_LEFT, player_entity.x,player_entity.y))
+            {
+                player_entity.y--;
+                player_entity.x--;
+            }
+            else if(!player_collides(DOWN_LEFT, player_entity.x,player_entity.y) && player_collides(UP_LEFT, player_entity.x,player_entity.y))
+            {
+                player_entity.y++;
+                player_entity.x--;
+            }
             break;
         case RIGHT:
-            if(((map_get_meta(LAYER_MIDDLE,player_entity.x+1, player_entity.y) & TILE_MIDDLE_LAYER_COLLIDING == 0)
-                || map_get_tile(LAYER_MIDDLE,player_entity.x+1, player_entity.y) == TILE_NONE)
-               && player_entity.x != map_get_width()-1)
+            if(!player_collides(RIGHT, player_entity.x,player_entity.y))
                 player_entity.x++;
+            else if(!player_collides(UP_RIGHT, player_entity.x,player_entity.y) && player_collides(DOWN_RIGHT, player_entity.x,player_entity.y))
+            {
+                player_entity.y--;
+                player_entity.x++;
+            }
+            else if(!player_collides(DOWN_RIGHT, player_entity.x,player_entity.y) && player_collides(UP_RIGHT, player_entity.x,player_entity.y))
+            {
+                player_entity.y++;
+                player_entity.x++;
+            }
             break;
         case UP:
-            if(((map_get_meta(LAYER_MIDDLE,player_entity.x, player_entity.y-1) & TILE_MIDDLE_LAYER_COLLIDING == 0)
-                || map_get_tile(LAYER_MIDDLE,player_entity.x, player_entity.y-1) == TILE_NONE)
-               && player_entity.y != 0)
+            if(!player_collides(UP, player_entity.x,player_entity.y))
                 player_entity.y--;
+            else if(!player_collides(UP_LEFT, player_entity.x,player_entity.y) && player_collides(UP_RIGHT, player_entity.x,player_entity.y))
+            {
+                player_entity.y--;
+                player_entity.x--;
+            }
+            else if(!player_collides(UP_RIGHT, player_entity.x,player_entity.y) && player_collides(UP_LEFT, player_entity.x,player_entity.y))
+            {
+                player_entity.y--;
+                player_entity.x++;
+            }
             break;
         case DOWN:
-            if(((map_get_meta(LAYER_MIDDLE,player_entity.x, player_entity.y+1) & TILE_MIDDLE_LAYER_COLLIDING == 0)
-                || map_get_tile(LAYER_MIDDLE,player_entity.x, player_entity.y+1) == TILE_NONE)
-               && player_entity.y != map_get_height()-1)
+            if(!player_collides(DOWN, player_entity.x,player_entity.y))
                 player_entity.y++;
+            else if(!player_collides(DOWN_LEFT, player_entity.x,player_entity.y) && player_collides(DOWN_RIGHT, player_entity.x,player_entity.y))
+            {
+                player_entity.y++;
+                player_entity.x--;
+            }
+            else if(!player_collides(DOWN_RIGHT, player_entity.x,player_entity.y) && player_collides(DOWN_LEFT, player_entity.x,player_entity.y))
+            {
+                player_entity.y++;
+                player_entity.x++;
+            }
             break;
     }
     last_dir = dir;

@@ -170,19 +170,19 @@ void handleKeyDown()
     const Uint8* keystate = SDL_GetKeyboardState(NULL);
 
     //continuous-response keys
-    if (keystate[SDL_SCANCODE_LEFT])
-    {
-        button_move_left();
-    }
-    if (keystate[SDL_SCANCODE_RIGHT])
-    {
-        button_move_right();
-    }
     if (keystate[SDL_SCANCODE_UP])
     {
         button_move_up();
     }
-    if (keystate[SDL_SCANCODE_DOWN])
+    else if (keystate[SDL_SCANCODE_RIGHT])
+    {
+        button_move_right();
+    }
+    else if (keystate[SDL_SCANCODE_LEFT])
+    {
+        button_move_left();
+    }
+    else if (keystate[SDL_SCANCODE_DOWN])
     {
         button_move_down();
     }

@@ -94,12 +94,12 @@ int main()
 
       if(keysDown() & KEY_UP)
           button_move_up();
-      else if(keysDown() & KEY_DOWN)
-          button_move_down();
-      else if(keysDown() & KEY_LEFT)
-          button_move_left();
       else if(keysDown() & KEY_RIGHT)
           button_move_right();
+      else if(keysDown() & KEY_LEFT)
+          button_move_left();
+      else if(keysDown() & KEY_DOWN)
+          button_move_down();
 
       update_world(delta);
 
