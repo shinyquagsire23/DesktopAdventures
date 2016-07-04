@@ -46,7 +46,6 @@ u32 version = 4;
 u32* tile;
 
 GLuint texture[0x2001];
-u32 tile_metadata[0x2000];
 izon_data **zone_data;
 //TNAME **tile_names;
 

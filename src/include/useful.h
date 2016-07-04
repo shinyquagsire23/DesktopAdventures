@@ -41,6 +41,7 @@ typedef volatile s32 vs32;
 typedef volatile s64 vs64;
 
 typedef u8 bool;
+#define BIT(n) (1<<n)
 #define true 0x1
 #define false 0x0
 #elif defined _3DS

@@ -18,6 +18,9 @@
  *  License along with this library; if not, see <http://www.gnu.org/licenses/>
  */
 
+#ifndef MAP_H
+#define MAP_H
+
 #include "useful.h"
 
 enum area_types
@@ -49,6 +52,14 @@ enum map_flags
     FIND_SOMETHING_USEFUL_BUILDING,
     FIND_THE_FORCE,
 };
+
+enum MAP_LAYER
+{
+    LAYER_LOW,
+    LAYER_MIDDLE,
+    LAYER_HIGH,
+    LAYER_OVERLAY
+} MAP_LAYER;
 
 typedef struct izax_entry
 {
@@ -109,5 +120,12 @@ void unload_map();
 void render_map();
 void update_world(double delta);
 
+u32 map_get_width();
+u32 map_get_height();
+u16 map_get_tile(u8 layer, int x, int y);
+u32 map_get_meta(u8 layer, int x, int y);
+
 void read_iact_stats(u16 map_num, u32 location, u16 num_iacts);
 void print_iact_stats();
+
+#endif

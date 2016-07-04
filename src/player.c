@@ -20,6 +20,9 @@
 
 #include "player.h"
 
+#include "map.h"
+#include "tile.h"
+
 int last_dir = -1;
 int anim_count = 0;
 bool moving = false;
@@ -33,16 +36,28 @@ void player_move(int dir)
 
     switch(dir) {
         case LEFT:
-            player_entity.x--;
+            if(((map_get_meta(LAYER_MIDDLE, player_entity.x-1,player_entity.y) & TILE_MIDDLE_LAYER_COLLIDING == 0)
+                || map_get_tile(LAYER_MIDDLE, player_entity.x-1, player_entity.y) == TILE_NONE)
+               && player_entity.x != 0)
+                player_entity.x--;
             break;
         case RIGHT:
-            player_entity.x++;
+            if(((map_get_meta(LAYER_MIDDLE,player_entity.x+1, player_entity.y) & TILE_MIDDLE_LAYER_COLLIDING == 0)
+                || map_get_tile(LAYER_MIDDLE,player_entity.x+1, player_entity.y) == TILE_NONE)
+               && player_entity.x != map_get_width()-1)
+                player_entity.x++;
             break;
         case UP:
-            player_entity.y--;
+            if(((map_get_meta(LAYER_MIDDLE,player_entity.x, player_entity.y-1) & TILE_MIDDLE_LAYER_COLLIDING == 0)
+                || map_get_tile(LAYER_MIDDLE,player_entity.x, player_entity.y-1) == TILE_NONE)
+               && player_entity.y != 0)
+                player_entity.y--;
             break;
         case DOWN:
-            player_entity.y++;
+            if(((map_get_meta(LAYER_MIDDLE,player_entity.x, player_entity.y+1) & TILE_MIDDLE_LAYER_COLLIDING == 0)
+                || map_get_tile(LAYER_MIDDLE,player_entity.x, player_entity.y+1) == TILE_NONE)
+               && player_entity.y != map_get_height()-1)
+                player_entity.y++;
             break;
     }
     last_dir = dir;

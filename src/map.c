@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "input.h"
+#include "tile.h"
 #include "tname.h"
 #include "screen.h"
 #include "assets.h"
@@ -31,6 +32,7 @@
 #include "character.h"
 #include "objectinfo.h"
 
+u32 tile_metadata[0x2000];
 double world_timer = 0.0;
 
 u16 *map_tiles_low;
@@ -429,8 +431,7 @@ void render_map()
        player_entity.x >= camera_x &&
        player_entity.x < (camera_x + 9))
     {
-        printf("%u\n", player_entity.current_frame);
-        tiles_high[((player_entity.y - camera_y)*9) + (player_entity.x - camera_x)] = char_data[player_entity.char_id]->frames[player_entity.current_frame];
+        tiles_middle[((player_entity.y - camera_y)*9) + (player_entity.x - camera_x)] = char_data[player_entity.char_id]->frames[player_entity.current_frame];
     }
 
     for(int i = 0; i < num_entities; i++)
@@ -458,6 +459,48 @@ void render_map()
     }
 }
 
+u32 map_get_width()
+{
+    return width;
+}
+
+u32 map_get_height()
+{
+    return height;
+}
+
+u16 map_get_tile(u8 layer, int x, int y)
+{
+    switch(layer)
+    {
+        case LAYER_LOW:
+            return map_tiles_low[(y*width)+x];
+        case LAYER_MIDDLE:
+            return map_tiles_middle[(y*width)+x];
+        case LAYER_HIGH:
+            return map_tiles_high[(y*width)+x];
+        default:
+        case LAYER_OVERLAY:
+            return map_overlay[(y*width)+x];
+    }
+}
+
+u32 map_get_meta(u8 layer, int x, int y)
+{
+    switch(layer)
+    {
+        case LAYER_LOW:
+            return tile_metadata[map_tiles_low[(y*width)+x]];
+        case LAYER_MIDDLE:
+            return tile_metadata[map_tiles_middle[(y*width)+x]];
+        case LAYER_HIGH:
+            return tile_metadata[map_tiles_high[(y*width)+x]];
+        default:
+        case LAYER_OVERLAY:
+            return tile_metadata[map_overlay[(y*width)+x]];
+    }
+}
+
 void update_world(double delta)
 {
     //Limit our FPS so that each frame corresponds to a game tick for "Game Speed"
@@ -472,7 +515,7 @@ void update_world(double delta)
             player_move(UP);
         if (BUTTON_DOWN_STATE)
             player_move(DOWN);
-        
+
         camera_x = MIN(MAX(0, player_entity.x - 4), width - 9);
         camera_y = MIN(MAX(0, player_entity.y - 4), height - 9);
 
