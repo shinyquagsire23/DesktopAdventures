@@ -146,6 +146,34 @@ void player_move(int dir)
                 player_entity.x++;
             }
             break;
+        case UP_LEFT:
+            if(!player_collides(UP_LEFT, player_entity.x,player_entity.y))
+            {
+                player_entity.y--;
+                player_entity.x--;
+            }
+            break;
+        case UP_RIGHT:
+            if(!player_collides(UP_RIGHT, player_entity.x,player_entity.y))
+            {
+                player_entity.y--;
+                player_entity.x++;
+            }
+            break;
+        case DOWN_LEFT:
+            if(!player_collides(DOWN_LEFT, player_entity.x,player_entity.y))
+            {
+                player_entity.y++;
+                player_entity.x--;
+            }
+            break;
+        case DOWN_RIGHT:
+            if(!player_collides(DOWN_RIGHT, player_entity.x,player_entity.y))
+            {
+                player_entity.y++;
+                player_entity.x++;
+            }
+            break;
     }
     last_dir = dir;
 }
