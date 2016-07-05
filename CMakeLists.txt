@@ -37,7 +37,7 @@ set(SOURCE_FILES
     src/include/tile.h
     src/include/tname.h
     src/useful.c
-    src/include/useful.h src/3ds/main.h src/include/input.h src/input.c)
+    src/include/useful.h src/3ds/main.h src/include/input.h src/input.c src/iact.c src/include/iact.h)
 
 add_definitions(-DPC_BUILD)
 set( CMAKE_VERBOSE_MAKEFILE on )
