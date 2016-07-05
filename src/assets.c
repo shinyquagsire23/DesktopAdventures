@@ -230,34 +230,38 @@ void load_resources()
             {
                 zone_data[izon_count-1]->num_iacts = read_prefix();
                 zone_data[izon_count-1]->iact_offset = tag_seek;
+                zone_data[izon_count-1]->iact_offsets[0] = tag_seek;
                 read_iact_stats((u16)(izon_count-1), zone_data[izon_count-1]->iact_offset, zone_data[izon_count-1]->num_iacts);
                 log("Found %u IACT%s at %x\n", zone_data[izon_count-1]->num_iacts, (zone_data[izon_count-1]->num_iacts > 1 && zone_data[izon_count-1]->num_iacts != 0 ? "s" : ""), tag_seek);
 
                 //Indy lumps all their IACTs into one giant section
-                //so we have to sift through them to link them to zones
-                if(!is_yoda)
+                //so we have to sift through them to link them to zones.
+                //However we want to index all of our IACT items anyhow,
+                //so this works.
+                seek(tag_seek);
+                u32 remaining_iacts = zone_data[izon_count - 1]->num_iacts+1;
+                u32 iact_index = 1;
+                while (remaining_iacts > 0)
                 {
-                    seek(tag_seek);
-                    u32 remaining_iacts = zone_data[izon_count - 1]->num_iacts+1;
-                    while (remaining_iacts > 0)
+                    char *tag_iact_look = get_strn(4);
+                    if (!strncmp(tag_iact_look, "IACT", 4))
                     {
-                        char *tag_iact_look = get_strn(4);
-                        if (!strncmp(tag_iact_look, "IACT", 4))
-                        {
-                            remaining_iacts--;
-                        }
-                        else if (!strncmp(tag_iact_look, "PUZ2", 4))
-                        {
-                            break;
-                        }
-                        else
-                        {
-                            seek_sub(sizeof(u32) - sizeof(u8));
-                        }
+                        zone_data[izon_count-1]->iact_offsets[iact_index++] = get_location()-sizeof(u32);
+                        remaining_iacts--;
                     }
-                    seek_sub(sizeof(u32));
-                    izon_count++;
+                    else if (!strncmp(tag_iact_look, "PUZ2", 4))
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        seek_sub(sizeof(u32) - sizeof(u8));
+                    }
                 }
+                seek_sub(sizeof(u32));
+
+                if(!is_yoda)
+                    izon_count++;
             }
 
             //Yoda Stories actually has length identifiers for these...

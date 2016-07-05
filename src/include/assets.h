@@ -46,6 +46,7 @@ typedef struct izon_data
     u16 num_iacts;
     u32 htsp_offset;
     u32 iact_offset;
+    u32 iact_offsets[0x100];
 } izon_data;
 
 //static const u8* yodesk_palette;
