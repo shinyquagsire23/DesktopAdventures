@@ -22,7 +22,7 @@
 #include <GL/gl.h>
 
 void load_resources();
-void load_texture(u16 width, u8 *data, u32 texture_num);
+void load_texture(u16 width, u32 data_loc, u32 texture_num);
 
 void seek(u32 location);
 void seek_add(u32 amount);
@@ -34,7 +34,7 @@ u32 read_long();
 u16 read_short();
 u16 read_prefix();
 u8 read_byte();
-void* current_file_pointer();
+void read_bytes(void *out, size_t size);
 
 typedef struct izon_data
 {

@@ -35,7 +35,7 @@
 #include "palette.h"
 #include "character.h"
 
-u8* yodesk;
+FILE *yodesk_fileptr;
 long yodesk_size = 0;
 
 float ASSETS_PERCENT = 0.0f;
@@ -64,7 +64,12 @@ u16 ipuznum = 0;
 void load_resources()
 {
     char *file_to_load = is_yoda ? (load_demo ? "YodaDemo.dta" : "YODESK.DTA") : "DESKTOP.DAW";
-    yodesk = readFileToBytes(file_to_load, &yodesk_size);
+
+    yodesk_fileptr = fopen(file_to_load, "rb");
+    fseek(yodesk_fileptr, 0, SEEK_END);
+    yodesk_size = ftell(yodesk_fileptr);
+    rewind(yodesk_fileptr);
+
     log("%s loaded, %lx bytes large\n", file_to_load, yodesk_size);
 
     u16 izon_count = 0;
@@ -90,7 +95,7 @@ void load_resources()
         else if(!strncmp(tag, "STUP", 4)) //STartUP Graphic, uses yodesk_palette
         {
             log("Found STUP at %x\n", tag_seek);
-            load_texture(288, current_file_pointer()+sizeof(u32), 0x2000); //Load Startup Texture past the last tile
+            load_texture(288, get_location()+sizeof(u32), 0x2000); //Load Startup Texture past the last tile
 
             u32 len = read_long();
             seek(len+sizeof(u64)+tag_seek);
@@ -257,6 +262,7 @@ void load_resources()
                     {
                         seek_sub(sizeof(u32) - sizeof(u8));
                     }
+                    free(tag_iact_look);
                 }
                 seek_sub(sizeof(u32));
 
@@ -304,7 +310,7 @@ void load_resources()
 
                 u32 tile_stuff = read_long();
                 tile_metadata[j] = tile_stuff;
-                load_texture(32, current_file_pointer(), j);
+                load_texture(32, get_location(), j);
                 seek_add(32*32*sizeof(u8));
             }
             seek(tag_seek+section_length+0x8);
@@ -374,7 +380,10 @@ void load_resources()
             for(int j = 0; j < (size / (is_yoda ? 0x54 : 0x4E)); j++)
             {
                 u16 id = read_short();
-                char_data[id] = (ichr_data*)(current_file_pointer());
+
+                ichr_data *new_entry = malloc(sizeof(ichr_data));
+                read_bytes(new_entry, sizeof(ichr_data));
+                char_data[id] = new_entry;
                 log("%x - %-16s %x %x %x %x\n", id, char_data[id]->name, char_data[id]->unk_1, char_data[id]->flags, char_data[id]->unk_4, char_data[id]->unk_5);
                 seek_add((u32)(is_yoda ? 0x54 : 0x4E) - 2);
             }
@@ -391,7 +400,9 @@ void load_resources()
             u16 entry_index = 0;
             while(1)
             {
-                chwp_data[entry_index++] = (chwp_entry*)(current_file_pointer());
+                chwp_entry *new_entry = malloc(sizeof(chwp_entry));
+                read_bytes(new_entry, sizeof(chwp_entry));
+                chwp_data[entry_index++] = new_entry;
 
                 u16 id_1 = read_short();
                 u16 id_2 = read_short();
@@ -418,7 +429,9 @@ void load_resources()
             u16 entry_index = 0;
             while(1)
             {
-                caux_data[entry_index++] = (caux_entry*)(current_file_pointer());
+                caux_entry *new_entry = malloc(sizeof(caux_entry));
+                read_bytes(new_entry, sizeof(caux_entry));
+                caux_data[entry_index++] = new_entry;
 
                 u16 id_1 = read_short();
                 u16 damage = read_short();
@@ -459,7 +472,7 @@ void load_resources()
                 if (id == 0xFFFF)
                     name = nop;
                 else
-                    name = current_file_pointer();
+                    name = get_str();
 
                 tile_names[id] = name;
 
@@ -494,6 +507,7 @@ void load_resources()
             seek_sub(sizeof(u32)-sizeof(u8));
             found = 0;
         }
+        free(tag);
     }
 
     load_map(0);
@@ -502,13 +516,16 @@ void load_resources()
     ASSETS_LOADING = 0;
 }
 
-void load_texture(u16 width, u8 *data, u32 texture_num)
+void load_texture(u16 width, u32 data_loc, u32 texture_num)
 {
+    u32 orig_seek = get_location();
+    seek(data_loc);
+
     u32 *data_buffer = malloc((size_t)(width * width * 4));
     int index = 0;
     for(int i = 0; i < width * width; i++)
     {
-        int color_index = data[index];
+        int color_index = read_byte();
         u32 color;
         if(is_yoda)
             color = ((u8)(yodesk_palette[(color_index * 4)]) << 16) + ((u8)(yodesk_palette[(color_index * 4) + 1]) << 8) + ((u8)(yodesk_palette[(color_index * 4) + 2]) << 0);
@@ -529,6 +546,8 @@ void load_texture(u16 width, u8 *data, u32 texture_num)
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 #endif
+
+    seek(orig_seek);
 }
 
 void seek(u32 location)
@@ -553,27 +572,46 @@ u32 get_location()
 
 char *get_str()
 {
-    u32 len = strlen((char*)(yodesk + yodesk_seek));
+    void *buffer = malloc(0x100);
+    fseek(yodesk_fileptr, yodesk_seek, SEEK_SET);
+    fread(buffer, 0x100, 1, yodesk_fileptr);
+
+    u32 len = strlen((char*)(buffer));
+    char *out = malloc(len+1);
+    strcpy(out, (char*)(buffer));
+    free(buffer);
+
     yodesk_seek += len;
-    return (char*)(yodesk + yodesk_seek - len);
+    return out;
 }
 
 char *get_strn(size_t len)
 {
+    char *out = malloc(len+1);
+    fseek(yodesk_fileptr, yodesk_seek, SEEK_SET);
+    fread(out, len, 1, yodesk_fileptr);
+    out[len] = NULL;
+
     yodesk_seek += len;
-    return (char*)(yodesk + yodesk_seek - len);
+    return out;
 }
 
 u32 read_long()
 {
-    u32 value = *(u32*)(yodesk + yodesk_seek);
+    u32 value;
+    fseek(yodesk_fileptr, yodesk_seek, SEEK_SET);
+    fread(&value, sizeof(u32), 1, yodesk_fileptr);
+
     yodesk_seek += 4;
     return value;
 }
 
 u16 read_short()
 {
-    u16 value = *(u16*)(yodesk + yodesk_seek);
+    u16 value;
+    fseek(yodesk_fileptr, yodesk_seek, SEEK_SET);
+    fread(&value, sizeof(u16), 1, yodesk_fileptr);
+
     yodesk_seek += 2;
     return value;
 }
@@ -589,12 +627,16 @@ u16 read_prefix()
 
 u8 read_byte()
 {
-    u8 value = *(u8*)(yodesk + yodesk_seek);
+    u8 value;
+    fseek(yodesk_fileptr, yodesk_seek, SEEK_SET);
+    fread(&value, sizeof(u8), 1, yodesk_fileptr);
+
     yodesk_seek += 1;
     return value;
 }
 
-void* current_file_pointer()
+void read_bytes(void *out, size_t size)
 {
-    return (void*)(yodesk + yodesk_seek);
+    fseek(yodesk_fileptr, yodesk_seek, SEEK_SET);
+    fread(out, size, 1, yodesk_fileptr);
 }

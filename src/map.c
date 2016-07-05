@@ -203,24 +203,34 @@ void add_new_entity(u16 id, u16 x, u16 y, u16 frame, u16 item, u16 num_items)
 
 void load_izax()
 {
-    void *zero_buf = calloc(0x10, sizeof(u8));
-
     seek(zone_data[id]->izax_offset);
-    izax_data_1 *first_section = (izax_data_1*)(zone_data[id]->izax_offset != 0 ? current_file_pointer() : zero_buf);
+    read_long(); //IZAX
+    u32 izax_data_1_size = zone_data[id]->izax_offset != 0 ? read_long() : 0;
+    izax_data_1 *first_section = (izax_data_1*)(zone_data[id]->izax_offset != 0 ? malloc(izax_data_1_size) : calloc(0x10, sizeof(u8)));
+    seek_sub(sizeof(u32)*2);
+    read_bytes(first_section, izax_data_1_size);
 
     /* Possible items to be found and replaced in scripts
      * (some scripts have filler spots for these items)
      * Probably used for generating the maps.
      */
     seek(zone_data[id]->izx2_offset);
-    izax_data_2 *second_section = (izax_data_2*)(zone_data[id]->izx2_offset != 0 ? current_file_pointer() : zero_buf);
+    read_long(); //IZX2
+    u32 izax_data_2_size = zone_data[id]->izx2_offset != 0 ? read_long() : 0;
+    izax_data_2 *second_section = (izax_data_2*)(zone_data[id]->izx2_offset != 0 ? malloc(izax_data_2_size) : calloc(0x10, sizeof(u8)));
+    seek_sub(sizeof(u32)*2);
+    read_bytes(second_section, izax_data_2_size);
 
     /* Ending or transition to possible ending item(s). Usually takes one of a select
      * amount of items and turns it into a single ending item for a map.
      * Probably used to properly shape plot by end of the map generation.
      */
     seek(zone_data[id]->izx3_offset);
-    izax_data_3 *third_section = (izax_data_3*)(zone_data[id]->izx3_offset != 0 ? current_file_pointer() : zero_buf);
+    read_long(); //IZX3
+    u32 izax_data_3_size = zone_data[id]->izx3_offset != 0 ? read_long() : 0;
+    izax_data_3 *third_section = (izax_data_3*)(zone_data[id]->izx3_offset != 0 ? malloc(izax_data_3_size) : calloc(0x10, sizeof(u8)));
+    seek_sub(sizeof(u32)*2);
+    read_bytes(third_section, izax_data_3_size);
 
     /*
      * If the value in IZX4 is zero, this map is a static map used for
@@ -230,7 +240,11 @@ void load_izax()
      * a certain item.
      */
     seek(zone_data[id]->izx4_offset);
-    izax_data_4 *fourth_section = (izax_data_4*)(zone_data[id]->izx4_offset != 0 ? current_file_pointer() : zero_buf);
+    read_long(); //IZX4
+    u32 izax_data_4_size = read_long();
+    izax_data_4 *fourth_section = (izax_data_4*)(zone_data[id]->izx4_offset != 0 ? malloc(izax_data_4_size) : calloc(0x10, sizeof(u8)));
+    seek_sub(sizeof(u32)*2);
+    read_bytes(first_section, izax_data_4_size);
 
     printf("Reading IZAX data, %u entries in first section, %u in the second and %u in the third. %s %s\n", first_section->num_entries, second_section->num_entries, third_section->num_entries, !fourth_section->is_intermediate ? "This map is either a seed item map or an end item consuming map!" : "", first_section->mission_specific ? "This map is specific to a particular plot!" : "");
 
@@ -249,6 +263,11 @@ void load_izax()
     {
         printf("   end item: %s\n", tile_names[third_section->entries[i].item]);
     }
+
+    free(first_section);
+    free(second_section);
+    free(third_section);
+    free(fourth_section);
 }
 
 void render_map()
