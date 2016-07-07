@@ -65,13 +65,13 @@ char obj_types[0x10][32] = {"QUEST_ITEM_SPOT", "SPAWN", "THE_FORCE", "VEHICLE_TO
 
 void map_init(u16 num_maps)
 {
-    map_tiles_low = malloc(num_maps*sizeof(u16*));
-    map_tiles_middle = malloc(num_maps*sizeof(u16*));
-    map_tiles_high = malloc(num_maps*sizeof(u16*));
-    map_vars = malloc(num_maps*sizeof(u16*));
+    map_tiles_low = calloc(num_maps*sizeof(u16*), 1);
+    map_tiles_middle = calloc(num_maps*sizeof(u16*), 1);
+    map_tiles_high = calloc(num_maps*sizeof(u16*), 1);
+    map_vars = calloc(num_maps*sizeof(u16*), 1);
 
-    object_info = malloc(num_maps*sizeof(void*));
-    object_info_qty = malloc(num_maps*sizeof(u16*));
+    object_info = calloc(num_maps*sizeof(void*), 1);
+    object_info_qty = calloc(num_maps*sizeof(u16*), 1);
 }
 
 //TODO: Try to make this a struct or something, less allocating of data that's already in our RAM buffer of the .DAT
@@ -195,17 +195,23 @@ void load_map(u16 map_id)
 void unload_map()
 {
     //These maps are not worth keeping in memory
-    if(map_flags[flags] == MAP_FLAG_INTRO_SCREEN)
+    if(flags == MAP_FLAG_INTRO_SCREEN)
     {
         free(map_tiles_low[id]);
         free(map_tiles_middle[id]);
         free(map_tiles_high[id]);
         free(map_vars[id]);
 
+        map_tiles_low[id] = NULL;
+
         for(int i = 0; i < object_info_qty[id]; i++)
+        {
             free(object_info[id][i]);
+            object_info[id][i] = NULL;
+        }
 
         free(object_info[id]);
+        object_info[id] = NULL;
     }
     free(map_overlay);
 
