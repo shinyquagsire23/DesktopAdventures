@@ -214,7 +214,7 @@ void run_iact(u32 loc, int iact_id)
                 player_entity.health += args[0];
                 break;
             default:
-                printf("Unhandled script command %s, args: %x %x %x %x %x %x, strlen %x\n", commands[command], args[0], args[1], args[2], args[3], args[4], args[5], strlen);
+                printf("Unhandled script command %s, args: %x %x %x %x %x, strlen %x\n", commands[command], args[0], args[1], args[2], args[3], args[4], strlen);
                 break;
         }
     }
