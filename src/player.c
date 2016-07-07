@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <stddef.h>
 #include "map.h"
+#include "iact.h"
 #include "tile.h"
 #include "objectinfo.h"
 
@@ -91,6 +92,46 @@ bool player_collides(int dir, int x, int y)
     return true;
 }
 
+bool player_collides_event(int dir, int x, int y)
+{
+    switch(dir)
+    {
+        case LEFT:
+            if(map_get_meta(LAYER_MIDDLE, player_entity.x-1,player_entity.y) & TILE_GAME_OBJECT)
+                return true;
+            break;
+        case RIGHT:
+            if(map_get_meta(LAYER_MIDDLE,player_entity.x+1, player_entity.y) & TILE_GAME_OBJECT)
+                return true;
+            break;
+        case UP:
+            if(map_get_meta(LAYER_MIDDLE,player_entity.x, player_entity.y-1) & TILE_GAME_OBJECT)
+                return true;
+            break;
+        case DOWN:
+            if(map_get_meta(LAYER_MIDDLE,player_entity.x, player_entity.y+1) & TILE_GAME_OBJECT)
+                return true;
+            break;
+        case UP_LEFT:
+            if(map_get_meta(LAYER_MIDDLE, player_entity.x-1,player_entity.y-1) & TILE_GAME_OBJECT)
+                return true;
+            break;
+        case UP_RIGHT:
+            if(map_get_meta(LAYER_MIDDLE,player_entity.x+1, player_entity.y-1) & TILE_GAME_OBJECT)
+                return true;
+            break;
+        case DOWN_LEFT:
+            if(map_get_meta(LAYER_MIDDLE, player_entity.x-1,player_entity.y+1) & TILE_GAME_OBJECT)
+                return true;
+            break;
+        case DOWN_RIGHT:
+            if(map_get_meta(LAYER_MIDDLE,player_entity.x+1, player_entity.y+1) & TILE_GAME_OBJECT)
+                return true;
+            break;
+    }
+    return false;
+}
+
 void player_goto_door_in()
 {
     player_entity.x = DOOR_IN_x;
@@ -110,6 +151,10 @@ void player_move(int dir)
         case LEFT:
             if(!player_collides(LEFT, player_entity.x,player_entity.y))
                 player_entity.x--;
+            else if(player_collides_event(LEFT, player_entity.x, player_entity.y))
+            {
+                moved = false;
+            }
             else if(!player_collides(UP_LEFT, player_entity.x,player_entity.y) && player_collides(DOWN_LEFT, player_entity.x,player_entity.y))
             {
                 player_entity.y--;
@@ -128,6 +173,10 @@ void player_move(int dir)
         case RIGHT:
             if(!player_collides(RIGHT, player_entity.x,player_entity.y))
                 player_entity.x++;
+            else if(player_collides_event(RIGHT, player_entity.x, player_entity.y))
+            {
+                moved = false;
+            }
             else if(!player_collides(UP_RIGHT, player_entity.x,player_entity.y) && player_collides(DOWN_RIGHT, player_entity.x,player_entity.y))
             {
                 player_entity.y--;
@@ -146,6 +195,10 @@ void player_move(int dir)
         case UP:
             if(!player_collides(UP, player_entity.x,player_entity.y))
                 player_entity.y--;
+            else if(player_collides_event(UP, player_entity.x, player_entity.y))
+            {
+                moved = false;
+            }
             else if(!player_collides(UP_LEFT, player_entity.x,player_entity.y) && player_collides(UP_RIGHT, player_entity.x,player_entity.y))
             {
                 player_entity.y--;
@@ -164,6 +217,10 @@ void player_move(int dir)
         case DOWN:
             if(!player_collides(DOWN, player_entity.x,player_entity.y))
                 player_entity.y++;
+            else if(player_collides_event(DOWN, player_entity.x, player_entity.y))
+            {
+                moved = false;
+            }
             else if(!player_collides(DOWN_LEFT, player_entity.x,player_entity.y) && player_collides(DOWN_RIGHT, player_entity.x,player_entity.y))
             {
                 player_entity.y++;
@@ -331,8 +388,7 @@ void player_bump(int dir, int x, int y)
         }
     }
 
-    if(remove_tile)
-        map_set_tile(LAYER_MIDDLE, bump_x, bump_y, TILE_NONE);
+    iact_set_trigger(IACT_TRIG_BumpTile, 3, bump_x, bump_y, map_get_tile(LAYER_MIDDLE, bump_x, bump_y));
 }
 
 void player_stand(int x, int y)
@@ -371,4 +427,5 @@ void player_stand(int x, int y)
 void player_update()
 {
     player_handle_walk_animation();
+    iact_set_trigger(IACT_TRIG_Walk, 2, player_entity.x, player_entity.y);
 }

@@ -21,6 +21,6 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-void draw_STUP();
+void redraw_swap_buffers();
 
 #endif

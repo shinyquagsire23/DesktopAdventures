@@ -32,6 +32,7 @@
 #include "useful.h"
 #include "assets.h"
 #include "screen.h"
+#include "sound.h"
 #include "input.h"
 #include "map.h"
 
@@ -51,7 +52,7 @@ int main(int argc, char **argv)
 {
     int done = FALSE;
     SDL_Event event;
-    SDL_Init(SDL_INIT_VIDEO);
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 
     SDL_CreateWindowAndRenderer(SCREEN_WIDTH, SCREEN_WIDTH, SDL_WINDOW_OPENGL, &displayWindow, &displayRenderer);
     SDL_GetRendererInfo(displayRenderer, &displayRendererInfo);
@@ -63,7 +64,9 @@ int main(int argc, char **argv)
         Quit(1);
     }
 
+    srand(time(NULL));
     initGL();
+    sound_init();
     resizeWindow(SCREEN_WIDTH, SCREEN_WIDTH);
     load_resources();
 
@@ -96,6 +99,7 @@ int main(int argc, char **argv)
         SDL_GL_SwapWindow(displayWindow);
     }
 
+    sound_exit();
     Quit(0);
     return (0);
 }
@@ -194,7 +198,7 @@ void Quit(int returnCode)
     exit(returnCode);
 }
 
-void draw_STUP()
+void redraw_swap_buffers()
 {
     draw_screen();
     SDL_GL_SwapWindow(displayWindow);

@@ -1,2 +1,11 @@
 build/*
 src/3ds/build/*
+src/3ds/*.3dsx
+src/3ds/*.elf
+src/3ds/*.3mdh
+src/3ds/*.sh
+sfx/*
+YODESK.DTA
+DESKTOP.DAW
+YodaDemo.dta
+bin/*

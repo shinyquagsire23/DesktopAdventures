@@ -115,7 +115,7 @@ int main()
    return 0;
 }
 
-void draw_STUP()
+void redraw_swap_buffers()
 {
     draw_screen();
 

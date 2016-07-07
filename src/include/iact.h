@@ -46,8 +46,8 @@ enum IACT_CMDS
     IACT_CMD_SetPlayerPos,
     IACT_CMD_MoveCamera,
     IACT_CMD_Redraw,
-    IACT_CMD_OpenDoor_MAYBE,
-    IACT_CMD_CloseDoor_MAYBE,
+    IACT_CMD_ShowObject,
+    IACT_CMD_HideObject,
     IACT_CMD_EnemySpawn,
     IACT_CMD_NPCSpawn,
     IACT_CMD_RemoveDraggedItem,
@@ -111,5 +111,8 @@ void print_iact_stats();
 
 void iact_set_trigger(u8 trigger, u8 count, ...);
 void iact_update();
+
+u16 IACT_RANDVAR;
+u16 IACT_TEMPVAR;
 
 #endif //DESKTOPADVENTURES_IACT_H

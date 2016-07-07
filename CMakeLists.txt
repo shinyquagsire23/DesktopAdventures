@@ -9,6 +9,8 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/externals/cmake-modules")
 
 find_package(SDL2 REQUIRED)
 include_directories(${SDL2_INCLUDE_DIR})
+find_package(SDL2_mixer REQUIRED)
+include_directories(${SDLMIXER_INCLUDE_DIR})
 find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
 
@@ -37,10 +39,10 @@ set(SOURCE_FILES
     src/include/tile.h
     src/include/tname.h
     src/useful.c
-    src/include/useful.h src/3ds/main.h src/include/input.h src/input.c src/iact.c src/include/iact.h)
+    src/include/useful.h src/3ds/main.h src/include/input.h src/input.c src/iact.c src/include/iact.h src/pc/sound.c)
 
 add_definitions(-DPC_BUILD)
 set( CMAKE_VERBOSE_MAKEFILE on )
 
 add_executable(DesktopAdventures ${SOURCE_FILES})
-target_link_libraries(DesktopAdventures ${SDL2_LIBRARY} ${OPENGL_LIBRARY})
+target_link_libraries(DesktopAdventures ${SDL2_LIBRARY} ${SDLMIXER_LIBRARY} ${OPENGL_LIBRARY})

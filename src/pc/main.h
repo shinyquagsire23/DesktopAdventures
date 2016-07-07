@@ -30,6 +30,6 @@
 void handleKeyDown();
 void Quit(int returnCode);
 void handleKeyPress( SDL_Keysym *keysym );
-void draw_STUP();
+void redraw_swap_buffers();
 
 #endif /* MAIN_H_ */

@@ -35,24 +35,24 @@ enum area_types
 
 enum map_flags
 {
-    ENEMY_TERRITORY = 0x1,
-    FINAL_DESTINATION,
-    ITEM_FOR_ITEM,
-    FIND_SOMETHING_USEFUL_NPC,
-    ITEM_TO_PASS, //Seen in map 99
-    FROM_ANOTHER_MAP,
-    TO_ANOTHER_MAP,
-    INDOORS,
-    INTRO_SCREEN,
-    FINAL_ITEM,
-    MAP_START_AREA,
-    UNUSED_C,
-    VICTORY_SCREEN,
-    LOSS_SCREEN,
-    MAP_TO_ITEM_FOR_LOCK,
-    FIND_SOMETHING_USEFUL_DROP, //Or building?
-    FIND_SOMETHING_USEFUL_BUILDING,
-    FIND_THE_FORCE,
+    MAP_FLAG_ENEMY_TERRITORY = 0x1,
+    MAP_FLAG_FINAL_DESTINATION,
+    MAP_FLAG_ITEM_FOR_ITEM,
+    MAP_FLAG_FIND_SOMETHING_USEFUL_NPC,
+    MAP_FLAG_ITEM_TO_PASS, //Seen in map 99
+    MAP_FLAG_FROM_ANOTHER_MAP,
+    MAP_FLAG_TO_ANOTHER_MAP,
+    MAP_FLAG_INDOORS,
+    MAP_FLAG_INTRO_SCREEN,
+    MAP_FLAG_FINAL_ITEM,
+    MAP_FLAG_MAP_START_AREA,
+    MAP_FLAG_UNUSED_C,
+    MAP_FLAG_VICTORY_SCREEN,
+    MAP_FLAG_LOSS_SCREEN,
+    MAP_FLAG_MAP_TO_ITEM_FOR_LOCK,
+    MAP_FLAG_FIND_SOMETHING_USEFUL_DROP, //Or building?
+    MAP_FLAG_FIND_SOMETHING_USEFUL_BUILDING,
+    MAP_FLAG_FIND_THE_FORCE,
 };
 
 enum MAP_LAYER
@@ -122,9 +122,13 @@ void unload_map();
 void render_map();
 void update_world(double delta);
 
+void map_init(u16 num_maps);
 u32 map_get_width();
 u32 map_get_height();
 u16 map_get_id();
+u16 map_get_var(u16 x, u16 y, u16 layer);
+void map_set_var(u16 x, u16 y, u16 layer, u16 val);
+obj_info *map_get_object_by_id(int index);
 obj_info *map_get_object(int index, int x, int y);
 u16 map_get_tile(u8 layer, int x, int y);
 void map_set_tile(u8 layer, int x, int y, u16 tile);
@@ -132,5 +136,9 @@ u32 map_get_meta(u8 layer, int x, int y);
 
 void read_iact_stats(u16 map_num, u32 location, u16 num_iacts);
 void print_iact_stats();
+
+u32 map_camera_x;
+u32 map_camera_y;
+bool map_camera_locked;
 
 #endif

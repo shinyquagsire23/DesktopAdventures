@@ -18,38 +18,29 @@
  *  License along with this library; if not, see <http://www.gnu.org/licenses/>
  */
 
-#include "useful.h"
+#include "sound.h"
 
-#ifndef OBJECTINFO_H
-#define OBJECTINFO_H
+const int NUM_CONCURRENT_SNDS = 0x100;
 
-enum OBJ_TYPE
+void sound_init()
 {
-    OBJ_QUEST_ITEM_SPOT,
-    OBJ_SPAWN,
-    OBJ_THE_FORCE,
-    OBJ_VEHICLE_TO,
-    OBJ_VEHICLE_FROM,
-    OBJ_LOCATOR,
-    OBJ_ITEM,
-    OBJ_PUZZLE_NPC,
-    OBJ_WEAPON,
-    OBJ_DOOR_IN,
-    OBJ_DOOR_OUT,
-    OBJ_UNKNOWN,
-    OBJ_LOCK,
-    OBJ_TELEPORTER,
-    OBJ_XWING_FROM,
-    OBJ_XWING_TO,
-};
 
-typedef struct obj_info
+}
+
+void sound_play(u16 id)
 {
-    u32 type;
-    u16 x;
-    u16 y;
-    u16 visible;
-    u16 arg;
-} obj_info;
+    char *path = malloc(0x100);
+    strcpy(path, "sfx/");
+    strcat(path, sound_files[id]);
 
-#endif
+    //TODO
+
+    free(path);
+
+    //TODO
+}
+
+void sound_exit()
+{
+
+}

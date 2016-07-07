@@ -22,14 +22,22 @@
 
 #include <stdlib.h>
 #include <stdarg.h>
+#include <unistd.h>
 #include <stdio.h>
 #include "map.h"
+#include "main.h"
+#include "tile.h"
+#include "sound.h"
 #include "assets.h"
+#include "player.h"
+#include "screen.h"
 
 char triggers[0x24][30] = { "FirstEnter", "Enter", "BumpTile", "DragItem", "Walk", "TempVarEq", "RandVarEq", "RandVarGt", "RandVarLs", "EnterVehicle", "CheckMapTile", "EnemyDead", "AllEnemiesDead", "HasItem", "HasEndItem", "Unk0f", "Unk10", "GameInProgress?", "GameCompleted?", "HealthLs", "HealthGt", "Unk15", "Unk16", "DragWrongItem", "PlayerAtPos", "GlobalVarEq", "GlobalVarLs", "GlobalVarGt", "ExperienceEq", "Unk1d", "Unk1e", "TempVarNe", "RandVarNe", "GlobalVarNe", "CheckMapTileVar", "ExperienceGt"};
-char commands[0x26][30] = { "SetMapTile", "ClearTile", "MoveMapTile", "DrawOverlayTile", "SayText", "ShowText", "RedrawTile", "RedrawTiles", "RenderChanges", "WaitSecs", "PlaySound", "Unk0b", "Random", "SetTempVar", "AddTempVar", "SetMapTileVar", "ReleaseCamera", "LockCamera", "SetPlayerPos", "MoveCamera", "Redraw", "OpenDoor?", "CloseDoor?", "EnemySpawn", "NPCSpawn", "RemoveDraggedItem", "RemoveDraggedItemSimilar?", "SpawnItem", "AddItemToInv", "DropItem", "Open?Show?", "Unk1f", "Unk20", "WarpToMap", "SetGlobalVar", "AddGlobalVar", "SetRandVar", "AddHealth"};
+char commands[0x26][30] = { "SetMapTile", "ClearTile", "MoveMapTile", "DrawOverlayTile", "SayText", "ShowText", "RedrawTile", "RedrawTiles", "RenderChanges", "WaitTicks", "PlaySound", "Unk0b", "Random", "SetTempVar", "AddTempVar", "SetMapTileVar", "ReleaseCamera", "LockCamera", "SetPlayerPos", "MoveCamera", "Redraw", "ShowObject", "HideObject", "EnemySpawn", "NPCSpawn", "RemoveDraggedItem", "RemoveDraggedItemSimilar?", "SpawnItem", "AddItemToInv", "DropItem", "Open?Show?", "Unk1f", "Unk20", "WarpToMap", "SetGlobalVar", "AddGlobalVar", "SetRandVar", "AddHealth"};
 
 u16 active_triggers[0x24][8];
+u16 IACT_RANDVAR = 0;
+u16 IACT_TEMPVAR = 0;
 
 void read_iact()
 {
@@ -89,8 +97,107 @@ void print_iact(u32 loc)
             {
                 str[l] = read_byte();
             }
+            str[strlen] = 0;
             printf("            \"%s\"\n", str);
             free(str);
+        }
+    }
+}
+
+void run_iact(u32 loc)
+{
+    seek(loc);
+    read_long(); //IACT
+    u32 length = read_long();
+    u16 iactItemCount1 = read_short();
+    seek_add(iactItemCount1*7*sizeof(u16));
+
+    u16 iactItemCount2 = read_short();
+    for(u16 k = 0; k < iactItemCount2; k++)
+    {
+        u16 args[5];
+        u16 command = read_short();
+        for(int j = 0; j < 5; j++)
+            args[j] = read_short();
+        u16 strlen = read_short();
+        char *string = get_strn(strlen);
+
+        switch(command)
+        {
+            case IACT_CMD_SetMapTile:
+                map_set_tile(args[2], args[0], args[1], args[3]);
+                break;
+            case IACT_CMD_ClearTile:
+                map_set_tile(args[2], args[0], args[1], TILE_NONE);
+                break;
+            case IACT_CMD_MoveMapTile:
+                map_set_tile(args[2], args[3], args[4], map_get_tile(args[2], args[0], args[1]));
+                map_set_tile(args[2], args[0], args[1], TILE_NONE);
+                break;
+            case IACT_CMD_SayText: //TODO
+                printf("Luke says: %s\n", string);
+                break;
+            case IACT_CMD_ShowText: //TODO
+                printf("Someone says: %s\n", string);
+                break;
+            case IACT_CMD_RedrawTiles:
+                //TODO? This might be able to stay nopped as long as they don't abuse this command somehow.
+                break;
+            case IACT_CMD_RenderChanges:
+                render_map();
+                redraw_swap_buffers();
+                break;
+            case IACT_CMD_WaitSecs:
+                usleep(1000*(1000/TARGET_TICK_FPS));
+                break;
+            case IACT_CMD_PlaySound:
+                sound_play(args[0]);
+                break;
+            case IACT_CMD_Random:
+                IACT_RANDVAR = random() % args[0];
+                break;
+            case IACT_CMD_SetTempVar:
+                IACT_TEMPVAR = args[0];
+                break;
+            case IACT_CMD_AddTempVar:
+                IACT_TEMPVAR += args[0];
+                break;
+            case IACT_CMD_SetMapTileVar:
+                map_set_var(args[0], args[1], args[2], args[3]);
+                break;
+            case IACT_CMD_ReleaseCamera:
+                map_camera_locked = false;
+                break;
+            case IACT_CMD_LockCamera:
+                map_camera_locked = true;
+                break;
+            case IACT_CMD_SetPlayerPos:
+                player_entity.x = args[0];
+                player_entity.y = args[1];
+                break;
+            case IACT_CMD_MoveCamera:
+                //TODO: Actual movement using first two args
+                map_camera_x = args[2];
+                map_camera_y = args[3];
+                break;
+            case IACT_CMD_ShowObject:
+                map_get_object_by_id(args[0])->visible = true;
+                break;
+            case IACT_CMD_HideObject:
+                map_get_object_by_id(args[0])->visible = false;
+                break;
+            case IACT_CMD_WarpToMap:
+                player_entity.x = args[1];
+                player_entity.y = args[2];
+                unload_map();
+                load_map(args[0]);
+                break;
+            case IACT_CMD_SetRandVar:
+                IACT_RANDVAR = args[0];
+                break;
+            default:
+                printf("Unhandled script command %s, args: %x %x %x %x %x %x, strlen %x\n", commands[command], args[0], args[1], args[2], args[3], args[4], args[5], strlen);
+                break;
         }
     }
 }
@@ -217,13 +324,27 @@ void iact_set_trigger(u8 trigger, u8 count, ...)
     active_triggers[trigger][0] = true;
     active_triggers[trigger][1] = count;
     for(int i = 0; i < count; i++)
-        active_triggers[trigger][i+2] = va_arg(args, u16);
+        active_triggers[trigger][i+2] = (u16)va_arg(args, int);
 
     va_end(args);
 }
 
 void iact_update()
 {
+    for(int i = 0; i < 0x24; i++)
+    {
+        switch(i)
+        {
+            case IACT_TRIG_TempVarEq:
+                iact_set_trigger(i, 1, IACT_TEMPVAR);
+                break;
+
+            case IACT_TRIG_RandVarEq:
+                iact_set_trigger(i, 1, IACT_RANDVAR);
+                break;
+        }
+    }
+
     for(int i = 0; i < zone_data[map_get_id()]->num_iacts; i++)
     {
         seek(zone_data[map_get_id()]->iact_offsets[i]);
@@ -257,8 +378,8 @@ void iact_update()
 
         if(conditions_met)
         {
-            //TODO: Run the scripts.
-            print_iact(zone_data[map_get_id()]->iact_offsets[i]);
+            //print_iact(zone_data[map_get_id()]->iact_offsets[i]);
+            run_iact(zone_data[map_get_id()]->iact_offsets[i]);;
         }
     }
 

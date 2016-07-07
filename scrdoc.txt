@@ -41,44 +41,44 @@ Zone - <x1> <y1> <x2> <y2> <tile/sprite number> { Executes script upon entering 
 
 Script Commands:
 -----------------
-00 - <x> <y> <layer> <value> <nop> <strlen> { Sets a map tile to a value, used for variable storage }
-01 - <x> <y> <layer> <nop> <nop> <strlen> { Sets map tile to 0xFFFF (cleared) }
-02 - <x from> <y from> <layer from> <x to> <y to> { Moves a map tile from one spot to another }
-03 - <x> <y> <tile> <nop> <nop> <strlen> { Draws/Overlays a tile on the map }
-04 - <x> <y> <Sh ow Te> <strlen> <string> { Shows text from Luke }
-05 - <x> <y> <Sh ow Te> <strlen> <string> { Shows text from coords }
-06 - <x> <y> <Re dr aw> <strlen> { Redraws the map tile at a position }
-07 - <x1> <y1> <x2> <y2> <nop> <strlen> { Redraws tiles from range x1,y1 to x2,y2 }
-08 - <unk> <nop> <nop> <nop> <nop> <strlen> { Triggers a draw call }
-09 - <seconds> <nop> <Wa it Fo> <strlen> { Waits a number of seconds }
-0a - <sound id> <nop> <nop> <nop> <nop> <strlen> { Plays a sound }
+00 (SetMapTile) - <x> <y> <layer> <value> <nop> <strlen> { Sets a map tile to a value, used for variable storage }
+01 (ClearTile) - <x> <y> <layer> <nop> <nop> <strlen> { Sets map tile to 0xFFFF (cleared) }
+02 (MoveMapTile) - <x from> <y from> <layer from> <x to> <y to> { Moves a map tile from one spot to another }
+03 (DrawOverlayTile) - <x> <y> <tile> <nop> <nop> <strlen> { Draws/Overlays a tile on the map }
+04 (SayText) - <x> <y> <Sh ow Te> <strlen> <string> { Shows text from Luke }
+05 (ShowText) - <x> <y> <Sh ow Te> <strlen> <string> { Shows text from coords }
+06 (RedrawTile) - <x> <y> <Re dr aw> <strlen> { Redraws the map tile at a position }
+07 (RedrawTiles) - <x1> <y1> <x2> <y2> <nop> <strlen> { Redraws tiles from range x1,y1 to x2,y2 }
+08 (RenderChanges) - <unk> <nop> <nop> <nop> <nop> <strlen> { Triggers a draw call }
+09 (WaitTicks) - <seconds> <nop> <Wa it Fo> <strlen> { Waits a number of ticks }
+0a (PlaySound) - <sound id> <nop> <nop> <nop> <nop> <strlen> { Plays a sound }
 0b - 
-0c - <highest number> <nop> <nop> <nop> <nop> <strlen> { Stores a random from 0 to a set number to RandVar }
-0d - <value> <nop> <nop> <nop> <nop> <strlen> { Sets TempVar to value }
-0e - <value> <nop> <nop> <nop> <nop> <strlen> { Adds value to TempVar }
-0f - <x> <y> <layer> <value> <nop> <strlen> { Sets a map tile to a value, used for variable storage }
-10 - <nop> <nop> <nop> <nop> <nop> <strlen> { Releases camera from player }
-11 - <nop> <nop> <nop> <nop> <nop> <strlen> { Locks camera to player }
-12 - <x> <y> <nop> <nop> <nop> <strlen> { Teleport/Move Player Position }
-13 - <x1> <y1> <x2> <y2> <time> { Moves camera from x1,y1 to x2,y2 in a set amount of time }
-14 - <nop> <nop> <nop> <nop> <nop> <strlen> { Redraws map }
-15 - <door num> <nop> <nop> <nop> <nop> <strlen> { Opens door? }
-16 - <door num> <nop> <nop> <nop> <nop> <strlen> { Closes door? }
-17 - <enemy num> <nop> <nop> <nop> <nop> <strlen> { Spawn enemy }
-18 - <npc num> <nop> <nop> <nop> <nop> <strlen> { Spawn NPC }
-19 - <nop> <nop> <nop> <nop> <nop> <strlen> { Remove dragged item }
-1a - <nop> <nop> <nop> <nop> <nop> <strlen> { Similar to 'Remove dragged item'? }
-1b - <item id> <x> <y> <nop> <nop> <nop> { Spawn item at coords }
-1c - <item id> <nop> <nop> <nop> <nop> <nop> { Adds item to inventory }
-1d - <item id> <nop> <nop> <nop> <nop> <nop> { Drop item from cursor }
-1e - 'Open'? 'Show'? Sets a bunch of values to 1. Used in map 52 on opening a box.
+0c (Random) - <highest number> <nop> <nop> <nop> <nop> <strlen> { Stores a random from 0 to a set number to RandVar }
+0d (SetTempVar) - <value> <nop> <nop> <nop> <nop> <strlen> { Sets TempVar to value }
+0e (AddTempVar) - <value> <nop> <nop> <nop> <nop> <strlen> { Adds value to TempVar }
+0f (SetMapTileVar) - <x> <y> <layer> <value> <nop> <strlen> { Sets a map tile to a value, used for variable storage }
+10 (ReleaseCamera) - <nop> <nop> <nop> <nop> <nop> <strlen> { Releases camera from player }
+11 (LockCamera) - <nop> <nop> <nop> <nop> <nop> <strlen> { Locks camera to player }
+12 (SetPlayerPos) - <x> <y> <nop> <nop> <nop> <strlen> { Teleport/Move Player Position }
+13 (MoveCamera) - <x1> <y1> <x2> <y2> <time> { Moves camera from x1,y1 to x2,y2 in a set amount of time }
+14 (Redraw) - <nop> <nop> <nop> <nop> <nop> <strlen> { Redraws map }
+15 (ShowObject) - <obj num> <nop> <nop> <nop> <nop> <strlen> { Shows an object }
+16 (HideObject) - <obj num> <nop> <nop> <nop> <nop> <strlen> { Hides an object }
+17 (EnemySpawn) - <enemy num> <nop> <nop> <nop> <nop> <strlen> { Spawn enemy }
+18 (NPCSpawn) - <npc num> <nop> <nop> <nop> <nop> <strlen> { Spawn NPC }
+19 (RemoveDraggedItem) - <nop> <nop> <nop> <nop> <nop> <strlen> { Remove dragged item }
+1a (RemoveDraggedItemSimilar?) - <nop> <nop> <nop> <nop> <nop> <strlen> { Similar to 'Remove dragged item'? }
+1b (SpawnItem) - <item id> <x> <y> <nop> <nop> <nop> { Spawn item at coords }
+1c (AddItemToInv) - <item id> <nop> <nop> <nop> <nop> <nop> { Adds item to inventory }
+1d (DropItem) - <item id> <nop> <nop> <nop> <nop> <nop> { Drop item from cursor }
+1e (Open?Show?) - 'Open'? 'Show'? Sets a bunch of values to 1. Used in map 52 on opening a box.
 1f - 
 20 - Never used.
-21 - <map num> <x> <y> <unk> <nop> <strlen> { Warps player to pos on map }
-22 - <value> <nop> <nop> <nop> <nop> <strlen> { Sets GlobalVar to value }
-23 - <value> <nop> <nop> <nop> <nop> <strlen> { Adds GlobalVar to value }
-24 - <value> <nop> <nop> <nop> <nop> <strlen> { Sets RandVar to value }
-25 - <amt> <nop> <nop> <nop> <nop> <strlen> { Adds amt to player health }
+21 (WarpToMap) - <map num> <x> <y> <unk> <nop> <strlen> { Warps player to pos on map }
+22 (SetGlobalVar) - <value> <nop> <nop> <nop> <nop> <strlen> { Sets GlobalVar to value }
+23 (AddGlobalVar) - <value> <nop> <nop> <nop> <nop> <strlen> { Adds GlobalVar to value }
+24 (SetRandVar) - <value> <nop> <nop> <nop> <nop> <strlen> { Sets RandVar to value }
+25 (AddHealth) - <amt> <nop> <nop> <nop> <nop> <strlen> { Adds amt to player health }
 
 Notes:
 -----------------

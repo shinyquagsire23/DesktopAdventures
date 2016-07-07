@@ -44,6 +44,7 @@ u16 NUM_MAPS = 0;
 
 u32 version = 4;
 u32* tile;
+char **sound_files;
 
 GLuint texture[0x2001];
 izon_data **zone_data;
@@ -83,7 +84,7 @@ void load_resources()
         ASSETS_PERCENT = ((float)tag_seek / (float)yodesk_size);
         if(found && ASSETS_PERCENT - last_percent > 0.1)
         {
-            draw_STUP();
+            redraw_swap_buffers();
             last_percent = ASSETS_PERCENT;
         }
 
@@ -99,7 +100,7 @@ void load_resources()
 
             u32 len = read_long();
             seek(len+sizeof(u64)+tag_seek);
-            draw_STUP();
+            redraw_swap_buffers();
         }
         else if(!strncmp(tag, "ZONE", 4)) //ZONEs (maps)
         {
@@ -125,6 +126,7 @@ void load_resources()
                 zone_data[j] = (izon_data*)calloc(sizeof(izon_data), sizeof(u8));
 
             log("%i maps in DAT\n", NUM_MAPS);
+            map_init(NUM_MAPS);
         }
         else if(!strncmp(tag, "IZON", 4)) //Index of ZONE
         {
@@ -305,7 +307,7 @@ void load_resources()
                 {
                     log("%x of %x...\n", j, section_length / ((32 * 32) + 4));
                     ASSETS_PERCENT = ((float)get_location() / (float)yodesk_size);
-                    draw_STUP();
+                    redraw_swap_buffers();
                 }
 
                 u32 tile_stuff = read_long();

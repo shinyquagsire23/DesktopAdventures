@@ -37,16 +37,18 @@
 u32 tile_metadata[0x2000];
 double world_timer = 0.0;
 
-u16 *map_tiles_low;
-u16 *map_tiles_middle;
-u16 *map_tiles_high;
+u16 **map_tiles_low;
+u16 **map_tiles_middle;
+u16 **map_tiles_high;
+u16 **map_vars;
 u16 *map_overlay;
-u32 camera_x = 0;
-u32 camera_y = 0;
+u32 map_camera_x = 0;
+u32 map_camera_y = 0;
+bool map_camera_locked = true;
 
 entity *entities[512];
-obj_info **object_info;
-u16 object_info_qty = 0;
+obj_info ***object_info;
+u16 *object_info_qty = NULL;
 u16 num_entities = 0;
 
 u32 unknown;
@@ -60,6 +62,17 @@ u16 id;
 char area_types[0x6][10] = { "UNUSED", "DESERT", "SNOW", "FOREST", "UNUSED", "SWAMP" };
 char map_flags[0x13][32] = {"NOP", "ENEMY_TERRITORY", "FINAL_DESTINATION", "ITEM_FOR_ITEM", "FIND_SOMETHING_USEFUL_NPC", "ITEM_TO_PASS", "FROM_ANOTHER_MAP", "TO_ANOTHER_MAP", "INDOORS", "INTRO_SCREEN", "FINAL_ITEM", "MAP_START_AREA", "UNUSED_C", "VICTORY_SCREEN", "LOSS_SCREEN", "MAP_TO_ITEM_FOR_LOCK", "FIND_SOMETHING_USEFUL_DROP", "FIND_SOMETHING_USEFUL_BUILDING", "FIND_THE_FORCE"};
 char obj_types[0x10][32] = {"QUEST_ITEM_SPOT", "SPAWN", "THE_FORCE", "VEHICLE_TO", "VEHICLE_FROM", "LOCATOR", "ITEM", "PUZZLE_NPC", "WEAPON", "DOOR_IN", "DOOR_OUT", "UNKNOWN", "LOCK", "TELEPORTER", "XWING_FROM", "XWING_TO"};
+
+void map_init(u16 num_maps)
+{
+    map_tiles_low = malloc(num_maps*sizeof(u16*));
+    map_tiles_middle = malloc(num_maps*sizeof(u16*));
+    map_tiles_high = malloc(num_maps*sizeof(u16*));
+    map_vars = malloc(num_maps*sizeof(u16*));
+
+    object_info = malloc(num_maps*sizeof(void*));
+    object_info_qty = malloc(num_maps*sizeof(u16*));
+}
 
 //TODO: Try to make this a struct or something, less allocating of data that's already in our RAM buffer of the .DAT
 void load_map(u16 map_id)
@@ -98,57 +111,71 @@ void load_map(u16 map_id)
     area_type = read_byte();
     same = read_byte();
 
-    map_tiles_low = malloc(width*height*2);
-    map_tiles_middle = malloc(width*height*2);
-    map_tiles_high = malloc(width*height*2);
-    map_overlay = malloc(width*height*2);
-    for(int i = 0; i < width*height; i++)
+    map_overlay = malloc(width * height * 2);
+    for (int i = 0; i < width * height; i++)
     {
-        map_tiles_low[i] = read_short();
-        map_tiles_middle[i] = read_short();
-        map_tiles_high[i] = read_short();
         map_overlay[i] = 0xFFFF;
+    }
+
+    if(map_tiles_low[id] == NULL)
+    {
+        map_tiles_low[id] = malloc(width * height * 2);
+        map_tiles_middle[id] = malloc(width * height * 2);
+        map_tiles_high[id] = malloc(width * height * 2);
+        map_vars[id] = malloc(width * height * 2); //TODO: Validate actual size
+        for (int i = 0; i < width * height; i++)
+        {
+            map_tiles_low[id][i] = read_short();
+            map_tiles_middle[id][i] = read_short();
+            map_tiles_high[id][i] = read_short();
+            map_overlay[i] = 0xFFFF;
+        }
+
+        //Process Object Info
+        if(!is_yoda)
+            seek(zone_data[map_id]->htsp_offset);
+
+        object_info_qty[id] = zone_data[map_id]->htsp_offset == 0 && !is_yoda ? 0 : read_short();
+        object_info[id] = malloc(object_info_qty[id] * sizeof(obj_info *));
+        for (int i = 0; i < object_info_qty[id]; i++)
+        {
+            object_info[id][i] = malloc(sizeof(obj_info));
+
+            object_info[id][i]->type = read_long();
+            object_info[id][i]->x = read_short();
+            object_info[id][i]->y = read_short();
+            object_info[id][i]->visible = read_short();
+            object_info[id][i]->arg = read_short();
+        }
+
+        iact_set_trigger(IACT_TRIG_FirstEnter, 0);
+    }
+    else
+    {
+        seek_add(width * height * sizeof(u16) * 3);
+    }
+
+    for (int i = 0; i < object_info_qty[id]; i++)
+    {
+        printf("  obj_info: %s, %u, %u, %u, %x (%s?)\n", obj_types[object_info[id][i]->type], object_info[id][i]->x, object_info[id][i]->y, object_info[id][i]->visible, object_info[id][i]->arg, tile_names[object_info[id][i]->arg]);
+
+        //Display items and NPCs for debug purposes
+        switch (object_info[id][i]->type)
+        {
+            case OBJ_ITEM:
+            case OBJ_WEAPON:
+            case OBJ_PUZZLE_NPC:
+                map_overlay[object_info[id][i]->x + (object_info[id][i]->y * width)] = object_info[id][i]->visible ? object_info[id][i]->arg : TILE_NONE;
+                break;
+            case OBJ_DOOR_OUT:
+                player_entity.x = object_info[id][i]->x;
+                player_entity.y = object_info[id][i]->y;
+                break;
+        }
     }
 
     printf("Loading map %i, %s, %s, %s, width %i, height %i\n", map_id, (unknown == 0x7AC ? "DYNAMIC" : "STATIC"), map_flags[flags], area_types[area_type], width, height);
     iact_set_trigger(IACT_TRIG_Enter, 0);
-
-    //Process Object Info
-    if(!is_yoda)
-        seek(zone_data[map_id]->htsp_offset);
-
-    object_info_qty = zone_data[map_id]->htsp_offset == 0 && !is_yoda ? 0 : read_short();
-    object_info = malloc(object_info_qty * sizeof(obj_info*));
-    for(int i = 0; i < object_info_qty; i++)
-    {
-        object_info[i] = malloc(sizeof(obj_info));
-
-        object_info[i]->type = read_long();
-        object_info[i]->x = read_short();
-        object_info[i]->y = read_short();
-        object_info[i]->unk1 = read_short();
-        object_info[i]->arg = read_short();
-
-        printf("  obj_info: %s, %u, %u, %u, %x (%s?)\n", obj_types[object_info[i]->type], object_info[i]->x, object_info[i]->y, object_info[i]->unk1, object_info[i]->arg, tile_names[object_info[i]->arg]);
-
-        //Display items and NPCs for debug purposes
-        switch(object_info[i]->type)
-        {
-            case OBJ_ITEM:
-                map_overlay[object_info[i]->x+(object_info[i]->y*width)] = object_info[i]->arg;
-                break;
-            case OBJ_WEAPON:
-                map_overlay[object_info[i]->x+(object_info[i]->y*width)] = object_info[i]->arg;
-                break;
-            case OBJ_PUZZLE_NPC:
-                map_overlay[object_info[i]->x+(object_info[i]->y*width)] = object_info[i]->arg;
-                break;
-            case OBJ_DOOR_OUT:
-                player_entity.x = object_info[i]->x;
-                player_entity.y = object_info[i]->y;
-                break;
-        }
-    }
 
     switch(PLAYER_MAP_CHANGE_REASON)
     {
@@ -167,17 +194,23 @@ void load_map(u16 map_id)
 
 void unload_map()
 {
-    free(map_tiles_low);
-    free(map_tiles_middle);
-    free(map_tiles_high);
+    //These maps are not worth keeping in memory
+    if(map_flags[flags] == MAP_FLAG_INTRO_SCREEN)
+    {
+        free(map_tiles_low[id]);
+        free(map_tiles_middle[id]);
+        free(map_tiles_high[id]);
+        free(map_vars[id]);
+
+        for(int i = 0; i < object_info_qty[id]; i++)
+            free(object_info[id][i]);
+
+        free(object_info[id]);
+    }
+    free(map_overlay);
 
     for(int i = 0; i < num_entities; i++)
         free(entities[i]);
-
-    for(int i = 0; i < object_info_qty; i++)
-        free(object_info[i]);
-
-    free(object_info);
 
     num_entities = 0;
 }
@@ -272,23 +305,37 @@ void load_izax()
 
 void render_map()
 {
+    for (int i = 0; i < object_info_qty[id]; i++)
+    {
+        //Display items and NPCs for debug purposes
+        switch (object_info[id][i]->type)
+        {
+            case OBJ_ITEM:
+            case OBJ_WEAPON:
+            case OBJ_PUZZLE_NPC:
+                map_overlay[object_info[id][i]->x + (object_info[id][i]->y * width)] = object_info[id][i]->visible ? object_info[id][i]->arg : TILE_NONE;
+                break;
+        }
+    }
+
+
     for(int i = 0; i < 9; i++)
     {
         for(int j = 0; j < 9; j++)
         {
-            tiles_low[(j*9)+i] = map_tiles_low[((camera_y+j)*width)+i+camera_x];
-            tiles_middle[(j*9)+i] = map_tiles_middle[((camera_y+j)*width)+i+camera_x];
-            tiles_high[(j*9)+i] = map_tiles_high[((camera_y+j)*width)+i+camera_x];
-            tiles_overlay[(j*9)+i] = map_overlay[((camera_y+j)*width)+i+camera_x];
+            tiles_low[(j*9)+i] = map_tiles_low[id][((map_camera_y+j)*width)+i+map_camera_x];
+            tiles_middle[(j*9)+i] = map_tiles_middle[id][((map_camera_y+j)*width)+i+map_camera_x];
+            tiles_high[(j*9)+i] = map_tiles_high[id][((map_camera_y+j)*width)+i+map_camera_x];
+            tiles_overlay[(j*9)+i] = map_overlay[((map_camera_y+j)*width)+i+map_camera_x];
         }
     }
 
-    if(player_entity.y >= camera_y &&
-       player_entity.y < (camera_y + 9) &&
-       player_entity.x >= camera_x &&
-       player_entity.x < (camera_x + 9))
+    if(player_entity.y >= map_camera_y &&
+       player_entity.y < (map_camera_y + 9) &&
+       player_entity.x >= map_camera_x &&
+       player_entity.x < (map_camera_x + 9))
     {
-        tiles_middle[((player_entity.y - camera_y)*9) + (player_entity.x - camera_x)] = char_data[player_entity.char_id]->frames[player_entity.current_frame];
+        tiles_middle[((player_entity.y - map_camera_y)*9) + (player_entity.x - map_camera_x)] = char_data[player_entity.char_id]->frames[player_entity.current_frame];
     }
 
     for(int i = 0; i < num_entities; i++)
@@ -297,15 +344,15 @@ void render_map()
         if(e->current_frame < 2)
             continue; //These frames are transparent/unused in Yoda Stories, not sure for Indy
 
-        if(e->y >= camera_y &&
-            e->y < camera_y + 9 &&
-            e->x >= camera_x &&
-            e->x < camera_x + 9)
+        if(e->y >= map_camera_y &&
+            e->y < map_camera_y + 9 &&
+            e->x >= map_camera_x &&
+            e->x < map_camera_x + 9)
         {
-            tiles_high[((e->y - camera_y)*9) + (e->x - camera_x)] = char_data[e->char_id]->frames[e->current_frame];
+            tiles_high[((e->y - map_camera_y)*9) + (e->x - map_camera_x)] = char_data[e->char_id]->frames[e->current_frame];
 
             if(e->num_items > 0)
-                tiles_overlay[((e->y - camera_y)*9) + (e->x - camera_x)] = e->item;
+                tiles_overlay[((e->y - map_camera_y)*9) + (e->x - map_camera_x)] = e->item;
         }
     }
 
@@ -331,15 +378,30 @@ u16 map_get_id()
     return id;
 }
 
+u16 map_get_var(u16 x, u16 y, u16 layer)
+{
+    return map_vars[id][((y*width)+x)+(layer*width*width)];
+}
+
+void map_set_var(u16 x, u16 y, u16 layer, u16 val)
+{
+    map_vars[id][((y*width)+x)+(layer*width*width)] = val;
+}
+
+obj_info *map_get_object_by_id(int index)
+{
+    return object_info[id][index];
+}
+
 obj_info *map_get_object(int index, int x, int y)
 {
     int seek_index = index;
-    for(int i = 0; i < object_info_qty; i++)
+    for(int i = 0; i < object_info_qty[id]; i++)
     {
-        if(object_info[i]->x == (u16)x && object_info[i]->y == (u16)y)
+        if(object_info[id][i]->x == (u16)x && object_info[id][i]->y == (u16)y)
         {
             if(seek_index == 0)
-                return object_info[i];
+                return object_info[id][i];
             seek_index--;
         }
     }
@@ -351,11 +413,11 @@ u16 map_get_tile(u8 layer, int x, int y)
     switch(layer)
     {
         case LAYER_LOW:
-            return map_tiles_low[(y*width)+x];
+            return map_tiles_low[id][(y*width)+x];
         case LAYER_MIDDLE:
-            return map_tiles_middle[(y*width)+x];
+            return map_tiles_middle[id][(y*width)+x];
         case LAYER_HIGH:
-            return map_tiles_high[(y*width)+x];
+            return map_tiles_high[id][(y*width)+x];
         default:
         case LAYER_OVERLAY:
             return map_overlay[(y*width)+x];
@@ -367,11 +429,11 @@ void map_set_tile(u8 layer, int x, int y, u16 tile)
     switch(layer)
     {
         case LAYER_LOW:
-            map_tiles_low[(y*width)+x] = tile;
+            map_tiles_low[id][(y*width)+x] = tile;
         case LAYER_MIDDLE:
-            map_tiles_middle[(y*width)+x] = tile;
+            map_tiles_middle[id][(y*width)+x] = tile;
         case LAYER_HIGH:
-            map_tiles_high[(y*width)+x] = tile;
+            map_tiles_high[id][(y*width)+x] = tile;
         default:
         case LAYER_OVERLAY:
             map_overlay[(y*width)+x] = tile;
@@ -383,11 +445,11 @@ u32 map_get_meta(u8 layer, int x, int y)
     switch(layer)
     {
         case LAYER_LOW:
-            return tile_metadata[map_tiles_low[(y*width)+x]];
+            return tile_metadata[map_tiles_low[id][(y*width)+x]];
         case LAYER_MIDDLE:
-            return tile_metadata[map_tiles_middle[(y*width)+x]];
+            return tile_metadata[map_tiles_middle[id][(y*width)+x]];
         case LAYER_HIGH:
-            return tile_metadata[map_tiles_high[(y*width)+x]];
+            return tile_metadata[map_tiles_high[id][(y*width)+x]];
         default:
         case LAYER_OVERLAY:
             return tile_metadata[map_overlay[(y*width)+x]];
@@ -409,8 +471,11 @@ void update_world(double delta)
         if (BUTTON_DOWN_STATE)
             player_move(DOWN);
 
-        camera_x = MIN(MAX(0, player_entity.x - 4), width - 9);
-        camera_y = MIN(MAX(0, player_entity.y - 4), height - 9);
+        if(map_camera_locked)
+        {
+            map_camera_x = MIN(MAX(0, player_entity.x - 4), width - 9);
+            map_camera_y = MIN(MAX(0, player_entity.y - 4), height - 9);
+        }
 
         player_update();
         iact_update();
