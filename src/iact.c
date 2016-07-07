@@ -196,7 +196,7 @@ void run_iact(u32 loc)
                 IACT_RANDVAR = args[0];
                 break;
             default:
-                printf("Unhandled script command %s, args: %x %x %x %x %x %x, strlen %x\n", commands[command], args[0], args[1], args[2], args[3], args[4], args[5], strlen);
+                printf("Unhandled script command %s, args: %x %x %x %x %x, strlen %x\n", commands[command], args[0], args[1], args[2], args[3], args[4], strlen);
                 break;
         }
     }
