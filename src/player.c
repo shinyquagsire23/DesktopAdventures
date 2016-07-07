@@ -138,6 +138,106 @@ void player_goto_door_in()
     player_entity.y = DOOR_IN_y;
 }
 
+void player_bump(int dir, int x, int y)
+{
+    u32 meta = -1;
+    int bump_x = player_entity.x;
+    int bump_y = player_entity.y;
+
+    switch(dir)
+    {
+        case LEFT:
+            bump_x--;
+            break;
+        case RIGHT:
+            bump_x++;
+            break;
+        case UP:
+            bump_y--;
+            break;
+        case DOWN:
+            bump_y++;
+            break;
+        case UP_LEFT:
+            bump_x--;
+            bump_y--;
+            break;
+        case UP_RIGHT:
+            bump_x++;
+            bump_y--;
+            break;
+        case DOWN_LEFT:
+            bump_x--;
+            bump_y++;
+            break;
+        case DOWN_RIGHT:
+            bump_x++;
+            bump_y++;
+            break;
+        default:
+            break;
+    }
+    meta = map_get_meta(LAYER_MIDDLE, bump_x, bump_y);
+
+    int object_index = 0;
+    bool locked;
+    bool remove_tile = false;
+    while(1)
+    {
+        obj_info *object = map_get_object(object_index++, bump_x, bump_y);
+        if(object == NULL)
+            break;
+
+        u32 obj_type = object->type;
+
+        if (obj_type == OBJ_DOOR_IN && !locked)
+        {
+            remove_tile = true;
+        }
+        else if (obj_type == OBJ_LOCK)
+        {
+            locked = true;
+            remove_tile = false;
+            printf("This door is locked!\n");
+        }
+    }
+
+    iact_set_trigger(IACT_TRIG_BumpTile, 3, bump_x, bump_y, map_get_tile(LAYER_MIDDLE, bump_x, bump_y));
+}
+
+void player_stand(int x, int y)
+{
+    u32 meta = map_get_meta(LAYER_MIDDLE, x, y);
+    int object_index = 0;
+    while(1)
+    {
+        obj_info *object = map_get_object(object_index++, x, y);
+        if(object == NULL)
+            break;
+
+        u32 obj_type = object->type;
+
+        if (obj_type == OBJ_DOOR_IN)
+        {
+            DOOR_IN_x = x;
+            DOOR_IN_y = y;
+            DOOR_IN_map = map_get_id();
+
+            PLAYER_MAP_CHANGE_REASON = MAP_CHANGE_DOOR_IN;
+
+            unload_map();
+            load_map(object->arg);
+        }
+        else if (obj_type == OBJ_DOOR_OUT)
+        {
+            PLAYER_MAP_CHANGE_REASON = MAP_CHANGE_DOOR_OUT;
+
+            unload_map();
+            load_map(DOOR_IN_map);
+        }
+    }
+}
+
 void player_move(int dir)
 {
     if(dir != last_dir)
@@ -322,106 +422,6 @@ void player_handle_walk_animation()
             break;
     }
     moving = 0;
-}
-
-void player_bump(int dir, int x, int y)
-{
-    u32 meta = -1;
-    int bump_x = player_entity.x;
-    int bump_y = player_entity.y;
-
-    switch(dir)
-    {
-        case LEFT:
-            bump_x--;
-            break;
-        case RIGHT:
-            bump_x++;
-            break;
-        case UP:
-            bump_y--;
-            break;
-        case DOWN:
-            bump_y++;
-            break;
-        case UP_LEFT:
-            bump_x--;
-            bump_y--;
-            break;
-        case UP_RIGHT:
-            bump_x++;
-            bump_y--;
-            break;
-        case DOWN_LEFT:
-            bump_x--;
-            bump_y++;
-            break;
-        case DOWN_RIGHT:
-            bump_x++;
-            bump_y++;
-            break;
-        default:
-            break;
-    }
-    meta = map_get_meta(LAYER_MIDDLE, bump_x, bump_y);
-
-    int object_index = 0;
-    bool locked;
-    bool remove_tile = false;
-    while(1)
-    {
-        obj_info *object = map_get_object(object_index++, bump_x, bump_y);
-        if(object == NULL)
-            break;
-
-        u32 obj_type = object->type;
-
-        if (obj_type == OBJ_DOOR_IN && !locked)
-        {
-            remove_tile = true;
-        }
-        else if (obj_type == OBJ_LOCK)
-        {
-            locked = true;
-            remove_tile = false;
-            printf("This door is locked!\n");
-        }
-    }
-
-    iact_set_trigger(IACT_TRIG_BumpTile, 3, bump_x, bump_y, map_get_tile(LAYER_MIDDLE, bump_x, bump_y));
-}
-
-void player_stand(int x, int y)
-{
-    u32 meta = map_get_meta(LAYER_MIDDLE, x, y);
-    int object_index = 0;
-    while(1)
-    {
-        obj_info *object = map_get_object(object_index++, x, y);
-        if(object == NULL)
-            break;
-
-        u32 obj_type = object->type;
-
-        if (obj_type == OBJ_DOOR_IN)
-        {
-            DOOR_IN_x = x;
-            DOOR_IN_y = y;
-            DOOR_IN_map = map_get_id();
-
-            PLAYER_MAP_CHANGE_REASON = MAP_CHANGE_DOOR_IN;
-
-            unload_map();
-            load_map(object->arg);
-        }
-        else if (obj_type == OBJ_DOOR_OUT)
-        {
-            PLAYER_MAP_CHANGE_REASON = MAP_CHANGE_DOOR_OUT;
-
-            unload_map();
-            load_map(DOOR_IN_map);
-        }
-    }
 }
 
 void player_update()
