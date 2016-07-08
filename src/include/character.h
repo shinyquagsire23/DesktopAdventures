@@ -31,6 +31,7 @@ typedef struct entity
     u16 current_frame;
     u16 item;
     u16 num_items;
+    u16 health;
 } entity;
 
 enum ICHR_FLAGS

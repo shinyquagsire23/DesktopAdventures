@@ -422,10 +422,17 @@ void player_stand(int x, int y)
             load_map(DOOR_IN_map);
         }
     }
+
+    iact_set_trigger(IACT_TRIG_Walk, 2, player_entity.x, player_entity.y);
+}
+
+void player_init()
+{
+    player_entity.health = 300;
 }
 
 void player_update()
 {
     player_handle_walk_animation();
-    iact_set_trigger(IACT_TRIG_Walk, 2, player_entity.x, player_entity.y);
+    iact_set_trigger(IACT_TRIG_PlayerAtPos, 2, player_entity.x, player_entity.y);
 }

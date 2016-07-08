@@ -39,6 +39,7 @@ bool player_collides(int dir, int x, int y);
 void player_move(int dir);
 void player_goto_door_in();
 void player_update();
+void player_init();
 
 entity player_entity;
 u8 PLAYER_MAP_CHANGE_REASON;

@@ -26,5 +26,8 @@ unsigned short tiles_high[0x100 * 0x100];
 unsigned short tiles_overlay[0x100 * 0x100];
 void init_screen();
 int draw_screen();
+void screen_transition_in();
+void screen_transition_out();
 
+u8 SCREEN_FADE_LEVEL;
 u16 TARGET_TICK_FPS;

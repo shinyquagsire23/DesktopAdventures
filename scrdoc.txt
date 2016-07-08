@@ -1,43 +1,41 @@
 Pre-Script Commands:
 -----------------
-00 - <nop> <nop> <nop> <nop> <nop> <nop> { Executes script on first entry of map }
-01 - <nop> <nop> <nop> <nop> <nop> <nop> { Executes script on entry of map }
-02 - <x> <y> <tile/sprite number> <nop> <nop> <nop> { Executes script on bumping into something }
-03 - <x> <y> <layer> <tile/sprite number> <item number> <nop> { Executes script on dragging an item onto a tile }
-04 - <x> <y> <nop> <nop> <nop> <nop> { Executes script on walking into something (cannot click or spacebar it) }
-05 - <value> <nop> <nop> <nop> <nop> <nop> { Checks if TempVar == value }
-06 - <value> <nop> <nop> <nop> <nop> <nop> { Checks if RandVar == value }
-07 - <value> <nop> <nop> <nop> <nop> <nop> { Checks if RandVar > Value }
-08 - <value> <nop> <nop> <nop> <nop> <nop> { Checks if RandVar < Value }
-09 - <nop> <nop> <nop> <nop> <nop> <nop> { Executes script on map entry (used for X-wings and transportation anims) }
-0a - <value> <x> <y> <layer> <nop> <nop> { Checks if map tile is set to a value, used for variable storage }
-0b - <enemy id> <nop> <nop> <nop> <nop> <nop> { Checks if enemy is dead }
-0c - <nop> <nop> <nop> <nop> <nop> <nop> { Checks if all enemies are dead }
-0d - <item num> <nop> <nop> <nop> <nop> <nop> { Checks if an item is in the player's inventory, does something unknown if the item num is FFFF (gets item currently equipped?) }
-0e - <item num> <nop> <nop> <nop> <nop> <nop> { Checks if player has an ending item? }
-0f - 
+00 (FirstEnter) - <nop> <nop> <nop> <nop> <nop> <nop> { Executes script on first entry of map }
+01 (Enter) - <nop> <nop> <nop> <nop> <nop> <nop> { Executes script on entry of map }
+02 (BumpTile) - <x> <y> <tile/sprite number> <nop> <nop> <nop> { Executes script on bumping into something }
+03 (DragItem) - <x> <y> <layer> <tile/sprite number> <item number> <nop> { Executes script on dragging an item onto a tile }
+04 (Walk) - <x> <y> <nop> <nop> <nop> <nop> { Executes script on walking into something (cannot click or spacebar it) }
+05 (TempVarEq) - <value> <nop> <nop> <nop> <nop> <nop> { Checks if TempVar == value }
+06 (RandVarEq) - <value> <nop> <nop> <nop> <nop> <nop> { Checks if RandVar == value }
+07 (RandVarGt) - <value> <nop> <nop> <nop> <nop> <nop> { Checks if RandVar > Value }
+08 (RandVarLs) - <value> <nop> <nop> <nop> <nop> <nop> { Checks if RandVar < Value }
+09 (EnterVehicle) - <nop> <nop> <nop> <nop> <nop> <nop> { Executes script on map entry (used for X-wings and transportation anims) }
+0a (CheckMapTile) - <value> <x> <y> <layer> <nop> <nop> { Checks if map tile is set to a value, used for variable storage }
+0b (EnemyDead) - <enemy id> <nop> <nop> <nop> <nop> <nop> { Checks if enemy is dead }
+0c (AllEnemiesDead) - <nop> <nop> <nop> <nop> <nop> <nop> { Checks if all enemies are dead }
+0d (HasItem) - <item num> <nop> <nop> <nop> <nop> <nop> { Checks if an item is in the player's inventory, does something unknown if the item num is FFFF (gets item currently equipped?) }
+0e (HasEndItem) - <item num> <nop> <nop> <nop> <nop> <nop> { Checks if player has an ending item? }
+0f - Has start item?
 10 - Used in map 150, also in early maps in Indy with leaked text "Pick"
-11 - <nop> <nop> <nop> <nop> <nop> <nop> { Executes script if player has not beaten game yet? Never used. }
-12 - <nop> <nop> <nop> <nop> <nop> <nop> { Executes script is player has beaten game? }
-13 - <value> <nop> <nop> <nop> <nop> <nop> { Checks if Luke health < Value } 
-14 - <value> <nop> <nop> <nop> <nop> <nop> { Checks if Luke health > Value }
-15 - Never used.
-16 - 
-17 - <x> <y> <layer> <tile/sprite number> <item number> <nop> { Executes script on dragging an incorrect item onto a tile }
-18 - <x> <y> <nop> <nop> <nop> <nop> { Checks if player is at position }
-19 - <value> <nop> <nop> <nop> <nop> <nop> { Checks if GlobalVar == value }
-1a - <value> <nop> <nop> <nop> <nop> <nop> { Checks if GlobalVar < value }
-1b - <value> <nop> <nop> <nop> <nop> <nop> { Checks if GlobalVar > value }
-1c - <value> <nop> <nop> <nop> <nop> <nop> { Checks if ExperienceVar == value, used in map 94 (Dagobah) a lot. }
+11 (GameInProgress) - <nop> <nop> <nop> <nop> <nop> <nop> { Executes script if player has not beaten game yet? Never used. }
+12 (GameCompleted) - <nop> <nop> <nop> <nop> <nop> <nop> { Executes script is player has beaten game? }
+13 (HealthLs) - <value> <nop> <nop> <nop> <nop> <nop> { Checks if Luke health < Value } 
+14 (HealthGt) - <value> <nop> <nop> <nop> <nop> <nop> { Checks if Luke health > Value }
+15 - Never used, and actually not implemented in Yoda Stories
+16 - Related to 10
+17 (DragWrongItem) - <x> <y> <layer> <tile/sprite number> <item number> <nop> { Executes script on dragging an incorrect item onto a tile }
+18 (PlayerAtPos) - <x> <y> <nop> <nop> <nop> <nop> { Checks if player is at position }
+19 (GlobalVarEq) - <value> <nop> <nop> <nop> <nop> <nop> { Checks if GlobalVar == value }
+1a (GlobalVarLs) - <value> <nop> <nop> <nop> <nop> <nop> { Checks if GlobalVar < value }
+1b (GlobalVarGt) - <value> <nop> <nop> <nop> <nop> <nop> { Checks if GlobalVar > value }
+1c (ExperienceEq) - <value> <nop> <nop> <nop> <nop> <nop> { Checks if ExperienceVar == value, used in map 94 (Dagobah) a lot. }
 1d - <unk> <unk> <nop> <nop> <nop> <nop> { Used in map 57, 139, 160 a lot, related to script cmd 15/16? Checks goals? }
 1e - 
-1f - <value> <nop> <nop> <nop> <nop> <nop> { Checks if TempVar != value }
-20 - <value> <nop> <nop> <nop> <nop> <nop> { Checks if RandVar != value }
-21 - <value> <nop> <nop> <nop> <nop> <nop> { Checks if GlobalVar != value }
-22 - <value> <x> <y> <layer> <nop> <nop> { Checks if map tile is set to a value, used for variable storage }
-23 - <value> <nop> <nop> <nop> <nop> <nop> { Checks if ExperienceVar > Value }
-
-Zone - <x1> <y1> <x2> <y2> <tile/sprite number> { Executes script upon entering zone }
+1f (TempVarNe) - <value> <nop> <nop> <nop> <nop> <nop> { Checks if TempVar != value }
+20 (RandVarNe) - <value> <nop> <nop> <nop> <nop> <nop> { Checks if RandVar != value }
+21 (GlobalVarNe) - <value> <nop> <nop> <nop> <nop> <nop> { Checks if GlobalVar != value }
+22 (CheckMapTileVar) - <value> <x> <y> <layer> <nop> <nop> { Checks if map tile is set to a value, used for variable storage, exact same as CheckMapTile in code }
+23 (ExperienceGt) - <value> <nop> <nop> <nop> <nop> <nop> { Checks if ExperienceVar > Value }
 
 Script Commands:
 -----------------
@@ -52,7 +50,7 @@ Script Commands:
 08 (RenderChanges) - <unk> <nop> <nop> <nop> <nop> <strlen> { Triggers a draw call }
 09 (WaitTicks) - <seconds> <nop> <Wa it Fo> <strlen> { Waits a number of ticks }
 0a (PlaySound) - <sound id> <nop> <nop> <nop> <nop> <strlen> { Plays a sound }
-0b - 
+0b - (TransitionIn) - <nop> <nop> <nop> <nop> <nop> <strlen> { Transitions into the map, needed explicitly for intro? }
 0c (Random) - <highest number> <nop> <nop> <nop> <nop> <strlen> { Stores a random from 0 to a set number to RandVar }
 0d (SetTempVar) - <value> <nop> <nop> <nop> <nop> <strlen> { Sets TempVar to value }
 0e (AddTempVar) - <value> <nop> <nop> <nop> <nop> <strlen> { Adds value to TempVar }
@@ -61,7 +59,7 @@ Script Commands:
 11 (LockCamera) - <nop> <nop> <nop> <nop> <nop> <strlen> { Locks camera to player }
 12 (SetPlayerPos) - <x> <y> <nop> <nop> <nop> <strlen> { Teleport/Move Player Position }
 13 (MoveCamera) - <x1> <y1> <x2> <y2> <time> { Moves camera from x1,y1 to x2,y2 in a set amount of time }
-14 (Redraw) - <nop> <nop> <nop> <nop> <nop> <strlen> { Redraws map }
+14 (FlagOnce) - <nop> <nop> <nop> <nop> <nop> <strlen> { Flag IACT script so that it doesn't run again }
 15 (ShowObject) - <obj num> <nop> <nop> <nop> <nop> <strlen> { Shows an object }
 16 (HideObject) - <obj num> <nop> <nop> <nop> <nop> <strlen> { Hides an object }
 17 (EnemySpawn) - <enemy num> <nop> <nop> <nop> <nop> <strlen> { Spawn enemy }
@@ -131,42 +129,42 @@ f: 24,    94, 95, 151, 263, 476, 477, 478, 535,
 23: 10,    1, 98, 223, 263, 424, 477, 478, 
 
 Number of uses of each script command:
-0: 5209,   
-1: 2772,   
-2: 2798,   
-3: 584,   
-4: 1030,   
-5: 1129,   
-6: 2574,   
-7: 2502,   
-8: 5137,   
-9: 4235,   
-a: 2523,   
-b: 31,   431, 432, 433, 434, 435, 465, 470, 537, 578, 629, 
-c: 436,   
-d: 1343,   
+0: 5517,   
+1: 3009,   
+2: 3009,   
+3: 638,   
+4: 1086,   
+5: 1234,   
+6: 2821,   
+7: 2668,   
+8: 5483,   
+9: 4524,   
+a: 2702,   
+b: 35,   373, 374, 376, 377, 379, 416, 465, 470, 537, 578, 629, 
+c: 475,   
+d: 1451,   
 e: 137,   
-f: 1293,   
-10: 456,   
-11: 287,   
-12: 890,   
-13: 123,   
-14: 986,   
-15: 403,   
-16: 502,   
-17: 423,   
-18: 248,   
-19: 10,   207, 432, 455, 475, 621, 631, 633, 643, 
-1a: 31,   26, 85, 101, 207, 222, 223, 232, 263, 265, 266, 276, 287, 296, 313, 379, 381, 409, 410, 432, 455, 475, 497, 498, 526, 570, 605, 621, 629, 631, 633, 
-1b: 690,   
-1c: 18,   156, 223, 247, 393, 578, 622, 624, 629, 641, 
-1d: 320,   
-1e: 145,   
+f: 1364,   
+10: 494,   
+11: 321,   
+12: 939,   
+13: 151,   
+14: 1075,   
+15: 446,   
+16: 552,   
+17: 448,   
+18: 283,   
+19: 11,   169, 207, 432, 455, 475, 621, 631, 633, 643, 
+1a: 32,   26, 85, 101, 169, 207, 222, 223, 232, 263, 265, 266, 276, 287, 296, 313, 379, 381, 409, 410, 432, 455, 475, 497, 498, 526, 570, 605, 621, 629, 631, 633, 
+1b: 765,   
+1c: 22,   614, 617, 620, 621, 623, 624, 625, 626, 629, 641, 
+1d: 354,   
+1e: 162,   
 1f: 16,   287, 316, 345, 376, 398, 409, 416, 450, 473, 498, 539, 578, 580, 605, 626, 636, 
 20: 0,   
-21: 410,   
-22: 328,   
+21: 415,   
+22: 339,   
 23: 59,   
-24: 1475,   
-25: 61,   
+24: 1551,   
+25: 71,    
 

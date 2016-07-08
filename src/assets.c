@@ -32,6 +32,7 @@
 #include "puzzle.h"
 #include "screen.h"
 #include "useful.h"
+#include "player.h"
 #include "palette.h"
 #include "character.h"
 
@@ -474,16 +475,11 @@ void load_resources()
                 if (id == 0xFFFF)
                     name = nop;
                 else
-                    name = get_str();
+                    name = get_strn((is_yoda ? 24 : 16));
 
                 tile_names[id] = name;
 
                 //log("%x, %s\n", id, tile_names[id]);
-
-                if (is_yoda)
-                    seek_add(24);
-                else
-                    seek_add(16);
             }
             seek(tag_seek+len+8);
         }
@@ -512,6 +508,7 @@ void load_resources()
         free(tag);
     }
 
+    player_init();
     load_map(0);
     init_screen();
     render_map();

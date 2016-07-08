@@ -40,7 +40,8 @@ double world_timer = 0.0;
 u16 **map_tiles_low;
 u16 **map_tiles_middle;
 u16 **map_tiles_high;
-u16 **map_vars;
+u16 *map_global_vars; //TODO: TempVar and RandVar are per-map as well.
+bool **map_iact_flagonce;
 u16 *map_overlay;
 u32 map_camera_x = 0;
 u32 map_camera_y = 0;
@@ -68,7 +69,9 @@ void map_init(u16 num_maps)
     map_tiles_low = calloc(num_maps*sizeof(u16*), 1);
     map_tiles_middle = calloc(num_maps*sizeof(u16*), 1);
     map_tiles_high = calloc(num_maps*sizeof(u16*), 1);
-    map_vars = calloc(num_maps*sizeof(u16*), 1);
+
+    map_global_vars = calloc(num_maps*sizeof(u16), 1);
+    map_iact_flagonce = calloc(num_maps*sizeof(bool*), 1);
 
     object_info = calloc(num_maps*sizeof(void*), 1);
     object_info_qty = calloc(num_maps*sizeof(u16*), 1);
@@ -122,12 +125,13 @@ void load_map(u16 map_id)
         map_tiles_low[id] = malloc(width * height * 2);
         map_tiles_middle[id] = malloc(width * height * 2);
         map_tiles_high[id] = malloc(width * height * 2);
-        map_vars[id] = malloc(width * height * 2); //TODO: Validate actual size
+        map_iact_flagonce[id] = calloc(zone_data[map_id]->num_iacts*sizeof(bool), 1);
         for (int i = 0; i < width * height; i++)
         {
             map_tiles_low[id][i] = read_short();
             map_tiles_middle[id][i] = read_short();
             map_tiles_high[id][i] = read_short();
+
             map_overlay[i] = 0xFFFF;
         }
 
@@ -174,17 +178,15 @@ void load_map(u16 map_id)
         }
     }
 
-    printf("Loading map %i, %s, %s, %s, width %i, height %i\n", map_id, (unknown == 0x7AC ? "DYNAMIC" : "STATIC"), map_flags[flags], area_types[area_type], width, height);
-    iact_set_trigger(IACT_TRIG_Enter, 0);
-
     switch(PLAYER_MAP_CHANGE_REASON)
     {
         case MAP_CHANGE_DOOR_OUT:
             player_goto_door_in();
-            map_set_tile(LAYER_MIDDLE, player_entity.x, player_entity.y, TILE_NONE); //TODO: This should be handled by map tile storage
             break;
     }
-    PLAYER_MAP_CHANGE_REASON = MAP_CHANGE_NONE;
+
+    printf("Loading map %i, %s, %s, %s, width %i, height %i\n", map_id, (unknown == 0x7AC ? "DYNAMIC" : "STATIC"), map_flags[flags], area_types[area_type], width, height);
+    iact_set_trigger(IACT_TRIG_Enter, 0);
 
     load_izax(); //TODO: Indy IZAX is funky.
 #ifndef _3DS
@@ -194,13 +196,21 @@ void load_map(u16 map_id)
 
 void unload_map()
 {
+    //Give the world one last render before unloading
+    render_map();
+    draw_screen();
+
+    if(PLAYER_MAP_CHANGE_REASON != MAP_CHANGE_NONE)
+        screen_transition_out();
+
     //These maps are not worth keeping in memory
     if(flags == MAP_FLAG_INTRO_SCREEN)
     {
         free(map_tiles_low[id]);
         free(map_tiles_middle[id]);
         free(map_tiles_high[id]);
-        free(map_vars[id]);
+
+        free(map_iact_flagonce[id]);
 
         map_tiles_low[id] = NULL;
 
@@ -219,6 +229,8 @@ void unload_map()
         free(entities[i]);
 
     num_entities = 0;
+
+
 }
 
 void add_existing_entity(entity e)
@@ -384,16 +396,6 @@ u16 map_get_id()
     return id;
 }
 
-u16 map_get_var(u16 x, u16 y, u16 layer)
-{
-    return map_vars[id][((y*width)+x)+(layer*width*width)];
-}
-
-void map_set_var(u16 x, u16 y, u16 layer, u16 val)
-{
-    map_vars[id][((y*width)+x)+(layer*width*width)] = val;
-}
-
 obj_info *map_get_object_by_id(int index)
 {
     return object_info[id][index];
@@ -436,13 +438,17 @@ void map_set_tile(u8 layer, int x, int y, u16 tile)
     {
         case LAYER_LOW:
             map_tiles_low[id][(y*width)+x] = tile;
+            break;
         case LAYER_MIDDLE:
             map_tiles_middle[id][(y*width)+x] = tile;
+            break;
         case LAYER_HIGH:
             map_tiles_high[id][(y*width)+x] = tile;
+            break;
         default:
         case LAYER_OVERLAY:
             map_overlay[(y*width)+x] = tile;
+            break;
     }
 }
 
@@ -462,8 +468,44 @@ u32 map_get_meta(u8 layer, int x, int y)
     }
 }
 
+void map_update_camera(bool redraw)
+{
+    map_camera_x = MIN(MAX(0, player_entity.x - 4), width - 9);
+    map_camera_y = MIN(MAX(0, player_entity.y - 4), height - 9);
+    if(redraw)
+        render_map();
+}
+
+u16 map_get_global_var()
+{
+    return map_global_vars[id];
+}
+
+void map_set_global_var(u16 val)
+{
+    map_global_vars[id] = val;
+}
+
+bool map_get_iact_flagonce(int iact_id)
+{
+    return map_iact_flagonce[id][iact_id];
+}
+
+void map_set_iact_flagonce(int iact_id, bool val)
+{
+    map_iact_flagonce[id][iact_id] = val;
+}
+
 void update_world(double delta)
 {
+    if(PLAYER_MAP_CHANGE_REASON != MAP_CHANGE_NONE && PLAYER_MAP_CHANGE_REASON != MAP_CHANGE_SCRIPT)
+    {
+        map_update_camera(true);
+
+        screen_transition_in();
+        PLAYER_MAP_CHANGE_REASON = MAP_CHANGE_NONE;
+    }
+
     //Limit our FPS so that each frame corresponds to a game tick for "Game Speed"
     world_timer += delta;
     if(world_timer > (1000/TARGET_TICK_FPS))
@@ -478,10 +520,7 @@ void update_world(double delta)
             player_move(DOWN);
 
         if(map_camera_locked)
-        {
-            map_camera_x = MIN(MAX(0, player_entity.x - 4), width - 9);
-            map_camera_y = MIN(MAX(0, player_entity.y - 4), height - 9);
-        }
+            map_update_camera(false);
 
         player_update();
         iact_update();

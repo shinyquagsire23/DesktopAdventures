@@ -23,13 +23,17 @@
 #include <GL/gl.h>
 #include <unistd.h>
 
+#include "main.h"
 #include "useful.h"
 #include "assets.h"
+#include "player.h"
 
 unsigned short tiles_low[0x100 * 0x100];
 unsigned short tiles_middle[0x100 * 0x100];
 unsigned short tiles_high[0x100 * 0x100];
 unsigned short tiles_overlay[0x100 * 0x100];
+
+u8 SCREEN_FADE_LEVEL = 0;
 
 //Default game uses 10fps for "Normal" speed, +- 5fps for Slow/Fast
 u16 TARGET_TICK_FPS = 10;
@@ -46,6 +50,8 @@ void init_screen()
 
 int draw_screen()
 {
+    SCREEN_FADE_LEVEL = MIN(SCREEN_FADE_LEVEL, 5);
+
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -100,8 +106,8 @@ int draw_screen()
     }
     else
     {
-        for (int y = 0; y < SCREEN_TILE_WIDTH; y++) {
-            for (int x = 0; x < SCREEN_TILE_WIDTH; x++) {
+        for (int y = SCREEN_FADE_LEVEL; y < SCREEN_TILE_WIDTH-SCREEN_FADE_LEVEL; y++) {
+            for (int x = SCREEN_FADE_LEVEL; x < SCREEN_TILE_WIDTH-SCREEN_FADE_LEVEL; x++) {
                 if (tiles_low[(y * SCREEN_TILE_WIDTH) + x] != 0xFFFF) {
                     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
                     glBindTexture(GL_TEXTURE_2D, texture[tiles_low[(y * 9) + x]]);
@@ -187,4 +193,28 @@ int draw_screen()
     }
 
     return 1;
+}
+
+void screen_transition_out()
+{
+    for(int i = 0; i <= 5; i++)
+    {
+        player_update();
+
+        SCREEN_FADE_LEVEL = i;
+        redraw_swap_buffers();
+        usleep(1000*(1000/TARGET_TICK_FPS));
+    }
+}
+
+void screen_transition_in()
+{
+    for(int i = 5; i >= 0; i--)
+    {
+        player_update();
+
+        SCREEN_FADE_LEVEL = i;
+        redraw_swap_buffers();
+        usleep(1000*(1000/TARGET_TICK_FPS));
+    }
 }
