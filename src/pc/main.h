@@ -20,9 +20,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
 #include <SDL.h>
+#include <SDL_opengl.h>
 
 #ifndef MAIN_H_
 #define MAIN_H_

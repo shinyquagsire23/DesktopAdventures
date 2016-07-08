@@ -40,7 +40,7 @@ typedef volatile s16 vs16;
 typedef volatile s32 vs32;
 typedef volatile s64 vs64;
 
-typedef u8 bool;
+#define bool u8
 #define BIT(n) (1<<n)
 #define true 0x1
 #define false 0x0

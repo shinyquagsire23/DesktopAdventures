@@ -26,8 +26,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
+#include <SDL_opengl.h>
 
 #include "useful.h"
 #include "assets.h"
@@ -45,6 +44,9 @@ int resizeWindow(int width, int height);
 SDL_Window* displayWindow;
 SDL_Renderer* displayRenderer;
 SDL_RendererInfo displayRendererInfo;
+
+// Our opengl context handle
+SDL_GLContext mainContext;
 
 u16 current_map = 0;
 
@@ -106,6 +108,13 @@ int main(int argc, char **argv)
 
 int initGL()
 {
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 1);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 5);
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+
+    mainContext = SDL_GL_CreateContext(displayWindow);
+
     glEnable( GL_TEXTURE_2D);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -125,7 +134,7 @@ int resizeWindow(int width, int height)
     glViewport(0, 0, (GLsizei) width, (GLsizei) height);
     glMatrixMode( GL_PROJECTION);
     glLoadIdentity();
-    gluOrtho2D(0, 288, 288, 0);
+    glOrtho(0, 288, 288, 0, -1, 1);
     glMatrixMode( GL_MODELVIEW);
     glLoadIdentity();
 
