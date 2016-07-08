@@ -140,7 +140,6 @@ void player_goto_door_in()
 
 void player_bump(int dir, int x, int y)
 {
-    u32 meta = -1;
     int bump_x = player_entity.x;
     int bump_y = player_entity.y;
 
@@ -177,37 +176,12 @@ void player_bump(int dir, int x, int y)
         default:
             break;
     }
-    meta = map_get_meta(LAYER_MIDDLE, bump_x, bump_y);
-
-    int object_index = 0;
-    bool locked;
-    bool remove_tile = false;
-    while(1)
-    {
-        obj_info *object = map_get_object(object_index++, bump_x, bump_y);
-        if(object == NULL)
-            break;
-
-        u32 obj_type = object->type;
-
-        if (obj_type == OBJ_DOOR_IN && !locked)
-        {
-            remove_tile = true;
-        }
-        else if (obj_type == OBJ_LOCK)
-        {
-            locked = true;
-            remove_tile = false;
-            printf("This door is locked!\n");
-        }
-    }
 
     iact_set_trigger(IACT_TRIG_BumpTile, 3, bump_x, bump_y, map_get_tile(LAYER_MIDDLE, bump_x, bump_y));
 }
 
 void player_stand(int x, int y)
 {
-    u32 meta = map_get_meta(LAYER_MIDDLE, x, y);
     int object_index = 0;
     while(1)
     {
