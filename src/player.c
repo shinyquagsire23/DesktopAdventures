@@ -41,50 +41,50 @@ bool player_collides(int dir, int x, int y)
     switch(dir)
     {
         case LEFT:
-            if(((map_get_meta(LAYER_MIDDLE, player_entity.x-1,player_entity.y) & TILE_MIDDLE_LAYER_COLLIDING == 0)
-                || map_get_tile(LAYER_MIDDLE, player_entity.x-1, player_entity.y) == TILE_NONE)
+            if(((!(map_get_meta(LAYER_MIDDLE, player_entity.x-1,player_entity.y) & (TILE_MIDDLE_LAYER_COLLIDING | TILE_GAME_OBJECT))
+                || map_get_tile(LAYER_MIDDLE, player_entity.x-1, player_entity.y) == TILE_NONE))
                && player_entity.x != 0)
                 return false;
             break;
         case RIGHT:
-            if(((map_get_meta(LAYER_MIDDLE,player_entity.x+1, player_entity.y) & TILE_MIDDLE_LAYER_COLLIDING == 0)
-                || map_get_tile(LAYER_MIDDLE,player_entity.x+1, player_entity.y) == TILE_NONE)
+            if(((!(map_get_meta(LAYER_MIDDLE,player_entity.x+1, player_entity.y) & (TILE_MIDDLE_LAYER_COLLIDING | TILE_GAME_OBJECT))
+                || map_get_tile(LAYER_MIDDLE,player_entity.x+1, player_entity.y) == TILE_NONE))
                && player_entity.x != map_get_width()-1)
                 return false;
             break;
         case UP:
-            if(((map_get_meta(LAYER_MIDDLE,player_entity.x, player_entity.y-1) & TILE_MIDDLE_LAYER_COLLIDING == 0)
-                || map_get_tile(LAYER_MIDDLE,player_entity.x, player_entity.y-1) == TILE_NONE)
-               && player_entity.y != 0)
+            if(((!(map_get_meta(LAYER_MIDDLE,player_entity.x, player_entity.y-1) & (TILE_MIDDLE_LAYER_COLLIDING | TILE_GAME_OBJECT))
+                || map_get_tile(LAYER_MIDDLE,player_entity.x, player_entity.y-1) == TILE_NONE))
+               )
                 return false;
             break;
         case DOWN:
-            if(((map_get_meta(LAYER_MIDDLE,player_entity.x, player_entity.y+1) & TILE_MIDDLE_LAYER_COLLIDING == 0)
-                || map_get_tile(LAYER_MIDDLE,player_entity.x, player_entity.y+1) == TILE_NONE)
+            if(((!(map_get_meta(LAYER_MIDDLE,player_entity.x, player_entity.y+1) & (TILE_MIDDLE_LAYER_COLLIDING | TILE_GAME_OBJECT))
+                || map_get_tile(LAYER_MIDDLE,player_entity.x, player_entity.y+1) == TILE_NONE))
                && player_entity.y != map_get_height()-1)
                 return false;
             break;
         case UP_LEFT:
-            if(((map_get_meta(LAYER_MIDDLE, player_entity.x-1,player_entity.y-1) & TILE_MIDDLE_LAYER_COLLIDING == 0)
-                || map_get_tile(LAYER_MIDDLE, player_entity.x-1, player_entity.y-1) == TILE_NONE)
+            if(((!(map_get_meta(LAYER_MIDDLE, player_entity.x-1,player_entity.y-1) & (TILE_MIDDLE_LAYER_COLLIDING | TILE_GAME_OBJECT))
+                || map_get_tile(LAYER_MIDDLE, player_entity.x-1, player_entity.y-1) == TILE_NONE))
                && (player_entity.x != 0 && player_entity.y != 0))
                 return false;
             break;
         case UP_RIGHT:
-            if(((map_get_meta(LAYER_MIDDLE,player_entity.x+1, player_entity.y-1) & TILE_MIDDLE_LAYER_COLLIDING == 0)
-                || map_get_tile(LAYER_MIDDLE,player_entity.x+1, player_entity.y-1) == TILE_NONE)
+            if(((!(map_get_meta(LAYER_MIDDLE,player_entity.x+1, player_entity.y-1) & (TILE_MIDDLE_LAYER_COLLIDING | TILE_GAME_OBJECT))
+                || map_get_tile(LAYER_MIDDLE,player_entity.x+1, player_entity.y-1) == TILE_NONE))
                && (player_entity.x != map_get_width()-1 && player_entity.y != 0))
                 return false;
             break;
         case DOWN_LEFT:
-            if(((map_get_meta(LAYER_MIDDLE, player_entity.x-1,player_entity.y+1) & TILE_MIDDLE_LAYER_COLLIDING == 0)
-                || map_get_tile(LAYER_MIDDLE, player_entity.x-1, player_entity.y+1) == TILE_NONE)
+            if(((!(map_get_meta(LAYER_MIDDLE, player_entity.x-1,player_entity.y+1) & (TILE_MIDDLE_LAYER_COLLIDING | TILE_GAME_OBJECT))
+                || map_get_tile(LAYER_MIDDLE, player_entity.x-1, player_entity.y+1) == TILE_NONE))
                && (player_entity.x != 0&& player_entity.y != map_get_height()-1))
                 return false;
             break;
         case DOWN_RIGHT:
-            if(((map_get_meta(LAYER_MIDDLE,player_entity.x+1, player_entity.y+1) & TILE_MIDDLE_LAYER_COLLIDING == 0)
-                || map_get_tile(LAYER_MIDDLE,player_entity.x+1, player_entity.y+1) == TILE_NONE)
+            if(((!(map_get_meta(LAYER_MIDDLE,player_entity.x+1, player_entity.y+1) & (TILE_MIDDLE_LAYER_COLLIDING | TILE_GAME_OBJECT))
+                || map_get_tile(LAYER_MIDDLE,player_entity.x+1, player_entity.y+1) == TILE_NONE))
                && (player_entity.x != map_get_width()-1 && player_entity.y != map_get_height()-1))
                 return false;
             break;

@@ -417,7 +417,7 @@ void load_resources()
                 if(char_data[id_1]->flags & ICHR_IS_WEAPON)
                     log("%-16s is a weapon with sound %-14s, health %x?\n", char_data[id_1]->name, sound_files[id_2], health);
                 else
-                    log("%-16s gets weapon %-25s, health %x\n", char_data[id_1]->name, id_2 == 0xFFFF ? "none" : char_data[id_2]->name, health);
+                    log("%-16s gets weapon %-25s, health %x\n", char_data[id_1]->name, (id_2 == 0xFFFF ? "none" : char_data[id_2]->name), health);
             }
             seek(tag_seek+len+8);
         }

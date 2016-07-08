@@ -126,13 +126,16 @@ void map_init(u16 num_maps);
 u32 map_get_width();
 u32 map_get_height();
 u16 map_get_id();
-u16 map_get_var(u16 x, u16 y, u16 layer);
-void map_set_var(u16 x, u16 y, u16 layer, u16 val);
 obj_info *map_get_object_by_id(int index);
 obj_info *map_get_object(int index, int x, int y);
 u16 map_get_tile(u8 layer, int x, int y);
 void map_set_tile(u8 layer, int x, int y, u16 tile);
 u32 map_get_meta(u8 layer, int x, int y);
+void map_update_camera(bool redraw);
+u16 map_get_global_var();
+void map_set_global_var(u16 val);
+bool map_get_iact_flagonce(int iact_id);
+void map_set_iact_flagonce(int iact_id, bool val);
 
 void read_iact_stats(u16 map_num, u32 location, u16 num_iacts);
 void print_iact_stats();

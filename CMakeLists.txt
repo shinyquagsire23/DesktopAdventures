@@ -2,7 +2,8 @@ cmake_minimum_required(VERSION 3.4)
 project(DesktopAdventures)
 
 set(CMAKE_BUILD_TYPE Debug)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall")
 file(MAKE_DIRECTORY ${DesktopAdventures_SOURCE_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${DesktopAdventures_SOURCE_DIR}/bin)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/externals/cmake-modules")
@@ -38,8 +39,11 @@ set(SOURCE_FILES
     src/include/sound.h
     src/include/tile.h
     src/include/tname.h
-    src/useful.c
-    src/include/useful.h src/3ds/main.h src/include/input.h src/input.c src/iact.c src/include/iact.h src/pc/sound.c)
+    src/include/useful.h
+    src/include/input.h
+    src/input.c src/iact.c
+    src/include/iact.h
+    src/pc/sound.c)
 
 add_definitions(-DPC_BUILD)
 set( CMAKE_VERBOSE_MAKEFILE on )
