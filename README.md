@@ -8,6 +8,17 @@ DesktopAdventures is a recreation of the Desktop Adventures engine used in *Indi
 
 Platform-specific code is placed within separate directories so as to keep the main code easily portable to any platform. Porting to another platform expects an implementation of OpenGL of some sort (SDL on PC-like platforms, ctrulib+Caelina for 3DS), and an output console for printf or similar. Input is handled platform-specific with hooks to the main code.
 
+#### Compiling
+
+For *nix/PC platforms, just compile using cmake:
+```
+mkdir build && cd build
+cmake ..
+make
+```
+
+For 3DS, cd to *src/3ds/* and run **make**.
+
 ### Work Needed
 
 The majority of the work needed in this project is reverse engineering and the implementation of the research obtained from it. At the time of writing, the following sections of the .DAT are being properly parsed for *Yoda Stories* only:
