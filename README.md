@@ -21,7 +21,13 @@ For 3DS, cd to *src/3ds/* and run **make**.
 
 ### Work Needed
 
-The majority of the work needed in this project is reverse engineering and the implementation of the research obtained from it. At the time of writing, the following sections of the .DAT are being properly parsed for *Yoda Stories* only:
+#### OS Porting
+
+Currently DesktopAdventures has only been developed and verified to work for Linux and 3DS (however it may work on OS X). Contributors who can validate and check on support for other platforms such as Windows or any other platforms which may be desirable to port to are welcome.
+
+#### DAT Research
+
+The majority of the work needed in this project is reverse engineering and the implementation of the research obtained from it. At the time of writing, the following sections of the .DAT are being properly parsed:
 
 - VERS
 - STUP
@@ -42,7 +48,7 @@ The majority of the work needed in this project is reverse engineering and the i
 The following currently need implementation and/or research:
 
 - ZONE
-  - IACT (see SCRIPTS.md)
+  - IACT (see SCRIPTS.md, iact.c)
 - PUZ2 (puzzle-specific data)
   - IPUZ (currently has reading implemented, needs more research)
 - ANAM (seems to have a lot of script command names? Looks to be debugging info for scripts, actually has a lot of fragments of leaked/overflowed command names seen in Yoda Stories. Indy only.)
