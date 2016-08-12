@@ -58,6 +58,7 @@ int main(int argc, char **argv)
 
     SDL_CreateWindowAndRenderer(SCREEN_WIDTH, SCREEN_WIDTH, SDL_WINDOW_OPENGL, &displayWindow, &displayRenderer);
     SDL_GetRendererInfo(displayRenderer, &displayRendererInfo);
+    SDL_SetRenderDrawBlendMode(displayRenderer, SDL_BLENDMODE_BLEND);
 
     if ((displayRendererInfo.flags & SDL_RENDERER_ACCELERATED) == 0 ||
         (displayRendererInfo.flags & SDL_RENDERER_TARGETTEXTURE) == 0)
@@ -181,6 +182,7 @@ void handleKeyPress(SDL_Keysym *keysym)
 void handleKeyDown()
 {
     const Uint8* keystate = SDL_GetKeyboardState(NULL);
+    const Uint32 modstate = SDL_GetModState();
 
     //continuous-response keys
     if (keystate[SDL_SCANCODE_UP])
@@ -199,6 +201,22 @@ void handleKeyDown()
     {
         button_move_down();
     }
+    else if (modstate & (KMOD_LSHIFT | KMOD_RSHIFT))
+    {
+        button_push();
+    }
+}
+
+void buffer_clear_screen(u8 r, u8 g, u8 b, u8 a)
+{
+    SDL_SetRenderDrawColor(displayRenderer, r, g, b, a);
+    SDL_RenderClear(displayRenderer);
+}
+
+void buffer_plot_pixel(int x, int y, u8 r, u8 g, u8 b, u8 a)
+{
+    SDL_SetRenderDrawColor(displayRenderer, r, g, b, a);
+    SDL_RenderDrawPoint(displayRenderer, x, y);
 }
 
 void Quit(int returnCode)

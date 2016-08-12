@@ -25,6 +25,7 @@
 #include "map.h"
 #include "iact.h"
 #include "tile.h"
+#include "input.h"
 #include "objectinfo.h"
 
 int last_dir = -1;
@@ -223,7 +224,8 @@ void player_move(int dir)
 
     bool moved = true;
 
-    switch(dir) {
+    switch(dir)
+    {
         case LEFT:
             if(!player_collides(LEFT, player_entity.x,player_entity.y))
                 player_entity.x--;

@@ -158,7 +158,7 @@ void run_iact(u32 loc, int iact_id)
                 PLAYER_MAP_CHANGE_REASON = MAP_CHANGE_NONE;
                 break;
             case IACT_CMD_Random:
-                IACT_RANDVAR = (random() % args[0]) + 1;
+                //IACT_RANDVAR = (random() % args[0]) + 1;
                 break;
             case IACT_CMD_SetTempVar:
                 IACT_TEMPVAR = args[0];

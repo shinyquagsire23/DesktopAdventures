@@ -47,6 +47,7 @@ u32 version = 4;
 u32* tile;
 char **sound_files;
 
+void *texture_buffers[0x2001];
 GLuint texture[0x2001];
 izon_data **zone_data;
 //TNAME **tile_names;
@@ -60,7 +61,21 @@ u16 ipuznum = 0;
 #ifdef PC_BUILD
     #define log(f_, ...) printf((f_), __VA_ARGS__)
 #else
-    #define log(f_, ...)
+#include <stdarg.h>
+void log(const char *fmt, ...)
+{
+    char *str = malloc(0x400);
+    va_list args;
+    va_start(args, fmt);
+    vsprintf(str, fmt, args);
+    va_end(args);
+
+    if(str[strlen(str)-1] == '\n')
+        str[strlen(str)-1] = 0;
+
+    svcOutputDebugString(str, strlen(str));
+    free(str);
+}
 #endif
 
 void load_resources()
@@ -511,7 +526,9 @@ void load_texture(u16 width, u32 data_loc, u32 texture_num)
     u32 orig_seek = get_location();
     seek(data_loc);
 
+#ifdef RENDER_GL
     u32 *data_buffer = malloc((size_t)(width * width * 4));
+    texture_buffers[texture_num] = data_buffer;
     int index = 0;
     for(int i = 0; i < width * width; i++)
     {
@@ -535,6 +552,11 @@ void load_texture(u16 width, u32 data_loc, u32 texture_num)
 #ifdef PC_BUILD
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+#endif
+#elif RENDER_BUFFER
+    void *data_buffer = malloc((size_t)(width * width * sizeof(u8)));
+    read_bytes(data_buffer, (size_t)(width * width * sizeof(u8)));
+    texture_buffers[texture_num] = data_buffer;
 #endif
 
     seek(orig_seek);
