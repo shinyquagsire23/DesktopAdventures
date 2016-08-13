@@ -2,11 +2,11 @@
 
 ### About
 
-DesktopAdventures is a recreation of the Desktop Adventures engine used in *Indianna Jones and his Desktop Adventures* and *Yoda Stories* games, licensed under LGPLv2. It currently supports *nix and 3DS, with support for Windows and OS X planned, but currently not implemented. The end goal of this project is to provide a free and open source implementation of the Desktop Adventures engine so that these games can be playable on modern platforms and preserved for future generations.
+DesktopAdventures is a recreation of the Desktop Adventures engine used in *Indianna Jones and his Desktop Adventures* and *Yoda Stories* games, licensed under LGPLv2. It currently supports *nix, 3DS, and Wii U, with support for Windows and OS X currently not tested. The end goal of this project is to provide a free and open source implementation of the Desktop Adventures engine so that these games can be playable on modern platforms and preserved for future generations.
 
 ### Platforms
 
-Platform-specific code is placed within separate directories so as to keep the main code easily portable to any platform. Porting to another platform expects an implementation of OpenGL of some sort (SDL on PC-like platforms, ctrulib+Caelina for 3DS), and an output console for printf or similar. Input is handled platform-specific with hooks to the main code.
+Platform-specific code is placed within separate directories so as to keep the main code easily portable to any platform. Porting to another platform expects an implementation of the C standard library such as glibc or newlib, as well as a framebuffer to draw in (hardware acceleration is available through the RENDER_GL backend). Input is handled platform-specific with hooks to the main code.
 
 #### Compiling
 
@@ -17,7 +17,9 @@ cmake ..
 make
 ```
 
-For 3DS, cd to *src/3ds/* and run **make**.
+For 3DS, cd to *src/3ds/* and run **make**. Compiling for 3DS requires an installation of DevKitARM and ctrulib.
+
+For Wii U, cd to *src/3ds/* and run **make**. Compiling for Wii U requires an installation of DevKitPPC and wut, in addition to newlib being built with *-fno-jump-tables* (see [here](https://github.com/devkitPro/buildscripts/issues/19)).
 
 ### Work Needed
 
