@@ -45,6 +45,7 @@ set(SOURCE_FILES
     src/include/iact.h
     src/pc/sound.c src/render_gl.c src/render_buffer.c)
 
+add_definitions(-DLITTLE_ENDIAN)
 add_definitions(-DPC_BUILD)
 add_definitions(-DRENDER_GL)
 set( CMAKE_VERBOSE_MAKEFILE on )

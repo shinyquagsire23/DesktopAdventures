@@ -73,9 +73,9 @@ typedef struct caux_entry
 
 enum CHAR_FRAME
 {
-    FRAME_DOWN = 0,
-    FRAME_UP = 1,
-    FRAME_UP_LEFT = 1,
+    FRAME_DOWN = 1,
+    FRAME_UP = 2,
+    FRAME_UP_LEFT = 2,
     FRAME_LEFT,
     FRAME_DOWN_LEFT,
     FRAME_UP_RIGHT,
@@ -83,7 +83,7 @@ enum CHAR_FRAME
     FRAME_DOWN_RIGHT,
 
     //Sprites for hero, walking
-    FRAME_WALK_UP_1 = 7,
+    FRAME_WALK_UP_1 = 8,
     FRAME_WALK_DOWN_1,
     FRAME_WALK_UP_LEFT_1,
     FRAME_WALK_LEFT_1,
@@ -102,7 +102,7 @@ enum CHAR_FRAME
 
     //Sprites for weapon, attacking.
     //Extend is used for whips (Indianna Jones) and Sabers (Luke)
-    FRAME_WEAPON_ICON = 9,
+    FRAME_WEAPON_ICON = 10,
     FRAME_ATTACK_UP_1,
     FRAME_ATTACK_DOWN_1,
     FRAME_ATTACK_EXTEND_UP_2,

@@ -23,7 +23,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <GL/gl.h>
 #include "map.h"
 #include "main.h"
 #include "tile.h"
@@ -48,7 +47,9 @@ u32* tile;
 char **sound_files;
 
 void *texture_buffers[0x2001];
-GLuint texture[0x2001];
+#ifdef RENDER_GL
+    GLuint texture[0x2001];
+#endif
 izon_data **zone_data;
 //TNAME **tile_names;
 
@@ -59,23 +60,26 @@ u8 is_yoda = 1;
 u16 ipuznum = 0;
 
 #ifdef PC_BUILD
-    #define log(f_, ...) printf((f_), __VA_ARGS__)
-#else
+#define log(f_, ...) printf((f_), __VA_ARGS__)
+#elif _3DS
 #include <stdarg.h>
-void log(const char *fmt, ...)
-{
-    char *str = malloc(0x400);
-    va_list args;
-    va_start(args, fmt);
-    vsprintf(str, fmt, args);
-    va_end(args);
+    void log(const char *fmt, ...)
+    {
+        char *str = malloc(0x400);
+        va_list args;
+        va_start(args, fmt);
+        vsprintf(str, fmt, args);
+        va_end(args);
 
-    if(str[strlen(str)-1] == '\n')
-        str[strlen(str)-1] = 0;
+        if(str[strlen(str)-1] == '\n')
+            str[strlen(str)-1] = 0;
 
-    svcOutputDebugString(str, strlen(str));
-    free(str);
-}
+        svcOutputDebugString(str, strlen(str));
+        free(str);
+    }
+#elif WIIU
+    #include <coreinit/debug.h>
+    #define log(f_, ...) OSReport((f_), __VA_ARGS__)
 #endif
 
 void load_resources()
@@ -210,7 +214,7 @@ void load_resources()
             zone_data[izon_count-1]->izx4_offset = tag_seek;
 
             u32 len = read_long();
-            seek(tag_seek+len);
+            seek(tag_seek+8+len+2);
         }
         else if(!strncmp(tag, "HTSP", 4)) //HoTSPot
         {
@@ -262,6 +266,11 @@ void load_resources()
                     {
                         zone_data[izon_count-1]->iact_offsets[iact_index++] = get_location()-sizeof(u32);
                         remaining_iacts--;
+
+                        if(remaining_iacts == 0 && is_yoda)
+                        {
+                            tag_seek = zone_data[izon_count-1]->iact_offsets[iact_index-2];
+                        }
                     }
                     else if (!strncmp(tag_iact_look, "PUZ2", 4))
                     {
@@ -270,6 +279,13 @@ void load_resources()
                     else
                     {
                         seek_sub(sizeof(u32) - sizeof(u8));
+                        u8 search_val = read_byte();
+                        while(search_val != 'I' && search_val != 'P')
+                        {
+                            search_val = read_byte();
+                        }
+                        seek_sub(sizeof(u8));
+
                     }
                     free(tag_iact_look);
                 }
@@ -377,7 +393,7 @@ void load_resources()
             ipuz_data[id] = e;
             ipuznum++;
 
-            seek_add(e->size+0xA);
+            seek(tag_seek+e->size+0xA);
         }
         else if(!strncmp(tag, "CHAR", 4)) //CHARacters
         {
@@ -391,10 +407,20 @@ void load_resources()
                 u16 id = read_short();
 
                 ichr_data *new_entry = malloc(sizeof(ichr_data));
-                read_bytes(new_entry, sizeof(ichr_data));
+
+                u32 start = get_location();
+                new_entry->magic = read_long();
+                new_entry->unk_1 = read_long();
+                read_bytes(new_entry->name, 0x10); seek_add(0x10);
+                new_entry->flags = read_long();
+                new_entry->unk_4 = read_short();
+                new_entry->unk_5 = read_long();
+                for(int k = 0; k < 26; k++)
+                    new_entry->frames[k] = read_short();
+
                 char_data[id] = new_entry;
                 log("%x - %-16s %x %x %x %x\n", id, char_data[id]->name, char_data[id]->unk_1, char_data[id]->flags, char_data[id]->unk_4, char_data[id]->unk_5);
-                seek_add((u32)(is_yoda ? 0x54 : 0x4E) - 2);
+                seek(start + (u32)(is_yoda ? 0x54 : 0x4E) - 2);
             }
             seek(tag_seek+size+8);
         }
@@ -410,12 +436,15 @@ void load_resources()
             while(1)
             {
                 chwp_entry *new_entry = malloc(sizeof(chwp_entry));
-                read_bytes(new_entry, sizeof(chwp_entry));
                 chwp_data[entry_index++] = new_entry;
 
                 u16 id_1 = read_short();
                 u16 id_2 = read_short();
                 u16 health = read_short();
+
+                new_entry->id_1 = id_1;
+                new_entry->id_2 = id_2;
+                new_entry->health = health;
 
                 if(id_1 == 0xFFFF)
                     break;
@@ -439,11 +468,13 @@ void load_resources()
             while(1)
             {
                 caux_entry *new_entry = malloc(sizeof(caux_entry));
-                read_bytes(new_entry, sizeof(caux_entry));
                 caux_data[entry_index++] = new_entry;
 
                 u16 id_1 = read_short();
                 u16 damage = read_short();
+
+                new_entry->id_1 = id_1;
+                new_entry->damage = damage;
 
                 if(id_1 == 0xFFFF)
                     break;
@@ -508,7 +539,15 @@ void load_resources()
         }
         else
         {
+            //Skip all bytes which cannot possibly be tags
             seek_sub(sizeof(u32)-sizeof(u8));
+            u8 seek_tag = read_byte();
+            while(seek_tag < 'A' || seek_tag > 'Z')
+            {
+                seek_tag = read_byte();
+            }
+            seek_sub(sizeof(u8));
+
             found = 0;
         }
         free(tag);
@@ -614,6 +653,10 @@ u32 read_long()
     fseek(yodesk_fileptr, yodesk_seek, SEEK_SET);
     fread(&value, sizeof(u32), 1, yodesk_fileptr);
 
+#if BIG_ENDIAN && !LITTLE_ENDIAN
+    value = (value >> 24) | ((value & 0xFF0000) >> 8) | ((value & 0xFF00) << 8) | (value << 24);
+#endif
+
     yodesk_seek += 4;
     return value;
 }
@@ -623,6 +666,10 @@ u16 read_short()
     u16 value;
     fseek(yodesk_fileptr, yodesk_seek, SEEK_SET);
     fread(&value, sizeof(u16), 1, yodesk_fileptr);
+
+#if BIG_ENDIAN && !LITTLE_ENDIAN
+    value = (u16)((value & 0xFF00) >> 8) | ((value & 0xFF) << 8);
+#endif
 
     yodesk_seek += 2;
     return value;

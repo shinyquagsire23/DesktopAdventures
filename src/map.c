@@ -259,7 +259,21 @@ void load_izax()
     u32 izax_data_1_size = zone_data[id]->izax_offset != 0 ? read_long() : 0;
     izax_data_1 *first_section = (izax_data_1*)(zone_data[id]->izax_offset != 0 ? malloc(izax_data_1_size) : calloc(0x10, sizeof(u8)));
     seek_sub(sizeof(u32)*2);
-    read_bytes(first_section, izax_data_1_size);
+
+    first_section->magic = read_long();
+    first_section->size = read_long();
+    first_section->mission_specific = read_short();
+    first_section->num_entries = read_short();
+    for(int i = 0; i < first_section->num_entries; i++)
+    {
+        first_section->entries[i].entity_id = read_short();
+        first_section->entries[i].x = read_short();
+        first_section->entries[i].y = read_short();
+        first_section->entries[i].item = read_short();
+        first_section->entries[i].num_items = read_short();
+        first_section->entries[i].unk3 = read_short();
+        read_bytes(first_section->entries[i].unk4, 0x10 * sizeof(u16));
+    }
 
     /* Possible items to be found and replaced in scripts
      * (some scripts have filler spots for these items)
@@ -270,7 +284,14 @@ void load_izax()
     u32 izax_data_2_size = zone_data[id]->izx2_offset != 0 ? read_long() : 0;
     izax_data_2 *second_section = (izax_data_2*)(zone_data[id]->izx2_offset != 0 ? malloc(izax_data_2_size) : calloc(0x10, sizeof(u8)));
     seek_sub(sizeof(u32)*2);
-    read_bytes(second_section, izax_data_2_size);
+
+    second_section->magic = read_long();
+    second_section->size = read_long();
+    second_section->num_entries = read_short();
+    for(int i = 0; i < second_section->num_entries; i++)
+    {
+        second_section->entries[i].item = read_short();
+    }
 
     /* Ending or transition to possible ending item(s). Usually takes one of a select
      * amount of items and turns it into a single ending item for a map.
@@ -281,7 +302,14 @@ void load_izax()
     u32 izax_data_3_size = zone_data[id]->izx3_offset != 0 ? read_long() : 0;
     izax_data_3 *third_section = (izax_data_3*)(zone_data[id]->izx3_offset != 0 ? malloc(izax_data_3_size) : calloc(0x10, sizeof(u8)));
     seek_sub(sizeof(u32)*2);
-    read_bytes(third_section, izax_data_3_size);
+
+    third_section->magic = read_long();
+    third_section->size = read_long();
+    third_section->num_entries = read_short();
+    for(int i = 0; i < third_section->num_entries; i++)
+    {
+        third_section->entries[i].item = read_short();
+    }
 
     /*
      * If the value in IZX4 is zero, this map is a static map used for
@@ -295,7 +323,10 @@ void load_izax()
     u32 izax_data_4_size = read_long();
     izax_data_4 *fourth_section = (izax_data_4*)(zone_data[id]->izx4_offset != 0 ? malloc(izax_data_4_size) : calloc(0x10, sizeof(u8)));
     seek_sub(sizeof(u32)*2);
-    read_bytes(first_section, izax_data_4_size);
+
+    fourth_section->magic = read_long();
+    fourth_section->size = read_long();
+    fourth_section->is_intermediate = read_short();
 
     printf("Reading IZAX data, %u entries in first section, %u in the second and %u in the third. %s %s\n", first_section->num_entries, second_section->num_entries, third_section->num_entries, !fourth_section->is_intermediate ? "This map is either a seed item map or an end item consuming map!" : "", first_section->mission_specific ? "This map is specific to a particular plot!" : "");
 

@@ -19,7 +19,12 @@
  *  License along with this library; if not, see <http://www.gnu.org/licenses/>
  */
 
-#include <GL/gl.h>
+#include <stddef.h>
+
+#ifdef RENDER_GL
+    #include <GL/gl.h>
+    GLuint texture[0x2001];
+#endif
 
 void load_resources();
 void load_texture(u16 width, u32 data_loc, u32 texture_num);
@@ -51,7 +56,6 @@ typedef struct izon_data
 
 //static const u8* yodesk_palette;
 void *texture_buffers[0x2001];
-GLuint texture[0x2001];
 u32 tile_metadata[0x2000];
 u8 ASSETS_LOADING;
 float ASSETS_PERCENT;
