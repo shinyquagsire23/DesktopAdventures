@@ -158,9 +158,6 @@ main(int argc, char **argv)
         reset_input_state();
         VPADRead(0, &vpad_data, 1, &error);
 
-        if (vpad_data.trigger & VPAD_BUTTON_PLUS)
-            break;
-
         if(vpad_data.trigger & VPAD_BUTTON_X)
         {
             if(current_map < NUM_MAPS)
