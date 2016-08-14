@@ -34,6 +34,29 @@
 #include "character.h"
 #include "objectinfo.h"
 
+#ifdef PC_BUILD
+#define log(f_, ...) printf((f_), __VA_ARGS__)
+#elif _3DS
+#include <stdarg.h>
+    void log(const char *fmt, ...)
+    {
+        char *str = malloc(0x400);
+        va_list args;
+        va_start(args, fmt);
+        vsprintf(str, fmt, args);
+        va_end(args);
+
+        if(str[strlen(str)-1] == '\n')
+            str[strlen(str)-1] = 0;
+
+        svcOutputDebugString(str, strlen(str));
+        free(str);
+    }
+#elif WIIU
+    #include <coreinit/debug.h>
+    #define log(f_, ...) OSReport((f_), __VA_ARGS__)
+#endif
+
 u32 tile_metadata[0x2000];
 double world_timer = 0.0;
 
@@ -114,7 +137,7 @@ void load_map(u16 map_id)
     area_type = read_byte();
     same = read_byte();
 
-    map_overlay = malloc(width * height * 2);
+    map_overlay = malloc(width * height * sizeof(u16));
     for (int i = 0; i < width * height; i++)
     {
         map_overlay[i] = 0xFFFF;
@@ -122,9 +145,9 @@ void load_map(u16 map_id)
 
     if(map_tiles_low[id] == NULL)
     {
-        map_tiles_low[id] = malloc(width * height * 2);
-        map_tiles_middle[id] = malloc(width * height * 2);
-        map_tiles_high[id] = malloc(width * height * 2);
+        map_tiles_low[id] = malloc(width * height * sizeof(u16));
+        map_tiles_middle[id] = malloc(width * height * sizeof(u16));
+        map_tiles_high[id] = malloc(width * height * sizeof(u16));
         map_iact_flagonce[id] = calloc(zone_data[map_id]->num_iacts*sizeof(bool), 1);
         for (int i = 0; i < width * height; i++)
         {
@@ -161,7 +184,7 @@ void load_map(u16 map_id)
 
     for (int i = 0; i < object_info_qty[id]; i++)
     {
-        printf("  obj_info: %s, %u, %u, %u, %x (%s?)\n", obj_types[object_info[id][i]->type], object_info[id][i]->x, object_info[id][i]->y, object_info[id][i]->visible, object_info[id][i]->arg, tile_names[object_info[id][i]->arg]);
+        log("  obj_info: %s, %u, %u, %u, %x (%s?)\n", obj_types[object_info[id][i]->type], object_info[id][i]->x, object_info[id][i]->y, object_info[id][i]->visible, object_info[id][i]->arg, tile_names[object_info[id][i]->arg]);
 
         //Display items and NPCs for debug purposes
         switch (object_info[id][i]->type)
@@ -185,7 +208,7 @@ void load_map(u16 map_id)
             break;
     }
 
-    printf("Loading map %i, %s, %s, %s, width %i, height %i\n", map_id, (unknown == 0x7AC ? "DYNAMIC" : "STATIC"), map_flags[flags], area_types[area_type], width, height);
+    log("Loading map %i, %s, %s, %s, width %i, height %i\n", map_id, (unknown == 0x7AC ? "DYNAMIC" : "STATIC"), map_flags[flags], area_types[area_type], width, height);
     iact_set_trigger(IACT_TRIG_Enter, 0);
 
     load_izax(); //TODO: Indy IZAX is funky.
@@ -206,6 +229,7 @@ void unload_map()
     //These maps are not worth keeping in memory
     if(flags == MAP_FLAG_INTRO_SCREEN)
     {
+        log("freeing crap, %x\n", flags);
         free(map_tiles_low[id]);
         free(map_tiles_middle[id]);
         free(map_tiles_high[id]);
@@ -257,22 +281,25 @@ void load_izax()
     seek(zone_data[id]->izax_offset);
     read_long(); //IZAX
     u32 izax_data_1_size = zone_data[id]->izax_offset != 0 ? read_long() : 0;
-    izax_data_1 *first_section = (izax_data_1*)(zone_data[id]->izax_offset != 0 ? malloc(izax_data_1_size) : calloc(0x10, sizeof(u8)));
+    izax_data_1 *first_section = (izax_data_1*)(zone_data[id]->izax_offset != 0 ? calloc(izax_data_1_size, sizeof(u8)) : calloc(0x10, sizeof(u8)));
     seek_sub(sizeof(u32)*2);
 
-    first_section->magic = read_long();
-    first_section->size = read_long();
-    first_section->mission_specific = read_short();
-    first_section->num_entries = read_short();
-    for(int i = 0; i < first_section->num_entries; i++)
+    if(zone_data[id]->izax_offset != 0)
     {
-        first_section->entries[i].entity_id = read_short();
-        first_section->entries[i].x = read_short();
-        first_section->entries[i].y = read_short();
-        first_section->entries[i].item = read_short();
-        first_section->entries[i].num_items = read_short();
-        first_section->entries[i].unk3 = read_short();
-        read_bytes(first_section->entries[i].unk4, 0x10 * sizeof(u16));
+        first_section->magic = read_long();
+        first_section->size = read_long();
+        first_section->mission_specific = read_short();
+        first_section->num_entries = read_short();
+        for (int i = 0; i < first_section->num_entries; i++)
+        {
+            first_section->entries[i].entity_id = read_short();
+            first_section->entries[i].x = read_short();
+            first_section->entries[i].y = read_short();
+            first_section->entries[i].item = read_short();
+            first_section->entries[i].num_items = read_short();
+            first_section->entries[i].unk3 = read_short();
+            read_bytes(first_section->entries[i].unk4, 0x10 * sizeof(u16));
+        }
     }
 
     /* Possible items to be found and replaced in scripts
@@ -282,15 +309,18 @@ void load_izax()
     seek(zone_data[id]->izx2_offset);
     read_long(); //IZX2
     u32 izax_data_2_size = zone_data[id]->izx2_offset != 0 ? read_long() : 0;
-    izax_data_2 *second_section = (izax_data_2*)(zone_data[id]->izx2_offset != 0 ? malloc(izax_data_2_size) : calloc(0x10, sizeof(u8)));
+    izax_data_2 *second_section = (izax_data_2*)(zone_data[id]->izx2_offset != 0 ? calloc(izax_data_2_size, sizeof(u8)) : calloc(0x10, sizeof(u8)));
     seek_sub(sizeof(u32)*2);
 
-    second_section->magic = read_long();
-    second_section->size = read_long();
-    second_section->num_entries = read_short();
-    for(int i = 0; i < second_section->num_entries; i++)
+    if(zone_data[id]->izx2_offset != 0)
     {
-        second_section->entries[i].item = read_short();
+        second_section->magic = read_long();
+        second_section->size = read_long();
+        second_section->num_entries = read_short();
+        for (int i = 0; i < second_section->num_entries; i++)
+        {
+            second_section->entries[i].item = read_short();
+        }
     }
 
     /* Ending or transition to possible ending item(s). Usually takes one of a select
@@ -300,15 +330,18 @@ void load_izax()
     seek(zone_data[id]->izx3_offset);
     read_long(); //IZX3
     u32 izax_data_3_size = zone_data[id]->izx3_offset != 0 ? read_long() : 0;
-    izax_data_3 *third_section = (izax_data_3*)(zone_data[id]->izx3_offset != 0 ? malloc(izax_data_3_size) : calloc(0x10, sizeof(u8)));
+    izax_data_3 *third_section = (izax_data_3*)(zone_data[id]->izx3_offset != 0 ? calloc(izax_data_3_size, sizeof(u8)) : calloc(0x10, sizeof(u8)));
     seek_sub(sizeof(u32)*2);
 
-    third_section->magic = read_long();
-    third_section->size = read_long();
-    third_section->num_entries = read_short();
-    for(int i = 0; i < third_section->num_entries; i++)
+    if(zone_data[id]->izx3_offset)
     {
-        third_section->entries[i].item = read_short();
+        third_section->magic = read_long();
+        third_section->size = read_long();
+        third_section->num_entries = read_short();
+        for (int i = 0; i < third_section->num_entries; i++)
+        {
+            third_section->entries[i].item = read_short();
+        }
     }
 
     /*
@@ -321,29 +354,33 @@ void load_izax()
     seek(zone_data[id]->izx4_offset);
     read_long(); //IZX4
     u32 izax_data_4_size = read_long();
-    izax_data_4 *fourth_section = (izax_data_4*)(zone_data[id]->izx4_offset != 0 ? malloc(izax_data_4_size) : calloc(0x10, sizeof(u8)));
+    izax_data_4 *fourth_section = (izax_data_4*)(zone_data[id]->izx4_offset != 0 ? calloc(izax_data_4_size+(sizeof(u32)*2), sizeof(u8)) : calloc(0x10, sizeof(u8)));
     seek_sub(sizeof(u32)*2);
+    log("size 4: %x\n", izax_data_4_size);
 
-    fourth_section->magic = read_long();
-    fourth_section->size = read_long();
-    fourth_section->is_intermediate = read_short();
+    if(zone_data[id]->izx4_offset != 0)
+    {
+        fourth_section->magic = read_long();
+        fourth_section->size = read_long();
+        fourth_section->is_intermediate = read_short();
+    }
 
-    printf("Reading IZAX data, %u entries in first section, %u in the second and %u in the third. %s %s\n", first_section->num_entries, second_section->num_entries, third_section->num_entries, !fourth_section->is_intermediate ? "This map is either a seed item map or an end item consuming map!" : "", first_section->mission_specific ? "This map is specific to a particular plot!" : "");
+    log("Reading IZAX data, %u entries in first section, %u in the second and %u in the third. %s %s\n", first_section->num_entries, second_section->num_entries, third_section->num_entries, !fourth_section->is_intermediate ? "This map is either a seed item map or an end item consuming map!" : "", first_section->mission_specific ? "This map is specific to a particular plot!" : "");
 
     for(int i = 0; i < first_section->num_entries; i++)
     {
-        printf("  entity: id=%x, x=%x, y=%x, item=%s, qty=%x, %x\n", first_section->entries[i].entity_id, first_section->entries[i].x, first_section->entries[i].y, tile_names[first_section->entries[i].item], first_section->entries[i].num_items, first_section->entries[i].unk3);
+        log("  entity: id=%x, x=%x, y=%x, item=%s, qty=%x, %x\n", first_section->entries[i].entity_id, first_section->entries[i].x, first_section->entries[i].y, tile_names[first_section->entries[i].item], first_section->entries[i].num_items, first_section->entries[i].unk3);
         add_new_entity(first_section->entries[i].entity_id, first_section->entries[i].x, first_section->entries[i].y, FRAME_DOWN, first_section->entries[i].item, first_section->entries[i].num_items);
     }
 
     for(int i = 0; i < second_section->num_entries; i++)
     {
-        printf("  item: %s\n", tile_names[second_section->entries[i].item]);
+        log("  item: %s\n", tile_names[second_section->entries[i].item]);
     }
 
     for(int i = 0; i < third_section->num_entries; i++)
     {
-        printf("   end item: %s\n", tile_names[third_section->entries[i].item]);
+        log("   end item: %s\n", tile_names[third_section->entries[i].item]);
     }
 
     free(first_section);

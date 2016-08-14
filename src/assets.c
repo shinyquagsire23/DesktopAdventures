@@ -37,6 +37,7 @@
 
 FILE *yodesk_fileptr;
 long yodesk_size = 0;
+void *yodesk_data;
 
 float ASSETS_PERCENT = 0.0f;
 u8 ASSETS_LOADING = 1;
@@ -90,12 +91,18 @@ void load_resources()
     fseek(yodesk_fileptr, 0, SEEK_END);
     yodesk_size = ftell(yodesk_fileptr);
     rewind(yodesk_fileptr);
+#ifdef DAT_IN_RAM
+    log("Reading %s to RAM...\n", file_to_load);
+    yodesk_data = malloc(yodesk_size);
+    fread(yodesk_data, yodesk_size, sizeof(u8), yodesk_fileptr);
+#endif
 
     log("%s loaded, %lx bytes large\n", file_to_load, yodesk_size);
 
     u16 izon_count = 0;
     u8 found = 1;
     float last_percent = 0.0f;
+    memset(texture_buffers, 0, sizeof(texture_buffers));
     while(1)
     {
         u32 tag_seek = get_location();
@@ -624,8 +631,12 @@ u32 get_location()
 char *get_str()
 {
     void *buffer = malloc(0x100);
+#ifndef DAT_IN_RAM
     fseek(yodesk_fileptr, yodesk_seek, SEEK_SET);
     fread(buffer, 0x100, 1, yodesk_fileptr);
+#else
+    memcpy(buffer, yodesk_data+yodesk_seek, 0x100);
+#endif
 
     u32 len = strlen((char*)(buffer));
     char *out = malloc(len+1);
@@ -638,9 +649,13 @@ char *get_str()
 
 char *get_strn(size_t len)
 {
-    char *out = malloc(len+1);
+    char *out = calloc(len+1, sizeof(u8));
+#ifndef DAT_IN_RAM
     fseek(yodesk_fileptr, yodesk_seek, SEEK_SET);
     fread(out, len, 1, yodesk_fileptr);
+#else
+    memcpy(out, yodesk_data+yodesk_seek, len);
+#endif
     out[len] = 0;
 
     yodesk_seek += len;
@@ -650,8 +665,12 @@ char *get_strn(size_t len)
 u32 read_long()
 {
     u32 value;
+#ifndef DAT_IN_RAM
     fseek(yodesk_fileptr, yodesk_seek, SEEK_SET);
     fread(&value, sizeof(u32), 1, yodesk_fileptr);
+#else
+    value = *(u32*)(yodesk_data+yodesk_seek);
+#endif
 
 #if BIG_ENDIAN && !LITTLE_ENDIAN
     value = (value >> 24) | ((value & 0xFF0000) >> 8) | ((value & 0xFF00) << 8) | (value << 24);
@@ -664,8 +683,12 @@ u32 read_long()
 u16 read_short()
 {
     u16 value;
+#ifndef DAT_IN_RAM
     fseek(yodesk_fileptr, yodesk_seek, SEEK_SET);
     fread(&value, sizeof(u16), 1, yodesk_fileptr);
+#else
+    value = *(u16*)(yodesk_data+yodesk_seek);
+#endif
 
 #if BIG_ENDIAN && !LITTLE_ENDIAN
     value = (u16)((value & 0xFF00) >> 8) | ((value & 0xFF) << 8);
@@ -687,8 +710,12 @@ u16 read_prefix()
 u8 read_byte()
 {
     u8 value;
+#ifndef DAT_IN_RAM
     fseek(yodesk_fileptr, yodesk_seek, SEEK_SET);
     fread(&value, sizeof(u8), 1, yodesk_fileptr);
+#else
+    value = *(u8*)(yodesk_data+yodesk_seek);
+#endif
 
     yodesk_seek += 1;
     return value;
@@ -696,6 +723,10 @@ u8 read_byte()
 
 void read_bytes(void *out, size_t size)
 {
+#ifndef DAT_IN_RAM
     fseek(yodesk_fileptr, yodesk_seek, SEEK_SET);
     fread(out, size, 1, yodesk_fileptr);
+#else
+    memcpy(out, yodesk_data+yodesk_seek, size);
+#endif
 }

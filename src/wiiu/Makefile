@@ -20,8 +20,8 @@ INCLUDE  := . ../include
 DATA     := data
 LIBS     := -lcoreinit -lvpad -lproc_ui -lsysapp
 
-CFLAGS   += -g -O2 -Wall -std=c11 -DWIIU -DRENDER_BUFFER -DBIG_ENDIAN
-CXXFLAGS += -g -O2 -Wall -DWIIU -DRENDER_BUFFER -DBIG_ENDIAN
+CFLAGS   += -g -O2 -Wall -std=c11 -DWIIU -DRENDER_BUFFER -DBIG_ENDIAN -DDAT_IN_RAM
+CXXFLAGS += -g -O2 -Wall -DWIIU -DRENDER_BUFFER -DBIG_ENDIAN -DDAT_IN_RAM
 
 ifneq ($(BUILD),$(notdir $(CURDIR)))
 

@@ -48,6 +48,7 @@ set(SOURCE_FILES
 add_definitions(-DLITTLE_ENDIAN)
 add_definitions(-DPC_BUILD)
 add_definitions(-DRENDER_GL)
+add_definitions(-DDAT_IN_RAM)
 set( CMAKE_VERBOSE_MAKEFILE on )
 
 add_executable(DesktopAdventures ${SOURCE_FILES})

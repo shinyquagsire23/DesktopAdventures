@@ -2,6 +2,7 @@
 #include <coreinit/debug.h>
 #include <coreinit/thread.h>
 #include <coreinit/foreground.h>
+#include <coreinit/systeminfo.h>
 #include <coreinit/screen.h>
 #include <proc_ui/procui.h>
 #include <sysapp/launch.h>
@@ -140,19 +141,23 @@ main(int argc, char **argv)
     fillScreen(0,0,0,0);
     flipBuffers();
 
+    OSSystemInfo *info = OSGetSystemInfo();
+    u32 clockSpeed = *(u32*)(info + sizeof(u32));
+
     chdir("fs:/vol/content/");
     load_resources();
 
     int error;
     VPADStatus vpad_data;
 
-    clock_t last_time = OSGetSystemTick()*10000;
+    OSTime last_time = OSGetSystemTime();
     while(AppRunning())
     {
         if(!initialized) continue;
 
-        clock_t time = OSGetSystemTick()*10000;
-        double delta = (double)(time - last_time)/(CLOCKS_PER_SEC/1000.0);
+        OSTime time = OSGetSystemTime();
+        double delta = (double)(((double)(time - last_time) * 1000.0f) / (OSGetSystemInfo()->clockSpeed / 4));
+        //OSReport("delta %f\n", delta);
         last_time = time;
 
         reset_input_state();
@@ -186,15 +191,7 @@ main(int argc, char **argv)
         else if(vpad_data.hold & VPAD_BUTTON_DOWN)
            button_move_down();
 
-        setActiveScreen(SCREEN_BOTTOM);
-        fillScreen(0,0,0,255);
-        setActiveScreen(SCREEN_TOP);
         update_world(delta);
-
-        setActiveScreen(SCREEN_TOP);
-        flipBuffers();
-        setActiveScreen(SCREEN_BOTTOM);
-        flipBuffers();
     }
     fsDevInit();
     return 0;
@@ -207,6 +204,11 @@ void redraw_swap_buffers()
     setActiveScreen(SCREEN_TOP);
 
     draw_screen();
+    AppRunning();
+}
+
+void buffer_flip_buffers()
+{
     setActiveScreen(SCREEN_TOP);
     flipBuffers();
     setActiveScreen(SCREEN_BOTTOM);
@@ -215,6 +217,9 @@ void redraw_swap_buffers()
 
 void buffer_clear_screen(u8 r, u8 g, u8 b, u8 a)
 {
+    setActiveScreen(SCREEN_TOP);
+    fillScreen(r,g,b,a);
+    setActiveScreen(SCREEN_BOTTOM);
     fillScreen(r,g,b,a);
 }
 

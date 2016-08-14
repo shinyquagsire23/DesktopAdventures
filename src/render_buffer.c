@@ -26,10 +26,11 @@
 
 void buffer_clear_screen(u8 r, u8 g, u8 b, u8 a);
 void buffer_plot_pixel(int x, int y, u8 r, u8 g, u8 b, u8 a);
+void buffer_flip_buffers();
 
 void render_texture(int x, int y, int width, int height, u8 alpha, void *buffer)
 {
-    if(!buffer)
+    if(!buffer || buffer == -1)
         return;
 
     for(int i = 0; i < width*height; i++)
@@ -97,6 +98,8 @@ void render(int x, int y)
             }
         }
     }
+
+    buffer_flip_buffers();
 }
 
 #endif

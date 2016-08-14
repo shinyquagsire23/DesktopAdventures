@@ -219,6 +219,11 @@ void buffer_plot_pixel(int x, int y, u8 r, u8 g, u8 b, u8 a)
     SDL_RenderDrawPoint(displayRenderer, x, y);
 }
 
+void buffer_flip_buffers()
+{
+
+}
+
 void Quit(int returnCode)
 {
     SDL_Quit();

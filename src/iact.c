@@ -32,6 +32,29 @@
 #include "player.h"
 #include "screen.h"
 
+#ifdef PC_BUILD
+#define log(f_, ...) printf((f_), __VA_ARGS__)
+#elif _3DS
+#include <stdarg.h>
+    void log(const char *fmt, ...)
+    {
+        char *str = malloc(0x400);
+        va_list args;
+        va_start(args, fmt);
+        vsprintf(str, fmt, args);
+        va_end(args);
+
+        if(str[strlen(str)-1] == '\n')
+            str[strlen(str)-1] = 0;
+
+        svcOutputDebugString(str, strlen(str));
+        free(str);
+    }
+#elif WIIU
+    #include <coreinit/debug.h>
+    #define log(f_, ...) OSReport((f_), __VA_ARGS__)
+#endif
+
 void print_iact(u32 loc);
 
 char triggers[0x24][30] = { "FirstEnter", "Enter", "BumpTile", "DragItem", "Walk", "TempVarEq", "RandVarEq", "RandVarGt", "RandVarLs", "EnterVehicle", "CheckMapTile", "EnemyDead", "AllEnemiesDead", "HasItem", "HasEndItem", "Unk0f", "Unk10", "GameInProgress?", "GameCompleted?", "HealthLs", "HealthGt", "Unk15", "Unk16", "DragWrongItem", "PlayerAtPos", "GlobalVarEq", "GlobalVarLs", "GlobalVarGt", "ExperienceEq", "Unk1d", "Unk1e", "TempVarNe", "RandVarNe", "GlobalVarNe", "CheckMapTileVar", "ExperienceGt"};
@@ -43,7 +66,7 @@ u16 IACT_TEMPVAR = 0;
 
 void read_iact()
 {
-    printf("Reading IACT data, %u IACTs\n", zone_data[map_get_id()]->num_iacts);
+    log("Reading IACT data, %u IACTs\n", zone_data[map_get_id()]->num_iacts);
     for(int i = 0; i < zone_data[map_get_id()]->num_iacts; i++)
     {
         //print_iact(zone_data[map_get_id()]->iact_offsets[i]);
@@ -56,7 +79,7 @@ void print_iact(u32 loc)
     read_long(); //IACT
     u32 length = read_long();
     u16 iactItemCount1 = read_short();
-    printf("\n    Action: size %08x, actions %d\n", length, iactItemCount1);
+    log("\n    Action: size %08x, actions %d\n", length, iactItemCount1);
     for (u16 k = 0; k < iactItemCount1; k++)
     {
         char pos_str[7];
@@ -69,10 +92,10 @@ void print_iact(u32 loc)
         *(u16*)(pos_str+2) = args[4];
         *(u16*)(pos_str+4) = args[5];
 
-        printf("        %s, %04x, %04x, %04x, %04x, %04x, %04x, %s\n", triggers[command], args[0], args[1], args[2], args[3], args[4], args[5], pos_str);
+        log("        %s, %04x, %04x, %04x, %04x, %04x, %04x, %s\n", triggers[command], args[0], args[1], args[2], args[3], args[4], args[5], pos_str);
     }
     u16 iactItemCount2 = read_short();
-    printf("    Script: commands %d\n", iactItemCount2);
+    log("    Script: commands %d\n", iactItemCount2);
     for(u16 k = 0; k < iactItemCount2; k++)
     {
         char pos_str[7];
@@ -86,7 +109,7 @@ void print_iact(u32 loc)
         *(u16*)(pos_str+2) = args[3];
         *(u16*)(pos_str+4) = args[4];
 
-        printf("        %s, %04x, %04x, %04x, %04x, %04x, %04x, %s\n", commands[command], args[0], args[1], args[2], args[3], args[4], strlen, pos_str);
+        log("        %s, %04x, %04x, %04x, %04x, %04x, %04x, %s\n", commands[command], args[0], args[1], args[2], args[3], args[4], strlen, pos_str);
         if (strlen)
         {
             char* str = malloc(strlen+1);
@@ -95,7 +118,7 @@ void print_iact(u32 loc)
                 str[l] = read_byte();
             }
             str[strlen] = 0;
-            printf("            \"%s\"\n", str);
+            log("            \"%s\"\n", str);
             free(str);
         }
     }
@@ -133,10 +156,10 @@ void run_iact(u32 loc, int iact_id)
                 map_set_tile(args[2], args[0], args[1], TILE_NONE);
                 break;
             case IACT_CMD_SayText: //TODO
-                printf("Luke says: %s\n", string);
+                log("Luke says: %s\n", string);
                 break;
             case IACT_CMD_ShowText: //TODO
-                printf("Someone says: %s\n", string);
+                log("Someone says: %s\n", string);
                 break;
             case IACT_CMD_RedrawTile:
             case IACT_CMD_RedrawTiles:
@@ -211,7 +234,7 @@ void run_iact(u32 loc, int iact_id)
                 player_entity.health += args[0];
                 break;
             default:
-                printf("Unhandled script command %s, args: %x %x %x %x %x, strlen %x\n", commands[command], args[0], args[1], args[2], args[3], args[4], strlen);
+                log("Unhandled script command %s, args: %x %x %x %x %x, strlen %x\n", commands[command], args[0], args[1], args[2], args[3], args[4], strlen);
                 break;
         }
     }

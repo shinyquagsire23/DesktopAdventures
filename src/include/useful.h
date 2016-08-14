@@ -56,7 +56,7 @@
     #define BIT(n) (1<<n)
     static inline int usleep(useconds_t usec)
     {
-        OSSleepTicks(usec*100);
+        OSSleepTicks(usec*50);
     }
 #endif
 
