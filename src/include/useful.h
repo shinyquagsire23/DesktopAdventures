@@ -53,10 +53,11 @@
     #include <time.h>
     #include <wut.h>
     #include <coreinit/thread.h>
+    #include <coreinit/systeminfo.h>
     #define BIT(n) (1<<n)
     static inline int usleep(useconds_t usec)
     {
-        OSSleepTicks(usec*50);
+        OSSleepTicks((usec/1000/1000) * (OSGetSystemInfo()->clockSpeed / 4));
     }
 #endif
 
