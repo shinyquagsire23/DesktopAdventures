@@ -32,6 +32,7 @@
 #include "map.h"
 
 u16 current_map = 0;
+bool quit = false;
 
 int main()
 {
@@ -70,6 +71,8 @@ int main()
       reset_input_state();
       update_input();
 
+      if(quit) break;
+
       update_world(delta);
    }
 
@@ -92,7 +95,7 @@ void update_input()
     hidScanInput();
 
     if (keysDown() & KEY_START)
-        break;
+        quit = true;
 
     if(keysDown() & KEY_X)
     {

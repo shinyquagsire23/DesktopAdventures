@@ -49,6 +49,23 @@
     #define false 0x0
 #elif defined _3DS
     #include <3ds.h>
+    #include <stdarg.h>
+    #define random() rand()
+
+    static inline void log(const char *fmt, ...)
+    {
+        char *str = malloc(0x400);
+        va_list args;
+        va_start(args, fmt);
+        vsprintf(str, fmt, args);
+        va_end(args);
+
+        if(str[strlen(str)-1] == '\n')
+            str[strlen(str)-1] = 0;
+
+        svcOutputDebugString(str, strlen(str));
+        free(str);
+    }
 #elif defined WIIU
     #include <time.h>
     #include <wut.h>

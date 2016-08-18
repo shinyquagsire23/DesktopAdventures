@@ -35,22 +35,6 @@
 
 #ifdef PC_BUILD
 #define log(f_, ...) printf((f_), __VA_ARGS__)
-#elif _3DS
-#include <stdarg.h>
-    void log(const char *fmt, ...)
-    {
-        char *str = malloc(0x400);
-        va_list args;
-        va_start(args, fmt);
-        vsprintf(str, fmt, args);
-        va_end(args);
-
-        if(str[strlen(str)-1] == '\n')
-            str[strlen(str)-1] = 0;
-
-        svcOutputDebugString(str, strlen(str));
-        free(str);
-    }
 #elif WIIU
     #include <coreinit/debug.h>
     #define log(f_, ...) OSReport((f_), __VA_ARGS__)

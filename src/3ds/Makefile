@@ -41,7 +41,7 @@ CFLAGS	:=	 -g -Wall -O2 -mword-relocations \
 			-fomit-frame-pointer -ffast-math \
 			$(ARCH)
 
-CFLAGS	+=	$(INCLUDE) -std=gnu99 -lstdc++ -DARM11 -D_3DS
+CFLAGS	+=	$(INCLUDE) -std=gnu99 -lstdc++ -DARM11 -D_3DS -DLITTLE_ENDIAN -DRENDER_GL
 
 CXXFLAGS	:= -std=c++11 -lstdc++ $(CFLAGS) -fno-rtti -fno-exceptions
 
