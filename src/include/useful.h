@@ -75,7 +75,9 @@
     static inline int usleep(useconds_t usec)
     {
         OSSleepTicks((usec/1000/1000) * (OSGetSystemInfo()->clockSpeed / 4));
+        return 0;
     }
+    #define random() 1 //https://xkcd.com/221 (TODO)
 #endif
 
 #define MIN(a,b) (((a)<(b))?(a):(b))
