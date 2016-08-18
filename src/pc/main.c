@@ -44,16 +44,16 @@ int resizeWindow(int width, int height);
 SDL_Window* displayWindow;
 SDL_Renderer* displayRenderer;
 SDL_RendererInfo displayRendererInfo;
+SDL_Event event;
 
 // Our opengl context handle
 SDL_GLContext mainContext;
 
 u16 current_map = 0;
+int done = FALSE;
 
 int main(int argc, char **argv)
 {
-    int done = FALSE;
-    SDL_Event event;
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 
     SDL_CreateWindowAndRenderer(SCREEN_WIDTH, SCREEN_WIDTH, SDL_WINDOW_OPENGL, &displayWindow, &displayRenderer);
@@ -81,25 +81,9 @@ int main(int argc, char **argv)
         last_time = time;
 
         reset_input_state();
-        while (SDL_PollEvent(&event))
-        {
-            switch (event.type)
-            {
-                case SDL_KEYDOWN:
-                    handleKeyPress(&event.key.keysym);
-                break;
-                case SDL_QUIT:
-                    done = TRUE;
-                break;
-                default:
-                break;
-            }
-        }
-        handleKeyDown();
+        update_input();
 
         update_world(delta);
-
-        SDL_GL_SwapWindow(displayWindow);
     }
 
     sound_exit();
@@ -201,9 +185,15 @@ void handleKeyDown()
     {
         button_move_down();
     }
-    else if (modstate & (KMOD_LSHIFT | KMOD_RSHIFT))
+
+    if (modstate & (KMOD_LSHIFT | KMOD_RSHIFT))
     {
         button_push();
+    }
+
+    if (keystate[SDL_SCANCODE_SPACE])
+    {
+        button_fire();
     }
 }
 
@@ -219,9 +209,9 @@ void buffer_plot_pixel(int x, int y, u8 r, u8 g, u8 b, u8 a)
     SDL_RenderDrawPoint(displayRenderer, x, y);
 }
 
-void buffer_flip_buffers()
+void render_flip_buffers()
 {
-
+    SDL_GL_SwapWindow(displayWindow);
 }
 
 void Quit(int returnCode)
@@ -230,10 +220,23 @@ void Quit(int returnCode)
     exit(returnCode);
 }
 
-void redraw_swap_buffers()
+void update_input()
 {
-    draw_screen();
-    SDL_GL_SwapWindow(displayWindow);
+    while (SDL_PollEvent(&event))
+    {
+        switch (event.type)
+        {
+            case SDL_KEYDOWN:
+                handleKeyPress(&event.key.keysym);
+                break;
+            case SDL_QUIT:
+                done = TRUE;
+                break;
+            default:
+                break;
+        }
+    }
+    handleKeyDown();
 }
 
 #endif

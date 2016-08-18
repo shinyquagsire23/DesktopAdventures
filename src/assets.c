@@ -111,7 +111,7 @@ void load_resources()
         ASSETS_PERCENT = ((float)tag_seek / (float)yodesk_size);
         if(found && ASSETS_PERCENT - last_percent > 0.1)
         {
-            redraw_swap_buffers();
+            draw_screen();
             last_percent = ASSETS_PERCENT;
         }
 
@@ -127,7 +127,7 @@ void load_resources()
 
             u32 len = read_long();
             seek(len+sizeof(u64)+tag_seek);
-            redraw_swap_buffers();
+            draw_screen();
         }
         else if(!strncmp(tag, "ZONE", 4)) //ZONEs (maps)
         {
@@ -338,7 +338,7 @@ void load_resources()
                 {
                     log("%x of %x...\n", j, section_length / ((32 * 32) + 4));
                     ASSETS_PERCENT = ((float)get_location() / (float)yodesk_size);
-                    redraw_swap_buffers();
+                    draw_screen();
                 }
 
                 u32 tile_stuff = read_long();

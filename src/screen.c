@@ -27,11 +27,16 @@
 #include "player.h"
 
 void render();
+void render_flip_buffers();
 
 unsigned short tiles_low[0x100 * 0x100];
 unsigned short tiles_middle[0x100 * 0x100];
 unsigned short tiles_high[0x100 * 0x100];
 unsigned short tiles_overlay[0x100 * 0x100];
+
+char *active_text;
+int active_text_x;
+int active_text_y;
 
 u8 SCREEN_FADE_LEVEL = 0;
 
@@ -60,6 +65,7 @@ int draw_screen()
 #endif
 
     render(shift_x, shift_y);
+    render_flip_buffers();
     return 1;
 }
 
@@ -70,7 +76,7 @@ void screen_transition_out()
         player_update();
 
         SCREEN_FADE_LEVEL = i;
-        redraw_swap_buffers();
+        draw_screen();
         usleep(1000*(1000/TARGET_TICK_FPS));
     }
 }
@@ -82,7 +88,7 @@ void screen_transition_in()
         player_update();
 
         SCREEN_FADE_LEVEL = i;
-        redraw_swap_buffers();
+        draw_screen();
         usleep(1000*(1000/TARGET_TICK_FPS));
     }
 }

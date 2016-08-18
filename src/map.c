@@ -356,7 +356,6 @@ void load_izax()
     u32 izax_data_4_size = read_long();
     izax_data_4 *fourth_section = (izax_data_4*)(zone_data[id]->izx4_offset != 0 ? calloc(izax_data_4_size+(sizeof(u32)*2), sizeof(u8)) : calloc(0x10, sizeof(u8)));
     seek_sub(sizeof(u32)*2);
-    log("size 4: %x\n", izax_data_4_size);
 
     if(zone_data[id]->izx4_offset != 0)
     {
@@ -591,9 +590,9 @@ void update_world(double delta)
             map_update_camera(false);
 
         player_update();
+        render_map();
         iact_update();
 
-        render_map();
         draw_screen();
         world_timer = 0.0;
     }

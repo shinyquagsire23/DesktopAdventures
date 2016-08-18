@@ -20,9 +20,12 @@
 
 #ifdef RENDER_BUFFER
 
+#include <string.h>
+
 #include "assets.h"
 #include "screen.h"
 #include "palette.h"
+#include "font.h"
 
 void buffer_clear_screen(u8 r, u8 g, u8 b, u8 a);
 void buffer_plot_pixel(int x, int y, u8 r, u8 g, u8 b, u8 a);
@@ -55,6 +58,56 @@ void render_texture(int x, int y, int width, int height, u8 alpha, void *buffer)
         }
 
         buffer_plot_pixel(x+(i%width),y+(i/height),r,g,b,alpha);
+    }
+}
+
+int render_char(int x, int y, char c)
+{
+    if(c == ' ')
+        return deskAdvFontFontInfo.space_width+1;
+
+    int offset = deskAdvFontDescriptors[c-deskAdvFontFontInfo.start_char].offset;
+    for(int i = 0; i < deskAdvFontDescriptors[c-deskAdvFontFontInfo.start_char].width; i++)
+    {
+        for(int j = 0; j < deskAdvFontFontInfo.height; j++)
+        {
+            if(deskAdvFontBitmaps[offset+j] & (1<<(7-i)))
+                buffer_plot_pixel(x+i,y+j,0,0,0,255);
+        }
+    }
+    return deskAdvFontDescriptors[c-deskAdvFontFontInfo.start_char].width+1;
+}
+
+void render_text(int x, int y, char *text)
+{
+    x = 0;
+    if(y >= 288/2)
+        y -= 32;
+    else
+        y += 32;
+    for(int i = 0; i < 288; i++)
+    {
+        for(int j = 0; j < deskAdvFontFontInfo.height; j++)
+        {
+            buffer_plot_pixel(x+i,y+j,255,255,255,255);
+        }
+    }
+
+    for(int i = 0; i < strlen(text); i++)
+    {
+        if(x > 280)
+        {
+            x = 0;
+            y += 10;
+            for(int i = 0; i < 288; i++)
+            {
+                for(int j = 0; j < deskAdvFontFontInfo.height+1; j++)
+                {
+                    buffer_plot_pixel(x+i,y+j-1,255,255,255,255);
+                }
+            }
+        }
+        x += render_char(x,y,text[i]);
     }
 }
 
@@ -99,7 +152,8 @@ void render(int x, int y)
         }
     }
 
-    buffer_flip_buffers();
+    if(active_text)
+        render_text(active_text_x,active_text_y,active_text);
 }
 
 #endif

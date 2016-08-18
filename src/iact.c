@@ -26,6 +26,7 @@
 #include <stdio.h>
 #include "map.h"
 #include "main.h"
+#include "input.h"
 #include "tile.h"
 #include "sound.h"
 #include "assets.h"
@@ -58,7 +59,7 @@
 void print_iact(u32 loc);
 
 char triggers[0x24][30] = { "FirstEnter", "Enter", "BumpTile", "DragItem", "Walk", "TempVarEq", "RandVarEq", "RandVarGt", "RandVarLs", "EnterVehicle", "CheckMapTile", "EnemyDead", "AllEnemiesDead", "HasItem", "HasEndItem", "Unk0f", "Unk10", "GameInProgress?", "GameCompleted?", "HealthLs", "HealthGt", "Unk15", "Unk16", "DragWrongItem", "PlayerAtPos", "GlobalVarEq", "GlobalVarLs", "GlobalVarGt", "ExperienceEq", "Unk1d", "Unk1e", "TempVarNe", "RandVarNe", "GlobalVarNe", "CheckMapTileVar", "ExperienceGt"};
-char commands[0x26][30] = { "SetMapTile", "ClearTile", "MoveMapTile", "DrawOverlayTile", "SayText", "ShowText", "RedrawTile", "RedrawTiles", "RenderChanges", "WaitTicks", "PlaySound", "Unk0b", "Random", "SetTempVar", "AddTempVar", "SetMapTileVar", "ReleaseCamera", "LockCamera", "SetPlayerPos", "MoveCamera", "FlagOnce", "ShowObject", "HideObject", "EnemySpawn", "NPCSpawn", "RemoveDraggedItem", "RemoveDraggedItemSimilar?", "SpawnItem", "AddItemToInv", "DropItem", "Open?Show?", "Unk1f", "Unk20", "WarpToMap", "SetGlobalVar", "AddGlobalVar", "SetRandVar", "AddHealth"};
+char commands[0x26][30] = { "SetMapTile", "ClearTile", "MoveMapTile", "DrawOverlayTile", "SayText", "ShowText", "RedrawTile", "RedrawTiles", "RenderChanges", "WaitTicks", "PlaySound", "Unk0b", "Random", "SetTempVar", "AddTempVar", "SetMapTileVar", "ReleaseCamera", "LockCamera", "SetPlayerPos", "MoveCamera", "FlagOnce", "ShowObject", "HideObject", "EnemySpawn", "EnemyDespawn", "SpawnAllEnemies", "DespawnAllEnemies", "SpawnItem", "AddItemToInv", "DropItem", "Open?Show?", "Unk1f", "Unk20", "WarpToMap", "SetGlobalVar", "AddGlobalVar", "SetRandVar", "AddHealth"};
 
 u16 active_triggers[0x24][8];
 u16 IACT_RANDVAR = 0;
@@ -124,6 +125,45 @@ void print_iact(u32 loc)
     }
 }
 
+void show_textbox(int x, int y, char *text)
+{
+    active_text = text;
+    active_text_x = (x - map_camera_x) * 32;
+    active_text_y = (y - map_camera_y) * 32;
+
+    draw_screen();
+
+    while(1)
+    {
+        if(BUTTON_FIRE_STATE)
+        {
+            break; //TODO: Scroll text
+        }
+
+        draw_screen();
+        reset_input_state();
+        update_input();
+        usleep(1000*(1000/60));
+    }
+
+    while(1)
+    {
+        if(!BUTTON_FIRE_STATE)
+        {
+            break;
+        }
+
+        draw_screen();
+        reset_input_state();
+        update_input();
+        usleep(1000*(1000/60));
+    }
+
+    draw_screen();
+
+    active_text = NULL;
+}
+
 void run_iact(u32 loc, int iact_id)
 {
     seek(loc);
@@ -157,9 +197,11 @@ void run_iact(u32 loc, int iact_id)
                 break;
             case IACT_CMD_SayText: //TODO
                 log("Luke says: %s\n", string);
+                show_textbox(player_entity.x,player_entity.y,string);
                 break;
             case IACT_CMD_ShowText: //TODO
                 log("Someone says: %s\n", string);
+                show_textbox(args[0],args[1],string);
                 break;
             case IACT_CMD_RedrawTile:
             case IACT_CMD_RedrawTiles:
@@ -167,7 +209,7 @@ void run_iact(u32 loc, int iact_id)
                 break;
             case IACT_CMD_RenderChanges:
                 render_map();
-                redraw_swap_buffers();
+                draw_screen();
                 break;
             case IACT_CMD_WaitTicks:
                 usleep(1000*(1000/TARGET_TICK_FPS)*args[0]);
@@ -181,7 +223,7 @@ void run_iact(u32 loc, int iact_id)
                 PLAYER_MAP_CHANGE_REASON = MAP_CHANGE_NONE;
                 break;
             case IACT_CMD_Random:
-                //IACT_RANDVAR = (random() % args[0]) + 1;
+                IACT_RANDVAR = (random() % args[0]) + 1;
                 break;
             case IACT_CMD_SetTempVar:
                 IACT_TEMPVAR = args[0];
@@ -347,7 +389,7 @@ void iact_update()
         if(conditions_met && !map_get_iact_flagonce(i))
         {
             //print_iact(zone_data[map_get_id()]->iact_offsets[i]);
-            run_iact(zone_data[map_get_id()]->iact_offsets[i], i);;
+            run_iact(zone_data[map_get_id()]->iact_offsets[i], i);
         }
     }
 

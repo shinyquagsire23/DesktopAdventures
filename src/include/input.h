@@ -34,6 +34,7 @@ void mouse_left();
 void mouse_right();
 void item_dragging(u16 item);
 void reset_input_state();
+void update_input();
 
 u16 CURRENT_ITEM_DRAGGED;
 

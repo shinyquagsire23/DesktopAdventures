@@ -147,9 +147,6 @@ main(int argc, char **argv)
     chdir("fs:/vol/content/");
     load_resources();
 
-    int error;
-    VPADStatus vpad_data;
-
     OSTime last_time = OSGetSystemTime();
     while(AppRunning())
     {
@@ -161,35 +158,7 @@ main(int argc, char **argv)
         last_time = time;
 
         reset_input_state();
-        VPADRead(0, &vpad_data, 1, &error);
-
-        if(vpad_data.trigger & VPAD_BUTTON_X)
-        {
-            if(current_map < NUM_MAPS)
-            {
-                unload_map();
-                current_map++;
-                load_map(current_map);
-            }
-        }
-        else if(vpad_data.trigger & VPAD_BUTTON_Y)
-        {
-            if(current_map > 0)
-            {
-                unload_map();
-                current_map--;
-                load_map(current_map);
-            }
-        }
-
-        if(vpad_data.hold & VPAD_BUTTON_UP)
-           button_move_up();
-        else if(vpad_data.hold & VPAD_BUTTON_RIGHT)
-           button_move_right();
-        else if(vpad_data.hold & VPAD_BUTTON_LEFT)
-           button_move_left();
-        else if(vpad_data.hold & VPAD_BUTTON_DOWN)
-           button_move_down();
+        update_input();
 
         update_world(delta);
     }
@@ -197,17 +166,47 @@ main(int argc, char **argv)
     return 0;
 }
 
-void redraw_swap_buffers()
+void update_input()
 {
-    setActiveScreen(SCREEN_BOTTOM);
-    fillScreen(0,0,0,255);
-    setActiveScreen(SCREEN_TOP);
+    int error;
+    VPADStatus vpad_data;
+    VPADRead(0, &vpad_data, 1, &error);
 
-    draw_screen();
-    AppRunning();
+    if(vpad_data.trigger & VPAD_BUTTON_X)
+    {
+        if(current_map < NUM_MAPS)
+        {
+            unload_map();
+            current_map++;
+            load_map(current_map);
+        }
+    }
+    else if(vpad_data.trigger & VPAD_BUTTON_Y)
+    {
+        if(current_map > 0)
+        {
+            unload_map();
+            current_map--;
+            load_map(current_map);
+        }
+    }
+
+    if(vpad_data.trigger & VPAD_BUTTON_A)
+    {
+        button_fire();
+    }
+
+    if(vpad_data.hold & VPAD_BUTTON_UP)
+        button_move_up();
+    else if(vpad_data.hold & VPAD_BUTTON_RIGHT)
+        button_move_right();
+    else if(vpad_data.hold & VPAD_BUTTON_LEFT)
+        button_move_left();
+    else if(vpad_data.hold & VPAD_BUTTON_DOWN)
+        button_move_down();
 }
 
-void buffer_flip_buffers()
+void render_flip_buffers()
 {
     setActiveScreen(SCREEN_TOP);
     flipBuffers();

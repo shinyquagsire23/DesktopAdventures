@@ -68,45 +68,9 @@ int main()
       last_time = time;
 
       reset_input_state();
-      hidScanInput();
-
-      if (keysDown() & KEY_START)
-         break;
-
-      if(keysDown() & KEY_X)
-      {
-          if(current_map < NUM_MAPS)
-          {
-            unload_map();
-            current_map++;
-            load_map(current_map);
-          }
-      }
-      else if(keysDown() & KEY_Y)
-      {
-          if(current_map > 0)
-          {
-            unload_map();
-            current_map--;
-            load_map(current_map);
-          }
-      }
-
-      if(keysDown() & KEY_UP)
-          button_move_up();
-      else if(keysDown() & KEY_RIGHT)
-          button_move_right();
-      else if(keysDown() & KEY_LEFT)
-          button_move_left();
-      else if(keysDown() & KEY_DOWN)
-          button_move_down();
+      update_input();
 
       update_world(delta);
-
-      gfxFlush(gfxGetFramebuffer(GFX_TOP, GFX_LEFT, NULL, NULL), 240, 400, GX_TRANSFER_FMT_RGB8);
-      
-      gfxSwapBuffersGpu();
-      gspWaitForVBlank();
    }
 
    // Exit services
@@ -115,14 +79,51 @@ int main()
    return 0;
 }
 
-void redraw_swap_buffers()
+void render_flip_buffers()
 {
-    draw_screen();
-
     gfxFlush(gfxGetFramebuffer(GFX_TOP, GFX_LEFT, NULL, NULL), 240, 400, GX_TRANSFER_FMT_RGB8);
 
     gfxSwapBuffersGpu();
     gspWaitForVBlank();
+}
+
+void update_input()
+{
+    hidScanInput();
+
+    if (keysDown() & KEY_START)
+        break;
+
+    if(keysDown() & KEY_X)
+    {
+        if(current_map < NUM_MAPS)
+        {
+            unload_map();
+            current_map++;
+            load_map(current_map);
+        }
+    }
+    else if(keysDown() & KEY_Y)
+    {
+        if(current_map > 0)
+        {
+            unload_map();
+            current_map--;
+            load_map(current_map);
+        }
+    }
+
+    if(keysDown() & KEY_UP)
+        button_move_up();
+    else if(keysDown() & KEY_RIGHT)
+        button_move_right();
+    else if(keysDown() & KEY_LEFT)
+        button_move_left();
+    else if(keysDown() & KEY_DOWN)
+        button_move_down();
+
+    if(keysDown() & KEY_A)
+        button_fire();
 }
 
 #endif

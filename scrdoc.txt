@@ -63,9 +63,9 @@ Script Commands:
 15 (ShowObject) - <obj num> <nop> <nop> <nop> <nop> <strlen> { Shows an object }
 16 (HideObject) - <obj num> <nop> <nop> <nop> <nop> <strlen> { Hides an object }
 17 (EnemySpawn) - <enemy num> <nop> <nop> <nop> <nop> <strlen> { Spawn enemy }
-18 (NPCSpawn) - <npc num> <nop> <nop> <nop> <nop> <strlen> { Spawn NPC }
-19 (RemoveDraggedItem) - <nop> <nop> <nop> <nop> <nop> <strlen> { Remove dragged item }
-1a (RemoveDraggedItemSimilar?) - <nop> <nop> <nop> <nop> <nop> <strlen> { Similar to 'Remove dragged item'? }
+18 (EnemyDespawn) - <npc num> <nop> <nop> <nop> <nop> <strlen> { Despawn enemy }
+19 (SpawnAllEnemies) - <nop> <nop> <nop> <nop> <nop> <strlen> { Spawns all enemies }
+1a (DespawnAllEnemies) - <nop> <nop> <nop> <nop> <nop> <strlen> { Despawns all enemies }
 1b (SpawnItem) - <item id> <x> <y> <nop> <nop> <nop> { Spawn item at coords }
 1c (AddItemToInv) - <item id> <nop> <nop> <nop> <nop> <nop> { Adds item to inventory }
 1d (DropItem) - <item id> <nop> <nop> <nop> <nop> <nop> { Drop item from cursor }
