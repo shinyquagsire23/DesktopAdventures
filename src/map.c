@@ -450,7 +450,7 @@ void render_map()
             e->x >= map_camera_x &&
             e->x < map_camera_x + 9)
         {
-            tiles_high[((e->y - map_camera_y)*9) + (e->x - map_camera_x)] = char_data[e->char_id]->frames[e->current_frame];
+            tiles_middle[((e->y - map_camera_y)*9) + (e->x - map_camera_x)] = char_data[e->char_id]->frames[e->current_frame];
 
             if(e->num_items > 0)
                 tiles_overlay[((e->y - map_camera_y)*9) + (e->x - map_camera_x)] = e->item;
