@@ -413,6 +413,11 @@ void player_init()
     player_inventory_count = 0;
 }
 
+void player_add_item_to_inv(u16 item)
+{
+    player_inventory[player_inventory_count++] = item;
+}
+
 void player_update()
 {
     player_handle_walk_animation();

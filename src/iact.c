@@ -251,6 +251,9 @@ void run_iact(u32 loc, int iact_id)
             case IACT_CMD_HideAllEntities:
                 map_hide_all_entities();
                 break;
+            case IACT_CMD_AddItemToInv:
+                player_add_item_to_inv(args[0]);
+                break;
             case IACT_CMD_WarpToMap:
                 player_entity.x = args[1];
                 player_entity.y = args[2];
