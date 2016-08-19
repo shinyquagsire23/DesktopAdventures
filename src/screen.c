@@ -27,6 +27,8 @@
 #include "player.h"
 
 void render();
+void render_pre();
+void render_post();
 void render_flip_buffers();
 
 unsigned short tiles_low[0x100 * 0x100];
@@ -64,7 +66,9 @@ int draw_screen()
     shift_y = (240 - SCREEN_WIDTH) / 2;
 #endif
 
+    render_pre();
     render(shift_x, shift_y);
+    render_post();
     render_flip_buffers();
     return 1;
 }

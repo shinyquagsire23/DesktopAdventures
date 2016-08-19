@@ -239,4 +239,13 @@ void update_input()
     handleKeyDown();
 }
 
+void render_pre()
+{
+
+}
+
+void render_post()
+{
+
+}
 #endif

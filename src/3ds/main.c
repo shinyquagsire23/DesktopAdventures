@@ -129,4 +129,14 @@ void update_input()
         button_fire();
 }
 
+void render_pre()
+{
+
+}
+
+void render_post()
+{
+
+}
+
 #endif
