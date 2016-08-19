@@ -204,6 +204,7 @@ void load_map(u16 map_id)
 void unload_map()
 {
     //Give the world one last render before unloading
+    player_update();
     render_map();
     draw_screen();
 
@@ -352,7 +353,7 @@ void load_izax()
 
     for(int i = 0; i < first_section->num_entries; i++)
     {
-        log("  entity: id=%x, x=%x, y=%x, item=%s, qty=%x, unk3=%x, unk4=%x %x %x %x %x %x %x %x %x %x %x %x %x %x %x %x\n", first_section->entries[i].entity_id, first_section->entries[i].x, first_section->entries[i].y, tile_names[first_section->entries[i].item], first_section->entries[i].num_items, first_section->entries[i].unk3, first_section->entries[i].unk4[0], first_section->entries[i].unk4[1], first_section->entries[i].unk4[2], first_section->entries[i].unk4[3], first_section->entries[i].unk4[4], first_section->entries[i].unk4[5], first_section->entries[i].unk4[6], first_section->entries[i].unk4[7], first_section->entries[i].unk4[8], first_section->entries[i].unk4[9], first_section->entries[i].unk4[10], first_section->entries[i].unk4[11], first_section->entries[i].unk4[12], first_section->entries[i].unk4[13], first_section->entries[i].unk4[14], first_section->entries[i].unk4[15]);
+        log("  entity: %s, x=%x, y=%x, item=%s, qty=%x, unk3=%x, unk4=%x %x %x %x %x %x %x %x %x %x %x %x %x %x %x %x\n", char_data[first_section->entries[i].entity_id]->name, first_section->entries[i].x, first_section->entries[i].y, tile_names[first_section->entries[i].item], first_section->entries[i].num_items, first_section->entries[i].unk3, first_section->entries[i].unk4[0], first_section->entries[i].unk4[1], first_section->entries[i].unk4[2], first_section->entries[i].unk4[3], first_section->entries[i].unk4[4], first_section->entries[i].unk4[5], first_section->entries[i].unk4[6], first_section->entries[i].unk4[7], first_section->entries[i].unk4[8], first_section->entries[i].unk4[9], first_section->entries[i].unk4[10], first_section->entries[i].unk4[11], first_section->entries[i].unk4[12], first_section->entries[i].unk4[13], first_section->entries[i].unk4[14], first_section->entries[i].unk4[15]);
         add_new_entity(first_section->entries[i].entity_id, first_section->entries[i].x, first_section->entries[i].y, FRAME_DOWN, first_section->entries[i].item, first_section->entries[i].num_items);
     }
 
@@ -410,8 +411,14 @@ void render_map()
     for(int i = 0; i < num_entities; i++)
     {
         entity *e = entities[i];
-        if(e->current_frame < 2)
-            continue; //These frames are transparent/unused in Yoda Stories, not sure for Indy
+
+        //Entities are sometimes used for animated scenery, or are just stationary and animated.
+        if(char_data[e->char_id]->flags & ICHR_BEHAVIOR_ANIMATED && char_data[e->char_id]->flags & ICHR_BEHAVIOR_STATIONARY)
+        {
+            e->current_frame++;
+            if(e->current_frame > 5)
+                e->current_frame = 1;
+        }
 
         if(e->y >= map_camera_y &&
             e->y < map_camera_y + 9 &&
@@ -574,9 +581,9 @@ void update_world(double delta)
             map_update_camera(false);
 
         player_update();
-        render_map();
         iact_update();
 
+        render_map();
         draw_screen();
         world_timer = 0.0;
     }

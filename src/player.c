@@ -352,6 +352,7 @@ void player_move(int dir)
             break;
     }
 
+    last_dir = dir;
     if(!moved)
     {
         player_bump(dir, player_entity.x, player_entity.y);
@@ -360,7 +361,6 @@ void player_move(int dir)
     {
         player_stand(player_entity.x, player_entity.y);
     }
-    last_dir = dir;
 }
 
 void player_handle_walk_animation()

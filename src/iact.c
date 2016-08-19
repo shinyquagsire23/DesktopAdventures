@@ -373,6 +373,8 @@ void iact_update()
         if(conditions_met && !map_get_iact_flagonce(i))
         {
             //print_iact(zone_data[map_get_id()]->iact_offsets[i]);
+            player_update();
+            render_map();
             run_iact(zone_data[map_get_id()]->iact_offsets[i], i);
         }
     }
