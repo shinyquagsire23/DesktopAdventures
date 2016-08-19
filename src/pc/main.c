@@ -28,6 +28,8 @@
 #include <unistd.h>
 #include <SDL_opengl.h>
 
+#include "player.h"
+#include "palette.h"
 #include "useful.h"
 #include "assets.h"
 #include "screen.h"
@@ -56,7 +58,7 @@ int main(int argc, char **argv)
 {
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 
-    SDL_CreateWindowAndRenderer(SCREEN_WIDTH, SCREEN_WIDTH, SDL_WINDOW_OPENGL, &displayWindow, &displayRenderer);
+    SDL_CreateWindowAndRenderer(SCREEN_WIDTH+256, SCREEN_WIDTH, SDL_WINDOW_OPENGL, &displayWindow, &displayRenderer);
     SDL_GetRendererInfo(displayRenderer, &displayRendererInfo);
     SDL_SetRenderDrawBlendMode(displayRenderer, SDL_BLENDMODE_BLEND);
 
@@ -239,6 +241,39 @@ void update_input()
     handleKeyDown();
 }
 
+void buffer_render_tile(int x, int y, u8 alpha, u32 tile)
+{
+    int width = 32, height = 32;
+    void *buffer = texture_buffers[tile];
+
+    if(!buffer || buffer == -1)
+        return;
+
+    for(int i = 0; i < width*height; i++)
+    {
+        u8 index = *(u8*)(buffer+i);
+        u8 r,g,b;
+
+        if(!index)
+            continue;
+
+        if(is_yoda)
+        {
+            b = (u8) (yodesk_palette[(index * 4)]);
+            g = (u8) (yodesk_palette[(index * 4) + 1]);
+            r = (u8) (yodesk_palette[(index * 4) + 2]);
+        }
+        else
+        {
+            b = (u8) (indy_palette[(index * 4)]);
+            g = (u8) (indy_palette[(index * 4) + 1]);
+            r = (u8) (indy_palette[(index * 4) + 2]);
+        }
+
+        buffer_plot_pixel(x+(i%width),y+(i/height),r,g,b,alpha);
+    }
+}
+
 void render_pre()
 {
 
@@ -246,6 +281,11 @@ void render_pre()
 
 void render_post()
 {
+    SDL_SetRenderDrawColor(displayRenderer, 200, 200, 200, 255);
+    SDL_Rect rect = {SCREEN_WIDTH, 0, 256, SCREEN_WIDTH};
+    SDL_RenderFillRect(displayRenderer, &rect);
 
+    for(int i = 0; i < player_inventory_count; i++)
+        buffer_render_tile(SCREEN_WIDTH+10, 10+(i*48), 255, player_inventory[i]);
 }
 #endif

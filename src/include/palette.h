@@ -18,6 +18,11 @@
  *  License along with this library; if not, see <http://www.gnu.org/licenses/>
  */
 
+#ifndef PALETTE_H
+#define PALETTE_H
+
+#include "useful.h"
+
 //BGRA
 static const u8 yodesk_palette[0x400] =
 {
@@ -539,3 +544,5 @@ static const u8 indy_palette[0x400] =
     0x00, 0x00, 0x00, 0x00,
     0xff, 0xff, 0xff, 0x00
 };
+
+#endif
