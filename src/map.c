@@ -506,6 +506,11 @@ u16 map_get_tile(u8 layer, int x, int y)
         case LAYER_LOW:
             return map_tiles_low[id][(y*width)+x];
         case LAYER_MIDDLE:
+            for(int i = 0; i < num_entities; i++)
+            {
+                if(entities[i]->x == x && entities[i]->y == y)
+                    return entities[i]->char_id;
+            }
             return map_tiles_middle[id][(y*width)+x];
         case LAYER_HIGH:
             return map_tiles_high[id][(y*width)+x];
@@ -542,6 +547,11 @@ u32 map_get_meta(u8 layer, int x, int y)
         case LAYER_LOW:
             return tile_metadata[map_tiles_low[id][(y*width)+x]];
         case LAYER_MIDDLE:
+            for(int i = 0; i < num_entities; i++)
+            {
+                if(entities[i]->x == x && entities[i]->y == y)
+                    return TILE_MIDDLE_LAYER_COLLIDING | TILE_GAME_OBJECT;
+            }
             return tile_metadata[map_tiles_middle[id][(y*width)+x]];
         case LAYER_HIGH:
             return tile_metadata[map_tiles_high[id][(y*width)+x]];
