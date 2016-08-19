@@ -42,6 +42,8 @@ void player_update();
 void player_init();
 
 entity player_entity;
+u16 *player_inventory;
+u16 player_inventory_count;
 u8 PLAYER_MAP_CHANGE_REASON;
 
 #endif

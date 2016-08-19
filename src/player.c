@@ -22,6 +22,7 @@
 
 #include <stdio.h>
 #include <stddef.h>
+#include <malloc.h>
 #include "map.h"
 #include "iact.h"
 #include "tile.h"
@@ -31,6 +32,9 @@
 int last_dir = -1;
 int anim_count = 0;
 bool moving = false;
+
+u16 *player_inventory;
+u16 player_inventory_count;
 
 u8 PLAYER_MAP_CHANGE_REASON = 0;
 u16 DOOR_IN_x = 0;
@@ -404,7 +408,9 @@ void player_handle_walk_animation()
 
 void player_init()
 {
-    player_entity.health = 300;
+    player_entity.health = chwp_data[0]->health;
+    player_inventory = calloc(256, sizeof(u16));
+    player_inventory_count = 0;
 }
 
 void player_update()
