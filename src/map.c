@@ -282,7 +282,7 @@ void load_izax()
             first_section->entries[i].item = read_short();
             first_section->entries[i].num_items = read_short();
             first_section->entries[i].unk3 = read_short();
-            read_bytes(first_section->entries[i].unk4, 0x10 * sizeof(u16));
+            read_bytes(first_section->entries[i].unk4, 0x10 * sizeof(u16)); seek_add(0x10 * sizeof(u16));
         }
     }
 
@@ -352,7 +352,7 @@ void load_izax()
 
     for(int i = 0; i < first_section->num_entries; i++)
     {
-        log("  entity: id=%x, x=%x, y=%x, item=%s, qty=%x, %x\n", first_section->entries[i].entity_id, first_section->entries[i].x, first_section->entries[i].y, tile_names[first_section->entries[i].item], first_section->entries[i].num_items, first_section->entries[i].unk3);
+        log("  entity: id=%x, x=%x, y=%x, item=%s, qty=%x, unk3=%x, unk4=%x %x %x %x %x %x %x %x %x %x %x %x %x %x %x %x\n", first_section->entries[i].entity_id, first_section->entries[i].x, first_section->entries[i].y, tile_names[first_section->entries[i].item], first_section->entries[i].num_items, first_section->entries[i].unk3, first_section->entries[i].unk4[0], first_section->entries[i].unk4[1], first_section->entries[i].unk4[2], first_section->entries[i].unk4[3], first_section->entries[i].unk4[4], first_section->entries[i].unk4[5], first_section->entries[i].unk4[6], first_section->entries[i].unk4[7], first_section->entries[i].unk4[8], first_section->entries[i].unk4[9], first_section->entries[i].unk4[10], first_section->entries[i].unk4[11], first_section->entries[i].unk4[12], first_section->entries[i].unk4[13], first_section->entries[i].unk4[14], first_section->entries[i].unk4[15]);
         add_new_entity(first_section->entries[i].entity_id, first_section->entries[i].x, first_section->entries[i].y, FRAME_DOWN, first_section->entries[i].item, first_section->entries[i].num_items);
     }
 
