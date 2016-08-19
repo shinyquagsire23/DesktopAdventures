@@ -284,6 +284,19 @@ void map_hide_all_entities()
         entities[i]->is_active_visible = false;
 }
 
+bool map_is_entity_active_visible(u16 index)
+{
+    return entities[index]->is_active_visible;
+}
+
+bool map_all_entities_active_visible()
+{
+    for(int i = 0; i < num_entities; i++)
+        if(!entities[i]->is_active_visible) return false;
+
+    return true;
+}
+
 void load_izax()
 {
     seek(zone_data[id]->izax_offset);

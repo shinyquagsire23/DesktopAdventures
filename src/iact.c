@@ -361,6 +361,13 @@ void iact_update()
                         if(map_get_tile(args[3], args[1], args[2]) == args[0])
                             conditions_met = true;
                         break;
+                    case IACT_TRIG_EnemyDead:
+                        if(!map_is_entity_active_visible(args[0]))
+                            conditions_met = true;
+                        break;
+                    case IACT_TRIG_AllEnemiesDead:
+                        conditions_met = !map_all_entities_active_visible();
+                        break;
                 }
 
                 if(!conditions_met)

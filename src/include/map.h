@@ -141,6 +141,8 @@ void map_show_entity(u16 index);
 void map_hide_entity(u16 index);
 void map_show_all_entities();
 void map_hide_all_entities();
+bool map_is_entity_active_visible(u16 index);
+bool map_all_entities_active_visible();
 
 void read_iact_stats(u16 map_num, u32 location, u16 num_iacts);
 void print_iact_stats();
