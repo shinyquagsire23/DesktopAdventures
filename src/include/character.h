@@ -32,6 +32,7 @@ typedef struct entity
     u16 item;
     u16 num_items;
     u16 health;
+    bool is_active_visible;
 } entity;
 
 enum ICHR_FLAGS

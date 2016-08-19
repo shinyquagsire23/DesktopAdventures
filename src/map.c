@@ -257,8 +257,31 @@ void add_new_entity(u16 id, u16 x, u16 y, u16 frame, u16 item, u16 num_items)
     e->current_frame = frame;
     e->item = item;
     e->num_items = num_items;
+    e->is_active_visible = true;
 
     entities[num_entities++] = e;
+}
+
+void map_show_entity(u16 index)
+{
+    entities[index]->is_active_visible = true;
+}
+
+void map_hide_entity(u16 index)
+{
+    entities[index]->is_active_visible = false;
+}
+
+void map_show_all_entities()
+{
+    for(int i = 0; i < num_entities; i++)
+        entities[i]->is_active_visible = true;
+}
+
+void map_hide_all_entities()
+{
+    for(int i = 0; i < num_entities; i++)
+        entities[i]->is_active_visible = false;
 }
 
 void load_izax()
@@ -411,6 +434,8 @@ void render_map()
     for(int i = 0; i < num_entities; i++)
     {
         entity *e = entities[i];
+
+        if(!e->is_active_visible) continue;
 
         //Entities are sometimes used for animated scenery, or are just stationary and animated.
         if(char_data[e->char_id]->flags & ICHR_BEHAVIOR_ANIMATED && char_data[e->char_id]->flags & ICHR_BEHAVIOR_STATIONARY)

@@ -43,7 +43,7 @@
 void print_iact(u32 loc);
 
 char triggers[0x24][30] = { "FirstEnter", "Enter", "BumpTile", "DragItem", "Walk", "TempVarEq", "RandVarEq", "RandVarGt", "RandVarLs", "EnterVehicle", "CheckMapTile", "EnemyDead", "AllEnemiesDead", "HasItem", "HasEndItem", "Unk0f", "Unk10", "GameInProgress?", "GameCompleted?", "HealthLs", "HealthGt", "Unk15", "Unk16", "DragWrongItem", "PlayerAtPos", "GlobalVarEq", "GlobalVarLs", "GlobalVarGt", "ExperienceEq", "Unk1d", "Unk1e", "TempVarNe", "RandVarNe", "GlobalVarNe", "CheckMapTileVar", "ExperienceGt"};
-char commands[0x26][30] = { "SetMapTile", "ClearTile", "MoveMapTile", "DrawOverlayTile", "SayText", "ShowText", "RedrawTile", "RedrawTiles", "RenderChanges", "WaitTicks", "PlaySound", "Unk0b", "Random", "SetTempVar", "AddTempVar", "SetMapTileVar", "ReleaseCamera", "LockCamera", "SetPlayerPos", "MoveCamera", "FlagOnce", "ShowObject", "HideObject", "EnemySpawn", "EnemyDespawn", "SpawnAllEnemies", "DespawnAllEnemies", "SpawnItem", "AddItemToInv", "DropItem", "Open?Show?", "Unk1f", "Unk20", "WarpToMap", "SetGlobalVar", "AddGlobalVar", "SetRandVar", "AddHealth"};
+char commands[0x26][30] = { "SetMapTile", "ClearTile", "MoveMapTile", "DrawOverlayTile", "SayText", "ShowText", "RedrawTile", "RedrawTiles", "RenderChanges", "WaitTicks", "PlaySound", "Unk0b", "Random", "SetTempVar", "AddTempVar", "SetMapTileVar", "ReleaseCamera", "LockCamera", "SetPlayerPos", "MoveCamera", "FlagOnce", "ShowObject", "HideObject", "ShowEntity", "HideEntity", "ShowAllEntities", "HideAllEntities", "SpawnItem", "AddItemToInv", "DropItem", "Open?Show?", "Unk1f", "Unk20", "WarpToMap", "SetGlobalVar", "AddGlobalVar", "SetRandVar", "AddHealth"};
 
 u16 active_triggers[0x24][8];
 u16 IACT_RANDVAR = 0;
@@ -238,6 +238,18 @@ void run_iact(u32 loc, int iact_id)
                 break;
             case IACT_CMD_HideObject:
                 map_get_object_by_id(args[0])->visible = false;
+                break;
+            case IACT_CMD_ShowEntity:
+                map_show_entity(args[0]);
+                break;
+            case IACT_CMD_HideEntity:
+                map_hide_entity(args[0]);
+                break;
+            case IACT_CMD_ShowAllEntities:
+                map_show_all_entities();
+                break;
+            case IACT_CMD_HideAllEntities:
+                map_hide_all_entities();
                 break;
             case IACT_CMD_WarpToMap:
                 player_entity.x = args[1];

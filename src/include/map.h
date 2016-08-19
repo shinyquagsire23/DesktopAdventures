@@ -137,6 +137,11 @@ void map_set_global_var(u16 val);
 bool map_get_iact_flagonce(int iact_id);
 void map_set_iact_flagonce(int iact_id, bool val);
 
+void map_show_entity(u16 index);
+void map_hide_entity(u16 index);
+void map_show_all_entities();
+void map_hide_all_entities();
+
 void read_iact_stats(u16 map_num, u32 location, u16 num_iacts);
 void print_iact_stats();
 
