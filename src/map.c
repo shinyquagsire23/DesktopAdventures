@@ -258,6 +258,7 @@ void add_new_entity(u16 id, u16 x, u16 y, u16 frame, u16 item, u16 num_items)
     e->item = item;
     e->num_items = num_items;
     e->is_active_visible = true;
+    e->health = chwp_data[id]->health;
 
     entities[num_entities++] = e;
 }
