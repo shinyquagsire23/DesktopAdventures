@@ -1170,7 +1170,7 @@ FONT_INFO deskAdvFontFontInfo =
 //
 
 // Character bitmaps for Hellovetica 6pt
-const uint_8 deskAdvInvFontBitmaps[] = 
+u8 deskAdvInvFontBitmaps[] =
 {
 	// @0 '!' (1 pixels wide)
 	0x80, // #
@@ -2491,7 +2491,7 @@ const uint_8 deskAdvInvFontBitmaps[] =
 
 // Character descriptors for Hellovetica 6pt
 // { [Char width in bits], [Offset into hellovetica_6ptCharBitmaps in bytes] }
-const FONT_CHAR_INFO deskAdvInvFontDescriptors[] = 
+FONT_CHAR_INFO deskAdvInvFontDescriptors[] =
 {
 	{1, 0}, 		// ! 
 	{3, 12}, 		// " 
@@ -2590,7 +2590,7 @@ const FONT_CHAR_INFO deskAdvInvFontDescriptors[] =
 };
 
 // Font information for Hellovetica 6pt
-const FONT_INFO deskAdvInvFontInfo =
+FONT_INFO deskAdvInvFontInfo =
 {
 	12, //  Character height
 	'!', //  Start character
