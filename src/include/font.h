@@ -24,5 +24,5 @@ FONT_INFO deskAdvFontFontInfo;
 FONT_CHAR_INFO deskAdvFontDescriptors[];
 
 u8 deskAdvInvFontBitmaps[];
-FONT_INFO deskAdvInvFontFontInfo;
+FONT_INFO deskAdvInvFontInfo;
 FONT_CHAR_INFO deskAdvInvFontDescriptors[];
