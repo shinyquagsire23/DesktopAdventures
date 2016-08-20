@@ -105,6 +105,8 @@ enum IACT_TRIGGERS
     IACT_TRIG_ExperienceGt,
 } IACT_TRIGGER;
 
+void item_select_prompt(u16 x, u16 y, u16 item);
+
 void read_iact();
 void read_iact_stats(u16 map_num, u32 location, u16 num_iacts);
 void print_iact_stats();

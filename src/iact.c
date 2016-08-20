@@ -49,6 +49,38 @@ u16 active_triggers[0x24][8];
 u16 IACT_RANDVAR = 0;
 u16 IACT_TEMPVAR = 0;
 
+void item_select_prompt(u16 x, u16 y, u16 item)
+{
+    bool show = false;
+    while(1)
+    {
+        int center_shift_x = map_get_width() < SCREEN_TILE_WIDTH ? ((SCREEN_TILE_WIDTH - map_get_width()) / 2)*32 : 0;
+        int center_shift_y = map_get_height() < SCREEN_TILE_HEIGHT ? ((SCREEN_TILE_HEIGHT - map_get_height()) / 2)*32 : 0;
+
+        int item_screen_x = ((x - map_camera_x)*32) + center_shift_x;
+        int item_screen_y = ((y - map_camera_y)*32) + center_shift_y;
+
+        if(BUTTON_FIRE_STATE || (BUTTON_LCLICK_STATE && MOUSE_X > item_screen_x && MOUSE_Y > item_screen_y && MOUSE_X < item_screen_x+32 && MOUSE_Y < item_screen_y+32))
+        {
+            map_set_tile(LAYER_HIGH, x, y, TILE_NONE);
+            render_map();
+
+            player_add_item_to_inv(item);
+            break; //TODO: Scroll text
+        }
+
+        map_set_tile(LAYER_HIGH, x, y, show?item:TILE_NONE);
+        render_map();
+
+        show = !show;
+
+        draw_screen();
+        reset_input_state();
+        update_input();
+        usleep(1000*(1000/(TARGET_TICK_FPS/2)));
+    }
+}
+
 void read_iact()
 {
     log("Reading IACT data, %u IACTs\n", zone_data[map_get_id()]->num_iacts);
@@ -250,6 +282,9 @@ void run_iact(u32 loc, int iact_id)
                 break;
             case IACT_CMD_HideAllEntities:
                 map_hide_all_entities();
+                break;
+            case IACT_CMD_SpawnItem:
+                item_select_prompt(args[1], args[2], args[0]);
                 break;
             case IACT_CMD_AddItemToInv:
                 player_add_item_to_inv(args[0]);
