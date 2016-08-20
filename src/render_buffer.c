@@ -80,7 +80,7 @@ int render_char(int x, int y, char c)
 
 void render_text(int x, int y, char *text)
 {
-    x = 0;
+    x = SCREEN_SHIFT_X;
     if(y >= 288/2)
         y -= 32;
     else
