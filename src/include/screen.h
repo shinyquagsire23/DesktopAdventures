@@ -34,5 +34,7 @@ int draw_screen();
 void screen_transition_in();
 void screen_transition_out();
 
+int SCREEN_SHIFT_X;
+int SCREEN_SHIFT_Y;
 u8 SCREEN_FADE_LEVEL;
 u16 TARGET_TICK_FPS;

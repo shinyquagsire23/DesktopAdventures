@@ -26,7 +26,7 @@
 #include "useful.h"
 #include "player.h"
 
-void render();
+void render(int x, int y);
 void render_pre();
 void render_post();
 void render_flip_buffers();
@@ -40,6 +40,8 @@ char *active_text;
 int active_text_x;
 int active_text_y;
 
+int SCREEN_SHIFT_X = 0;
+int SCREEN_SHIFT_Y = 0;
 u8 SCREEN_FADE_LEVEL = 0;
 
 //Default game uses 10fps for "Normal" speed, +- 5fps for Slow/Fast
@@ -59,15 +61,8 @@ int draw_screen()
 {
     SCREEN_FADE_LEVEL = MIN(SCREEN_FADE_LEVEL, 5);
 
-    int shift_x = 0, shift_y = 0;
-
-#ifdef _3DS
-    shift_x = (400 - SCREEN_WIDTH) / 2;
-    shift_y = (240 - SCREEN_WIDTH) / 2;
-#endif
-
     render_pre();
-    render(shift_x, shift_y);
+    render(SCREEN_SHIFT_X, SCREEN_SHIFT_Y);
     render_post();
     render_flip_buffers();
     return 1;

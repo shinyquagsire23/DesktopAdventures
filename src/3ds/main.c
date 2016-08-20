@@ -59,6 +59,9 @@ int main()
    glBindTexture(GL_TEXTURE_2D, 0);
    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
+   SCREEN_SHIFT_X = (400 - SCREEN_WIDTH) / 2;
+   SCREEN_SHIFT_Y = (240 - SCREEN_WIDTH) / 2;
+
    load_resources();
 
    clock_t last_time = clock();

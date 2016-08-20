@@ -111,13 +111,13 @@ void render_text(int x, int y, char *text)
     }
 }
 
-void render(int x, int y)
+void render(int x_shift, int y_shift)
 {
     buffer_clear_screen(0,0,0,255);
 
     if (ASSETS_LOADING)
     {
-        render_texture(x,y,288,288,255,texture_buffers[0x2000]);
+        render_texture(x_shift,y_shift,288,288,255,texture_buffers[0x2000]);
 
         int bar_x = 8;
         int bar_y = 264;
@@ -125,7 +125,7 @@ void render(int x, int y)
         {
             for(int j = 0; j < 16; j++)
             {
-                buffer_plot_pixel(bar_x+i,bar_y+j,0,0,128,255);
+                buffer_plot_pixel(x_shift+bar_x+i,y_shift+bar_y+j,0,0,128,255);
             }
         }
     }
@@ -134,19 +134,19 @@ void render(int x, int y)
         for (int y = SCREEN_FADE_LEVEL; y < SCREEN_TILE_WIDTH-SCREEN_FADE_LEVEL; y++) {
             for (int x = SCREEN_FADE_LEVEL; x < SCREEN_TILE_WIDTH-SCREEN_FADE_LEVEL; x++) {
                 if (tiles_low[(y * SCREEN_TILE_WIDTH) + x] != 0xFFFF) {
-                    render_texture(32 * x, 32 * y, 32, 32, 255, texture_buffers[tiles_low[(y * 9) + x]]);
+                    render_texture((32 * x)+x_shift, (32 * y)+y_shift, 32, 32, 255, texture_buffers[tiles_low[(y * 9) + x]]);
                 }
 
                 if (tiles_middle[(y * SCREEN_TILE_WIDTH) + x] != 0xFFFF) {
-                    render_texture(32 * x, 32 * y, 32, 32, 255, texture_buffers[tiles_middle[(y * 9) + x]]);
+                    render_texture((32 * x)+x_shift, (32 * y)+y_shift, 32, 32, 255, texture_buffers[tiles_middle[(y * 9) + x]]);
                 }
 
                 if (tiles_high[(y * SCREEN_TILE_WIDTH) + x] != 0xFFFF) {
-                    render_texture(32 * x, 32 * y, 32, 32, 255, texture_buffers[tiles_high[(y * 9) + x]]);
+                    render_texture((32 * x)+x_shift, (32 * y)+y_shift, 32, 32, 255, texture_buffers[tiles_high[(y * 9) + x]]);
                 }
 
                 if (tiles_overlay[(y * SCREEN_TILE_WIDTH) + x] != 0xFFFF) {
-                    render_texture(32 * x, 32 * y, 32, 32, 153, texture_buffers[tiles_overlay[(y * 9) + x]]);
+                    render_texture((32 * x)+x_shift, (32 * y)+y_shift, 32, 32, 153, texture_buffers[tiles_overlay[(y * 9) + x]]);
                 }
             }
         }
