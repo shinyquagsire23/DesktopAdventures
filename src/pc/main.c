@@ -27,6 +27,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <SDL_opengl.h>
+#include <tname.h>
 
 #include "player.h"
 #include "palette.h"
@@ -35,6 +36,7 @@
 #include "screen.h"
 #include "sound.h"
 #include "input.h"
+#include "font.h"
 #include "map.h"
 
 #define TRUE  1
@@ -58,7 +60,7 @@ int main(int argc, char **argv)
 {
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 
-    SDL_CreateWindowAndRenderer(SCREEN_WIDTH+256, SCREEN_WIDTH, SDL_WINDOW_OPENGL, &displayWindow, &displayRenderer);
+    SDL_CreateWindowAndRenderer(SCREEN_WIDTH+232, SCREEN_WIDTH+16, SDL_WINDOW_OPENGL, &displayWindow, &displayRenderer);
     SDL_GetRendererInfo(displayRenderer, &displayRendererInfo);
     SDL_SetRenderDrawBlendMode(displayRenderer, SDL_BLENDMODE_BLEND);
 
@@ -68,6 +70,9 @@ int main(int argc, char **argv)
         fprintf( stderr, "Video init failed: %s\n", SDL_GetError());
         Quit(1);
     }
+
+    SCREEN_SHIFT_X = 8;
+    SCREEN_SHIFT_Y = 8;
 
     srand(time(NULL));
     initGL();
@@ -201,8 +206,13 @@ void handleKeyDown()
 
 void buffer_clear_screen(u8 r, u8 g, u8 b, u8 a)
 {
+    SDL_SetRenderDrawColor(displayRenderer, 200, 200, 200, 255);
+    SDL_Rect rect = {0, 0, SCREEN_WIDTH+236, SCREEN_WIDTH+16};
+    SDL_RenderFillRect(displayRenderer, &rect);
+
     SDL_SetRenderDrawColor(displayRenderer, r, g, b, a);
-    SDL_RenderClear(displayRenderer);
+    SDL_Rect rectGame = {8, 8, SCREEN_WIDTH, SCREEN_WIDTH};
+    SDL_RenderFillRect(displayRenderer, &rectGame);
 }
 
 void buffer_plot_pixel(int x, int y, u8 r, u8 g, u8 b, u8 a)
@@ -274,18 +284,88 @@ void buffer_render_tile(int x, int y, u8 alpha, u32 tile)
     }
 }
 
+int buffer_render_char(int x, int y, char c)
+{
+    if(c == ' ')
+        return deskAdvInvFontInfo.space_width+1;
+
+    int offset = deskAdvInvFontDescriptors[c-deskAdvInvFontInfo.start_char].offset;
+    for(int i = 0; i < deskAdvInvFontDescriptors[c-deskAdvInvFontInfo.start_char].width; i++)
+    {
+        for(int j = 0; j < deskAdvInvFontInfo.height; j++)
+        {
+            if(deskAdvInvFontBitmaps[offset+j] & (1<<(7-i)))
+                buffer_plot_pixel(x+i,y+j,0,0,0,255);
+        }
+    }
+    return deskAdvInvFontDescriptors[c-deskAdvInvFontInfo.start_char].width+1;
+}
+
+void buffer_render_text(int x, int y, char *text)
+{
+    for(int i = 0; i < strlen(text); i++)
+    {
+        x += buffer_render_char(x,y,text[i]);
+    }
+}
+
+void buffer_render_outdent(int x, int y, int width, int height, u32 highlight, u32 shadow)
+{
+    SDL_SetRenderDrawColor(displayRenderer, (u8)((shadow & 0xFF0000) >> 16), (u8)((shadow & 0xFF00) >> 8), (u8)((shadow & 0xFF)), 255);
+    SDL_RenderDrawLine(displayRenderer,x+width-1,y+height-1,x, y+height-1);
+    SDL_RenderDrawLine(displayRenderer,x+width-1,y+height-1,x+width-1, y);
+
+    SDL_SetRenderDrawColor(displayRenderer, (u8)((highlight & 0xFF0000) >> 16), (u8)((highlight & 0xFF00) >> 8), (u8)((highlight & 0xFF)), 255);
+    SDL_RenderDrawLine(displayRenderer,x,y,x+width-1,y);
+    SDL_RenderDrawLine(displayRenderer,x,y,x,y+height-2);
+}
+
 void render_pre()
 {
 
 }
 
+int inventory_scroll = 0;
+
 void render_post()
 {
-    SDL_SetRenderDrawColor(displayRenderer, 200, 200, 200, 255);
-    SDL_Rect rect = {SCREEN_WIDTH, 0, 256, SCREEN_WIDTH};
-    SDL_RenderFillRect(displayRenderer, &rect);
+    //Game Surrounding box
+    buffer_render_outdent(5, 5, SCREEN_WIDTH+6,SCREEN_WIDTH+6, 0x808080, 0xFFFFFF);
+    buffer_render_outdent(6, 6, SCREEN_WIDTH+4,SCREEN_WIDTH+4, 0x808080, 0xFFFFFF);
+    buffer_render_outdent(7, 7, SCREEN_WIDTH+2,SCREEN_WIDTH+2, 0x808080, 0xFFFFFF);
 
-    for(int i = 0; i < player_inventory_count; i++)
-        buffer_render_tile(SCREEN_WIDTH+10, 10+(i*48), 255, player_inventory[i]);
+    //Surrounding box
+    buffer_render_outdent(SCREEN_WIDTH + 17, 6, 187,228, 0x808080, 0xFFFFFF);
+    buffer_render_outdent(SCREEN_WIDTH + 18, 7, 185,226, 0x808080, 0xFFFFFF);
+
+    //Force box
+    buffer_render_outdent(SCREEN_WIDTH + 17 + 77, 236 + 18, 13,36, 0x808080, 0xFFFFFF);
+    buffer_render_outdent(SCREEN_WIDTH + 17 + 78, 237 + 18, 11,34, 0x808080, 0xFFFFFF);
+    buffer_render_outdent(SCREEN_WIDTH + 17 + 79, 237 + 19, 9,32, 0xFFFFFF, 0x808080);
+
+    //Item box
+    buffer_render_outdent(SCREEN_WIDTH + 16 + 17 + 77, 236 + 18, 36,36, 0x808080, 0xFFFFFF);
+    buffer_render_outdent(SCREEN_WIDTH + 16 + 17 + 78, 237 + 18, 34,34, 0x808080, 0xFFFFFF);
+    buffer_render_outdent(SCREEN_WIDTH + 16 + 17 + 79, 237 + 19, 32,32, 0xFFFFFF, 0x808080);
+
+    //Scroll box
+    buffer_render_outdent(SCREEN_WIDTH + 17 + 190, 6, 20,228, 0x808080, 0xFFFFFF);
+    buffer_render_outdent(SCREEN_WIDTH + 18 + 190, 7, 18,226, 0x808080, 0xFFFFFF);
+
+    for(int i = 0; i < 7; i++)
+    {
+        buffer_render_outdent(SCREEN_WIDTH + 19, 8 + (i * 32),32,32, 0xFFFFFF, 0x808080);
+        buffer_render_outdent(SCREEN_WIDTH + 19 + 33, 8 + (i * 32),150,32, 0xFFFFFF, 0x808080);
+    }
+
+    if(!player_inventory) return;
+
+    for(int i = 0; i < 7; i++)
+    {
+        if(player_inventory[i+inventory_scroll] == NULL) break;
+
+        buffer_render_tile(SCREEN_WIDTH + 19, 8 + (i * 48), 255, player_inventory[i+inventory_scroll]);
+        buffer_render_text(SCREEN_WIDTH + 19 + 32 + 10, 8 + (i * 48) + ((32/2) - deskAdvInvFontInfo.height/2), tile_names[player_inventory[i+inventory_scroll]]);
+    }
 }
 #endif
