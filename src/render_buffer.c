@@ -153,7 +153,7 @@ void render(int x_shift, int y_shift)
     }
 
     if(active_text)
-        render_text(active_text_x,active_text_y,active_text);
+        render_text(active_text_x+x_shift,active_text_y+y_shift,active_text);
 }
 
 #endif
