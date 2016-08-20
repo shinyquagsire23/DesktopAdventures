@@ -25,6 +25,7 @@
 #include "main.h"
 #include "useful.h"
 #include "player.h"
+#include "map.h"
 
 void render(int x, int y);
 void render_pre();
@@ -39,6 +40,9 @@ unsigned short tiles_overlay[0x100 * 0x100];
 char *active_text;
 int active_text_x;
 int active_text_y;
+
+u32 SCREEN_WIDTH = 288;
+u32 SCREEN_HEIGHT = 288;
 
 int SCREEN_SHIFT_X = 0;
 int SCREEN_SHIFT_Y = 0;
@@ -59,7 +63,7 @@ void init_screen()
 
 int draw_screen()
 {
-    SCREEN_FADE_LEVEL = MIN(SCREEN_FADE_LEVEL, 5);
+    SCREEN_FADE_LEVEL = MIN(SCREEN_FADE_LEVEL, (SCREEN_TILE_WIDTH/2)+1);
 
     render_pre();
     render(SCREEN_SHIFT_X, SCREEN_SHIFT_Y);
@@ -70,7 +74,7 @@ int draw_screen()
 
 void screen_transition_out()
 {
-    for(int i = 0; i <= 5; i++)
+    for(int i = (SCREEN_TILE_WIDTH > map_get_width() ? ((SCREEN_TILE_WIDTH-map_get_width())/2)+1 : 0); i <= (SCREEN_TILE_WIDTH/2)+1; i++)
     {
         player_update();
 
@@ -82,7 +86,7 @@ void screen_transition_out()
 
 void screen_transition_in()
 {
-    for(int i = 5; i >= 0; i--)
+    for(int i = (SCREEN_TILE_WIDTH/2)+1; i > (SCREEN_TILE_WIDTH > map_get_width() ? ((SCREEN_TILE_WIDTH-map_get_width())/2)+1 : 0); i--)
     {
         player_update();
 
@@ -90,4 +94,6 @@ void screen_transition_in()
         draw_screen();
         usleep(1000*(1000/TARGET_TICK_FPS));
     }
+    SCREEN_FADE_LEVEL = 0;
+    draw_screen();
 }

@@ -83,8 +83,9 @@
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
-#define SCREEN_WIDTH  288
 #define SCREEN_TILE_WIDTH (SCREEN_WIDTH / 32)
+#define SCREEN_TILE_HEIGHT (SCREEN_HEIGHT / 32)
+
 #define SCREEN_BPP     32
 
 u8 *readFileToBytes(char* file, long *size);

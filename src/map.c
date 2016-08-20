@@ -412,6 +412,9 @@ void load_izax()
 
 void render_map()
 {
+    int center_shift_x = width < SCREEN_TILE_WIDTH ? (SCREEN_TILE_WIDTH - width) / 2 : 0;
+    int center_shift_y = height < SCREEN_TILE_HEIGHT ? (SCREEN_TILE_HEIGHT - height) / 2 : 0;
+
     for (int i = 0; i < object_info_qty[id]; i++)
     {
         //Display items and NPCs for debug purposes
@@ -420,29 +423,40 @@ void render_map()
             case OBJ_ITEM:
             case OBJ_WEAPON:
             case OBJ_PUZZLE_NPC:
-                map_overlay[object_info[id][i]->x + (object_info[id][i]->y * width)] = object_info[id][i]->visible ? object_info[id][i]->arg : TILE_NONE;
+                map_overlay[object_info[id][i]->x + ((object_info[id][i]->y + center_shift_y) * width) + center_shift_x] = object_info[id][i]->visible ? object_info[id][i]->arg : TILE_NONE;
                 break;
         }
     }
 
-
-    for(int i = 0; i < 9; i++)
+    //Clear old tiles
+    for(int i = 0; i < SCREEN_TILE_WIDTH*SCREEN_TILE_HEIGHT; i++)
     {
-        for(int j = 0; j < 9; j++)
+            tiles_low[i] = TILE_NONE;
+            tiles_middle[i] = TILE_NONE;
+            tiles_high[i] = TILE_NONE;
+            tiles_overlay[i] = TILE_NONE;
+    }
+
+    for(int i = 0; i < SCREEN_TILE_WIDTH; i++)
+    {
+        for(int j = 0; j < SCREEN_TILE_HEIGHT; j++)
         {
-            tiles_low[(j*9)+i] = map_tiles_low[id][((map_camera_y+j)*width)+i+map_camera_x];
-            tiles_middle[(j*9)+i] = map_tiles_middle[id][((map_camera_y+j)*width)+i+map_camera_x];
-            tiles_high[(j*9)+i] = map_tiles_high[id][((map_camera_y+j)*width)+i+map_camera_x];
-            tiles_overlay[(j*9)+i] = map_overlay[((map_camera_y+j)*width)+i+map_camera_x];
+            if(i >= width || j >= height)
+                continue;
+
+            tiles_low[((j+center_shift_y)*SCREEN_TILE_WIDTH)+i+center_shift_x] = map_tiles_low[id][((map_camera_y+j)*width)+i+map_camera_x];
+            tiles_middle[((j+center_shift_y)*SCREEN_TILE_WIDTH)+i+center_shift_x] = map_tiles_middle[id][((map_camera_y+j)*width)+i+map_camera_x];
+            tiles_high[((j+center_shift_y)*SCREEN_TILE_WIDTH)+i+center_shift_x] = map_tiles_high[id][((map_camera_y+j)*width)+i+map_camera_x];
+            tiles_overlay[((j+center_shift_y)*SCREEN_TILE_WIDTH)+i+center_shift_x] = map_overlay[((map_camera_y+j)*width)+i+map_camera_x];
         }
     }
 
     if(player_entity.y >= map_camera_y &&
-       player_entity.y < (map_camera_y + 9) &&
+       player_entity.y < (map_camera_y + SCREEN_TILE_HEIGHT) &&
        player_entity.x >= map_camera_x &&
-       player_entity.x < (map_camera_x + 9))
+       player_entity.x < (map_camera_x + SCREEN_TILE_WIDTH))
     {
-        tiles_middle[((player_entity.y - map_camera_y)*9) + (player_entity.x - map_camera_x)] = char_data[player_entity.char_id]->frames[player_entity.current_frame];
+        tiles_middle[((player_entity.y - map_camera_y + center_shift_y)*SCREEN_TILE_WIDTH) + (player_entity.x - map_camera_x + center_shift_x)] = char_data[player_entity.char_id]->frames[player_entity.current_frame];
     }
 
     for(int i = 0; i < num_entities; i++)
@@ -460,14 +474,14 @@ void render_map()
         }
 
         if(e->y >= map_camera_y &&
-            e->y < map_camera_y + 9 &&
+            e->y < (map_camera_y + SCREEN_TILE_HEIGHT) &&
             e->x >= map_camera_x &&
-            e->x < map_camera_x + 9)
+            e->x < (map_camera_x + SCREEN_TILE_WIDTH))
         {
-            tiles_middle[((e->y - map_camera_y)*9) + (e->x - map_camera_x)] = char_data[e->char_id]->frames[e->current_frame];
+            tiles_middle[((e->y - map_camera_y + center_shift_y)*SCREEN_TILE_WIDTH) + (e->x - map_camera_x + center_shift_x)] = char_data[e->char_id]->frames[e->current_frame];
 
             if(e->num_items > 0)
-                tiles_overlay[((e->y - map_camera_y)*9) + (e->x - map_camera_x)] = e->item;
+                tiles_overlay[((e->y - map_camera_y + center_shift_y)*SCREEN_TILE_WIDTH) + (e->x - map_camera_x + center_shift_x)] = e->item;
         }
     }
 
@@ -577,8 +591,22 @@ u32 map_get_meta(u8 layer, int x, int y)
 
 void map_update_camera(bool redraw)
 {
-    map_camera_x = MIN(MAX(0, player_entity.x - 4), width - 9);
-    map_camera_y = MIN(MAX(0, player_entity.y - 4), height - 9);
+    if(width > SCREEN_TILE_WIDTH)
+    {
+        int half_width = (SCREEN_TILE_WIDTH / 2);
+        map_camera_x = MIN(MAX(0, player_entity.x - half_width), width - SCREEN_TILE_WIDTH);
+    }
+    else
+        map_camera_x = 0;
+
+    if(height > SCREEN_TILE_HEIGHT)
+    {
+        int half_height = (SCREEN_TILE_HEIGHT / 2);
+        map_camera_y = MIN(MAX(0, player_entity.y - half_height), height - SCREEN_TILE_HEIGHT);
+    }
+    else
+        map_camera_y = 0;
+
     if(redraw)
         render_map();
 }

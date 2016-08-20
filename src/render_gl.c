@@ -82,11 +82,11 @@ void render(int x, int y)
     }
     else
     {
-        for (int y = SCREEN_FADE_LEVEL; y < SCREEN_TILE_WIDTH-SCREEN_FADE_LEVEL; y++) {
+        for (int y = SCREEN_FADE_LEVEL; y < SCREEN_TILE_HEIGHT-SCREEN_FADE_LEVEL; y++) {
             for (int x = SCREEN_FADE_LEVEL; x < SCREEN_TILE_WIDTH-SCREEN_FADE_LEVEL; x++) {
                 if (tiles_low[(y * SCREEN_TILE_WIDTH) + x] != 0xFFFF) {
                     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-                    glBindTexture(GL_TEXTURE_2D, texture[tiles_low[(y * 9) + x]]);
+                    glBindTexture(GL_TEXTURE_2D, texture[tiles_low[(y * SCREEN_TILE_WIDTH) + x]]);
                     glBegin(GL_QUADS);
                     {
                         glTexCoord2f(1.0f, 1.0f);
@@ -106,7 +106,7 @@ void render(int x, int y)
 
                 if (tiles_middle[(y * SCREEN_TILE_WIDTH) + x] != 0xFFFF) {
                     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-                    glBindTexture(GL_TEXTURE_2D, texture[tiles_middle[(y * 9) + x]]);
+                    glBindTexture(GL_TEXTURE_2D, texture[tiles_middle[(y * SCREEN_TILE_WIDTH) + x]]);
                     glBegin(GL_QUADS);
                     {
                         glTexCoord2f(1.0f, 1.0f);
@@ -126,7 +126,7 @@ void render(int x, int y)
 
                 if (tiles_high[(y * SCREEN_TILE_WIDTH) + x] != 0xFFFF) {
                     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-                    glBindTexture(GL_TEXTURE_2D, texture[tiles_high[(y * 9) + x]]);
+                    glBindTexture(GL_TEXTURE_2D, texture[tiles_high[(y * SCREEN_TILE_WIDTH) + x]]);
                     glBegin(GL_QUADS);
                     {
                         glTexCoord2f(1.0f, 1.0f);
@@ -146,7 +146,7 @@ void render(int x, int y)
 
                 if (tiles_overlay[(y * SCREEN_TILE_WIDTH) + x] != 0xFFFF) {
                     glColor4f(1.0f, 1.0f, 1.0f, 0.6f);
-                    glBindTexture(GL_TEXTURE_2D, texture[tiles_overlay[(y * 9) + x]]);
+                    glBindTexture(GL_TEXTURE_2D, texture[tiles_overlay[(y * SCREEN_TILE_WIDTH) + x]]);
                     float scale = 1.0f;
                     glBegin(GL_QUADS);
                     {

@@ -34,6 +34,9 @@ int draw_screen();
 void screen_transition_in();
 void screen_transition_out();
 
+u32 SCREEN_WIDTH;
+u32 SCREEN_HEIGHT;
+
 int SCREEN_SHIFT_X;
 int SCREEN_SHIFT_Y;
 u8 SCREEN_FADE_LEVEL;

@@ -117,7 +117,9 @@ void render(int x_shift, int y_shift)
 
     if (ASSETS_LOADING)
     {
-        render_texture(x_shift,y_shift,288,288,255,texture_buffers[0x2000]);
+        int x_center = 9 < SCREEN_TILE_WIDTH ? ((SCREEN_TILE_WIDTH - 9) / 2)*32 : 0;
+        int y_center = 9 < SCREEN_TILE_HEIGHT ? ((SCREEN_TILE_HEIGHT - 9) / 2)*32 : 0;
+        render_texture(x_center + x_shift,y_center + y_shift,288,288,255,texture_buffers[0x2000]);
 
         int bar_x = 8;
         int bar_y = 264;
@@ -125,28 +127,28 @@ void render(int x_shift, int y_shift)
         {
             for(int j = 0; j < 16; j++)
             {
-                buffer_plot_pixel(x_shift+bar_x+i,y_shift+bar_y+j,0,0,128,255);
+                buffer_plot_pixel(x_center+x_shift+bar_x+i,y_center+y_shift+bar_y+j,0,0,128,255);
             }
         }
     }
     else
     {
-        for (int y = SCREEN_FADE_LEVEL; y < SCREEN_TILE_WIDTH-SCREEN_FADE_LEVEL; y++) {
+        for (int y = SCREEN_FADE_LEVEL; y < SCREEN_TILE_HEIGHT-SCREEN_FADE_LEVEL; y++) {
             for (int x = SCREEN_FADE_LEVEL; x < SCREEN_TILE_WIDTH-SCREEN_FADE_LEVEL; x++) {
                 if (tiles_low[(y * SCREEN_TILE_WIDTH) + x] != 0xFFFF) {
-                    render_texture((32 * x)+x_shift, (32 * y)+y_shift, 32, 32, 255, texture_buffers[tiles_low[(y * 9) + x]]);
+                    render_texture((32 * x)+x_shift, (32 * y)+y_shift, 32, 32, 255, texture_buffers[tiles_low[(y * SCREEN_TILE_WIDTH) + x]]);
                 }
 
                 if (tiles_middle[(y * SCREEN_TILE_WIDTH) + x] != 0xFFFF) {
-                    render_texture((32 * x)+x_shift, (32 * y)+y_shift, 32, 32, 255, texture_buffers[tiles_middle[(y * 9) + x]]);
+                    render_texture((32 * x)+x_shift, (32 * y)+y_shift, 32, 32, 255, texture_buffers[tiles_middle[(y * SCREEN_TILE_WIDTH) + x]]);
                 }
 
                 if (tiles_high[(y * SCREEN_TILE_WIDTH) + x] != 0xFFFF) {
-                    render_texture((32 * x)+x_shift, (32 * y)+y_shift, 32, 32, 255, texture_buffers[tiles_high[(y * 9) + x]]);
+                    render_texture((32 * x)+x_shift, (32 * y)+y_shift, 32, 32, 255, texture_buffers[tiles_high[(y * SCREEN_TILE_WIDTH) + x]]);
                 }
 
                 if (tiles_overlay[(y * SCREEN_TILE_WIDTH) + x] != 0xFFFF) {
-                    render_texture((32 * x)+x_shift, (32 * y)+y_shift, 32, 32, 153, texture_buffers[tiles_overlay[(y * 9) + x]]);
+                    render_texture((32 * x)+x_shift, (32 * y)+y_shift, 32, 32, 153, texture_buffers[tiles_overlay[(y * SCREEN_TILE_WIDTH) + x]]);
                 }
             }
         }
