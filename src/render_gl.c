@@ -35,9 +35,7 @@ void render(int x, int y)
 
     glLoadIdentity();
 
-#ifdef _3DS
-    glTranslatef((400 - SCREEN_WIDTH) / 2, (240 - SCREEN_WIDTH) / 2, 0.0f); //Center screen
-#endif
+    glTranslatef((float)x, (float)y, 0.0f);
 
     if (ASSETS_LOADING)
     {
