@@ -719,7 +719,7 @@ void update_world(double delta)
         iact_update();
 
         render_map();
-        draw_screen();
         world_timer = 0.0;
     }
+    draw_screen();
 }

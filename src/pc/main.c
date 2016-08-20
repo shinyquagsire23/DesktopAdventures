@@ -55,6 +55,10 @@ SDL_GLContext mainContext;
 
 u16 current_map = 0;
 int done = FALSE;
+int sdl_mouse_x = 0;
+int sdl_mouse_y = 0;
+int sdl_left_state = 0;
+int sdl_right_state = 0;
 
 int main(int argc, char **argv)
 {
@@ -136,6 +140,8 @@ int resizeWindow(int width, int height)
 /* function to handle key press events */
 void handleKeyPress(SDL_Keysym *keysym)
 {
+    if(CURRENT_ITEM_DRAGGED != -1) return;
+
     switch (keysym->sym)
     {
         case SDLK_ESCAPE:
@@ -172,6 +178,8 @@ void handleKeyPress(SDL_Keysym *keysym)
 
 void handleKeyDown()
 {
+    if(CURRENT_ITEM_DRAGGED != -1) return;
+
     const Uint8* keystate = SDL_GetKeyboardState(NULL);
     const Uint32 modstate = SDL_GetModState();
 
@@ -209,6 +217,15 @@ void handleMouseMove(SDL_MouseMotionEvent *event)
     int x = event->x;
     int y = event->y;
 
+    sdl_mouse_x = x;
+    sdl_mouse_y = y;
+
+    if(CURRENT_ITEM_DRAGGED != -1)
+    {
+        mouse_move(-1,-1);
+        return;
+    }
+
     if(x < SCREEN_SHIFT_X || x > SCREEN_SHIFT_X+SCREEN_WIDTH || y < SCREEN_SHIFT_Y || y > SCREEN_SHIFT_Y+SCREEN_HEIGHT)
     {
         if(SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_LEFT))
@@ -220,6 +237,29 @@ void handleMouseMove(SDL_MouseMotionEvent *event)
     }
 
     mouse_move(x-SCREEN_SHIFT_X,y-SCREEN_SHIFT_Y);
+}
+
+void handleMousePress()
+{
+    int left_state = SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_LEFT);
+    int right_state = SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_RIGHT) ;
+
+    if(!sdl_left_state && left_state)
+    {
+        if(CURRENT_ITEM_DRAGGED != -1)
+        {
+            if (sdl_mouse_x - SCREEN_SHIFT_X > 0 && sdl_mouse_x - SCREEN_SHIFT_X < SCREEN_WIDTH &&
+                sdl_mouse_y - SCREEN_SHIFT_Y > 0 && sdl_mouse_y - SCREEN_SHIFT_Y < SCREEN_HEIGHT)
+                drop_item(sdl_mouse_x - SCREEN_SHIFT_X, sdl_mouse_y - SCREEN_SHIFT_Y);
+            else
+            {
+                CURRENT_ITEM_DRAGGED = -1;
+            }
+        }
+    }
+
+    sdl_left_state = left_state;
+    sdl_right_state = right_state;
 }
 
 bool rendering_world = false;
@@ -268,6 +308,10 @@ void update_input()
                 break;
             case SDL_MOUSEMOTION:
                 handleMouseMove(&event.motion);
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+            case SDL_MOUSEBUTTONUP:
+                handleMousePress();
                 break;
             case SDL_QUIT:
                 done = TRUE;
@@ -400,8 +444,24 @@ void render_post()
     {
         if(player_inventory[i+inventory_scroll] == NULL) break;
 
-        buffer_render_tile(SCREEN_WIDTH + 19, 8 + (i * 32), 255, player_inventory[i+inventory_scroll]);
+        if(CURRENT_ITEM_DRAGGED != i+inventory_scroll)
+            buffer_render_tile(SCREEN_WIDTH + 19, 8 + (i * 32), 255, player_inventory[i+inventory_scroll]);
+
+        if(sdl_mouse_x > SCREEN_WIDTH + 19 && sdl_mouse_x < SCREEN_WIDTH + 19 + 32 && sdl_mouse_y > 8 + (i * 32) && sdl_mouse_y < 8 + (i * 32) + 32)
+        {
+            if(sdl_left_state && CURRENT_ITEM_DRAGGED == -1)
+                CURRENT_ITEM_DRAGGED = i+inventory_scroll;
+        }
+
         buffer_render_text(SCREEN_WIDTH + 19 + 32 + 10, 8 + (i * 32) + ((32/2) - deskAdvInvFontInfo.height/2), tile_names[player_inventory[i+inventory_scroll]]);
     }
+
+    if(CURRENT_ITEM_DRAGGED != -1)
+    {
+        SDL_ShowCursor(SDL_DISABLE);
+        buffer_render_tile(sdl_mouse_x - 16, sdl_mouse_y - 16, 255, player_inventory[CURRENT_ITEM_DRAGGED]);
+    }
+    else
+        SDL_ShowCursor(SDL_ENABLE);
 }
 #endif

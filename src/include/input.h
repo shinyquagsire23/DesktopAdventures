@@ -29,6 +29,7 @@ void button_move_left();
 void button_move_right();
 void button_push();
 void button_fire();
+void drop_item(int x, int y);
 void mouse_move(int x, int y);
 void mouse_left();
 void mouse_right();
@@ -36,7 +37,7 @@ void item_dragging(u16 item);
 void reset_input_state();
 void update_input();
 
-u16 CURRENT_ITEM_DRAGGED;
+int CURRENT_ITEM_DRAGGED;
 
 u8 BUTTON_DOWN_STATE;
 u8 BUTTON_UP_STATE;

@@ -20,7 +20,7 @@
 
 #include "useful.h"
 
-int CURRENT_ITEM_DRAGGED = 0;
+int CURRENT_ITEM_DRAGGED = -1;
 
 u8 BUTTON_DOWN_STATE;
 u8 BUTTON_UP_STATE;
@@ -64,6 +64,12 @@ void button_fire()
     BUTTON_FIRE_STATE = 1;
 }
 
+void drop_item(int x, int y)
+{
+    CURRENT_ITEM_DRAGGED = -1;
+    //TODO: IACT trigger
+}
+
 void mouse_move(int x, int y)
 {
     MOUSE_X = x;
@@ -73,11 +79,6 @@ void mouse_move(int x, int y)
 void mouse_left()
 {
     BUTTON_LCLICK_STATE = 1;
-    if(CURRENT_ITEM_DRAGGED >= 0)
-    {
-        CURRENT_ITEM_DRAGGED = -1;
-        //TODO
-    }
 }
 
 void mouse_right()
