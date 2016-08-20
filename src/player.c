@@ -22,7 +22,7 @@
 
 #include <stdio.h>
 #include <stddef.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include "map.h"
 #include "iact.h"
 #include "tile.h"

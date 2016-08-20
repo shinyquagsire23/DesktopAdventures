@@ -2,7 +2,7 @@
 
 ### About
 
-DesktopAdventures is a recreation of the Desktop Adventures engine used in *Indianna Jones and his Desktop Adventures* and *Yoda Stories* games, licensed under LGPLv2. It currently supports *nix, 3DS, and Wii U, with support for Windows and OS X currently not tested. The end goal of this project is to provide a free and open source implementation of the Desktop Adventures engine so that these games can be playable on modern platforms and preserved for future generations.
+DesktopAdventures is a recreation of the Desktop Adventures engine used in *Indianna Jones and his Desktop Adventures* and *Yoda Stories* games, licensed under LGPLv2. It currently supports OS X, *nix, 3DS, and Wii U, with support for Windows currently not tested. The end goal of this project is to provide a free and open source implementation of the Desktop Adventures engine so that these games can be playable on modern platforms and preserved for future generations.
 
 ### Platforms
 
