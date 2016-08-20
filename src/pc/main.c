@@ -204,6 +204,24 @@ void handleKeyDown()
     }
 }
 
+void handleMouseMove(SDL_MouseMotionEvent *event)
+{
+    int x = event->x;
+    int y = event->y;
+
+    if(x < SCREEN_SHIFT_X || x > SCREEN_SHIFT_X+SCREEN_WIDTH || y < SCREEN_SHIFT_Y || y > SCREEN_SHIFT_Y+SCREEN_HEIGHT)
+    {
+        if(SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_LEFT))
+            mouse_move(x-SCREEN_SHIFT_X,y-SCREEN_SHIFT_Y);
+        else
+            mouse_move(-1,-1);
+
+        return;
+    }
+
+    mouse_move(x-SCREEN_SHIFT_X,y-SCREEN_SHIFT_Y);
+}
+
 bool rendering_world = false;
 
 void buffer_clear_screen(u8 r, u8 g, u8 b, u8 a)
@@ -248,6 +266,9 @@ void update_input()
             case SDL_KEYDOWN:
                 handleKeyPress(&event.key.keysym);
                 break;
+            case SDL_MOUSEMOTION:
+                handleMouseMove(&event.motion);
+                break;
             case SDL_QUIT:
                 done = TRUE;
                 break;
@@ -256,6 +277,12 @@ void update_input()
         }
     }
     handleKeyDown();
+
+    if(SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_LEFT))
+        mouse_left();
+
+    if(SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_RIGHT))
+        mouse_right();
 }
 
 void buffer_render_tile(int x, int y, u8 alpha, u32 tile)

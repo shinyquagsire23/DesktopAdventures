@@ -654,6 +654,64 @@ void update_world(double delta)
         if (BUTTON_DOWN_STATE)
             player_move(DOWN);
 
+        if(MOUSE_X != -1 && MOUSE_Y != -1)
+        {
+            int center_shift_x = width < SCREEN_TILE_WIDTH ? ((SCREEN_TILE_WIDTH - width) / 2)*32 : 0;
+            int center_shift_y = height < SCREEN_TILE_HEIGHT ? ((SCREEN_TILE_HEIGHT - height) / 2)*32 : 0;
+
+            int player_screen_x = ((player_entity.x - map_camera_x)*32) + center_shift_x;
+            int player_screen_y = ((player_entity.y - map_camera_y)*32) + center_shift_y;
+
+            if(MOUSE_Y < player_screen_y-8 && MOUSE_X > player_screen_x+32)
+            {
+                player_face(UP_RIGHT);
+                if(BUTTON_LCLICK_STATE)
+                    player_move(UP_RIGHT);
+            }
+            else if(MOUSE_Y < player_screen_y-8 && MOUSE_X < player_screen_x)
+            {
+                player_face(UP_LEFT);
+                if(BUTTON_LCLICK_STATE)
+                    player_move(UP_LEFT);
+            }
+            else if(MOUSE_Y < player_screen_y-8 && MOUSE_X > player_screen_x)
+            {
+                player_face(UP);
+                if(BUTTON_LCLICK_STATE)
+                    player_move(UP);
+            }
+            else if(MOUSE_Y < player_screen_y+32 && MOUSE_X < player_screen_x)
+            {
+                player_face(LEFT);
+                if(BUTTON_LCLICK_STATE)
+                    player_move(LEFT);
+            }
+            else if(MOUSE_Y < player_screen_y+32 && MOUSE_X > player_screen_x+32)
+            {
+                player_face(RIGHT);
+                if(BUTTON_LCLICK_STATE)
+                    player_move(RIGHT);
+            }
+            if(MOUSE_Y > player_screen_y+8+32 && MOUSE_X > player_screen_x+32)
+            {
+                player_face(DOWN_RIGHT);
+                if(BUTTON_LCLICK_STATE)
+                    player_move(DOWN_RIGHT);
+            }
+            else if(MOUSE_Y > player_screen_y+8+32 && MOUSE_X < player_screen_x)
+            {
+                player_face(DOWN_LEFT);
+                if(BUTTON_LCLICK_STATE)
+                    player_move(DOWN_LEFT);
+            }
+            else if(MOUSE_Y > player_screen_y+8+32 && MOUSE_X > player_screen_x)
+            {
+                player_face(DOWN);
+                if(BUTTON_LCLICK_STATE)
+                    player_move(DOWN);
+            }
+        }
+
         if(map_camera_locked)
             map_update_camera(false);
 

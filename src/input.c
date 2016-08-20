@@ -20,7 +20,7 @@
 
 #include "useful.h"
 
-u16 CURRENT_ITEM_DRAGGED = 0;
+int CURRENT_ITEM_DRAGGED = 0;
 
 u8 BUTTON_DOWN_STATE;
 u8 BUTTON_UP_STATE;
@@ -30,6 +30,9 @@ u8 BUTTON_PUSH_STATE;
 u8 BUTTON_FIRE_STATE;
 u8 BUTTON_LCLICK_STATE;
 u8 BUTTON_RCLICK_STATE;
+
+int MOUSE_X = -1;
+int MOUSE_Y = -1;
 
 void button_move_down()
 {
@@ -61,17 +64,18 @@ void button_fire()
     BUTTON_FIRE_STATE = 1;
 }
 
-void mouse_move(u16 x, u16 y)
+void mouse_move(int x, int y)
 {
-    //TODO
+    MOUSE_X = x;
+    MOUSE_Y = y;
 }
 
 void mouse_left()
 {
     BUTTON_LCLICK_STATE = 1;
-    if(CURRENT_ITEM_DRAGGED)
+    if(CURRENT_ITEM_DRAGGED >= 0)
     {
-        CURRENT_ITEM_DRAGGED = 0;
+        CURRENT_ITEM_DRAGGED = -1;
         //TODO
     }
 }

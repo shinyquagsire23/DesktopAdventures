@@ -219,6 +219,11 @@ void player_stand(int x, int y)
     iact_set_trigger(IACT_TRIG_Walk, 2, player_entity.x, player_entity.y);
 }
 
+void player_face(int dir)
+{
+    last_dir = dir;
+}
+
 void player_move(int dir)
 {
     if(dir != last_dir)

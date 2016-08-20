@@ -29,7 +29,7 @@ void button_move_left();
 void button_move_right();
 void button_push();
 void button_fire();
-void mouse_move(u16 x, u16 y);
+void mouse_move(int x, int y);
 void mouse_left();
 void mouse_right();
 void item_dragging(u16 item);
@@ -46,5 +46,8 @@ u8 BUTTON_PUSH_STATE;
 u8 BUTTON_FIRE_STATE;
 u8 BUTTON_LCLICK_STATE;
 u8 BUTTON_RCLICK_STATE;
+
+int MOUSE_X;
+int MOUSE_Y;
 
 #endif
