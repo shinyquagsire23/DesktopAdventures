@@ -19,7 +19,7 @@ make
 
 For 3DS, cd to *src/3ds/* and run **make**. Compiling for 3DS requires an installation of DevKitARM and ctrulib.
 
-For Wii U, cd to *src/3ds/* and run **make**. Compiling for Wii U requires an installation of DevKitPPC and wut, in addition to newlib being built with *-fno-jump-tables* (see [here](https://github.com/devkitPro/buildscripts/issues/19)).
+For Wii U, cd to *src/wiiu/* and run **make**. Compiling for Wii U requires an installation of DevKitPPC and wut, in addition to newlib being built with *-fno-jump-tables* (see [here](https://github.com/devkitPro/buildscripts/issues/19)).
 
 ### Work Needed
 
