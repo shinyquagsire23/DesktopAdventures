@@ -20,6 +20,12 @@
 
 #include "useful.h"
 
+#include "player.h"
+#include "screen.h"
+#include "tile.h"
+#include "iact.h"
+#include "map.h"
+
 int CURRENT_ITEM_DRAGGED = -1;
 
 u8 BUTTON_DOWN_STATE;
@@ -66,8 +72,44 @@ void button_fire()
 
 void drop_item(int x, int y)
 {
+    int tile_x = x / 32;
+    int tile_y = y / 32;
+
+    int center_shift_x = map_get_width() < SCREEN_TILE_WIDTH ? (SCREEN_TILE_WIDTH - map_get_width()) / 2 : 0;
+    int center_shift_y = map_get_height() < SCREEN_TILE_HEIGHT ? (SCREEN_TILE_HEIGHT - map_get_height()) / 2 : 0;
+
+    int item_actual_tile_x = tile_x + map_camera_x - center_shift_x;
+    int item_actual_tile_y = tile_y + map_camera_y - center_shift_y;
+
+    if(item_actual_tile_x < 0 || item_actual_tile_y < 0 || item_actual_tile_x >= map_get_width() || item_actual_tile_y >= map_get_height())
+    {
+        CURRENT_ITEM_DRAGGED = -1;
+        return;
+    }
+
+    printf("dropped item on %u,%u\n", item_actual_tile_x, item_actual_tile_y);
+
+    if(map_get_tile(LAYER_HIGH, item_actual_tile_x, item_actual_tile_y) == TILE_NONE)
+    {
+        if(map_get_tile(LAYER_MIDDLE, item_actual_tile_x, item_actual_tile_y) == TILE_NONE)
+        {
+            if(!map_get_tile(LAYER_LOW, item_actual_tile_x, item_actual_tile_y) == TILE_NONE)
+            {
+                iact_set_trigger(IACT_TRIG_DragItem, 5, item_actual_tile_x, item_actual_tile_y, LAYER_LOW, map_get_tile(LAYER_LOW, item_actual_tile_x, item_actual_tile_y), player_inventory[CURRENT_ITEM_DRAGGED]);
+            }
+        }
+        else
+        {
+            iact_set_trigger(IACT_TRIG_DragItem, 5, item_actual_tile_x, item_actual_tile_y, LAYER_MIDDLE, map_get_tile(LAYER_MIDDLE, item_actual_tile_x, item_actual_tile_y), player_inventory[CURRENT_ITEM_DRAGGED]);
+        }
+    }
+    else
+    {
+        iact_set_trigger(IACT_TRIG_DragItem, 5, item_actual_tile_x, item_actual_tile_y, LAYER_HIGH, map_get_tile(LAYER_HIGH, item_actual_tile_x, item_actual_tile_y), player_inventory[CURRENT_ITEM_DRAGGED]);
+    }
+
+
     CURRENT_ITEM_DRAGGED = -1;
-    //TODO: IACT trigger
 }
 
 void mouse_move(int x, int y)

@@ -409,6 +409,13 @@ void iact_update()
                     case IACT_TRIG_HasItem:
                         conditions_met = player_has_item(args[0]);
                         break;
+                    case IACT_TRIG_DragWrongItem:
+                        if(active_triggers[IACT_TRIG_DragItem][0])
+                        {
+                            if(args[0] == active_triggers[IACT_TRIG_DragItem][0+2] && args[1] == active_triggers[IACT_TRIG_DragItem][1+2] && args[2] == active_triggers[IACT_TRIG_DragItem][2+2] && args[3] == active_triggers[IACT_TRIG_DragItem][3+2] && args[4] != active_triggers[IACT_TRIG_DragItem][4+2])
+                                conditions_met = true;
+                        }
+                        break;
                 }
 
                 if(!conditions_met)
