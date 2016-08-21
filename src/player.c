@@ -329,6 +329,14 @@ void player_move(int dir)
                 player_entity.y--;
                 player_entity.x--;
             }
+            else if(!player_collides(UP, player_entity.x,player_entity.y))
+            {
+                player_entity.y--;
+            }
+            else if(!player_collides(LEFT, player_entity.x,player_entity.y))
+            {
+                player_entity.x--;
+            }
             else
                 moved = false;
             break;
@@ -336,6 +344,14 @@ void player_move(int dir)
             if(!player_collides(UP_RIGHT, player_entity.x,player_entity.y))
             {
                 player_entity.y--;
+                player_entity.x++;
+            }
+            else if(!player_collides(UP, player_entity.x,player_entity.y))
+            {
+                player_entity.y--;
+            }
+            else if(!player_collides(RIGHT, player_entity.x,player_entity.y))
+            {
                 player_entity.x++;
             }
             else
@@ -347,6 +363,14 @@ void player_move(int dir)
                 player_entity.y++;
                 player_entity.x--;
             }
+            else if(!player_collides(DOWN, player_entity.x,player_entity.y))
+            {
+                player_entity.y++;
+            }
+            else if(!player_collides(LEFT, player_entity.x,player_entity.y))
+            {
+                player_entity.x--;
+            }
             else
                 moved = false;
             break;
@@ -354,6 +378,14 @@ void player_move(int dir)
             if(!player_collides(DOWN_RIGHT, player_entity.x,player_entity.y))
             {
                 player_entity.y++;
+                player_entity.x++;
+            }
+            else if(!player_collides(DOWN, player_entity.x,player_entity.y))
+            {
+                player_entity.y++;
+            }
+            else if(!player_collides(RIGHT, player_entity.x,player_entity.y))
+            {
                 player_entity.x++;
             }
             else
