@@ -137,6 +137,104 @@ bool player_collides_event(int dir, int x, int y)
     return false;
 }
 
+void player_do_push(int dir)
+{
+    //TODO: Spawn item objects when blocks are moved
+    if(BUTTON_PUSH_STATE)
+    {
+        switch(dir)
+        {
+            case LEFT:
+                if((map_get_meta(LAYER_MIDDLE, player_entity.x-1,player_entity.y) & (TILE_PUSH_PULL_BLOCK)) && player_entity.x > 1)
+                {
+                    if(map_get_tile(LAYER_MIDDLE, player_entity.x-2,player_entity.y) == TILE_NONE)
+                    {
+                        map_set_tile(LAYER_MIDDLE, player_entity.x-2, player_entity.y, map_get_tile(LAYER_MIDDLE, player_entity.x-1,player_entity.y));
+                        map_set_tile(LAYER_MIDDLE, player_entity.x-1, player_entity.y, TILE_NONE);
+                        return;
+                    }
+                }
+                break;
+            case RIGHT:
+                if((map_get_meta(LAYER_MIDDLE, player_entity.x+1,player_entity.y) & (TILE_PUSH_PULL_BLOCK)) && player_entity.x != map_get_width()-2)
+                {
+                    if(map_get_tile(LAYER_MIDDLE, player_entity.x+2,player_entity.y) == TILE_NONE)
+                    {
+                        map_set_tile(LAYER_MIDDLE, player_entity.x+2, player_entity.y, map_get_tile(LAYER_MIDDLE, player_entity.x+1,player_entity.y));
+                        map_set_tile(LAYER_MIDDLE, player_entity.x+1, player_entity.y, TILE_NONE);
+                        return;
+                    }
+                }
+                break;
+            case UP:
+                if((map_get_meta(LAYER_MIDDLE,player_entity.x, player_entity.y-1) & (TILE_PUSH_PULL_BLOCK)) && player_entity.y > 1)
+                {
+                    if(map_get_tile(LAYER_MIDDLE, player_entity.x,player_entity.y-2) == TILE_NONE)
+                    {
+                        map_set_tile(LAYER_MIDDLE, player_entity.x, player_entity.y-2, map_get_tile(LAYER_MIDDLE, player_entity.x,player_entity.y-1));
+                        map_set_tile(LAYER_MIDDLE, player_entity.x, player_entity.y-1, TILE_NONE);
+                        return;
+                    }
+                }
+                break;
+            case DOWN:
+                if((map_get_meta(LAYER_MIDDLE,player_entity.x, player_entity.y+1) & (TILE_PUSH_PULL_BLOCK)) && player_entity.y != map_get_height()-2)
+                {
+                    if(map_get_tile(LAYER_MIDDLE, player_entity.x,player_entity.y+2) == TILE_NONE)
+                    {
+                        map_set_tile(LAYER_MIDDLE, player_entity.x, player_entity.y+2, map_get_tile(LAYER_MIDDLE, player_entity.x,player_entity.y+1));
+                        map_set_tile(LAYER_MIDDLE, player_entity.x, player_entity.y+1, TILE_NONE);
+                        return;
+                    }
+                }
+                break;
+        }
+    }
+}
+
+void player_do_pull(int dir)
+{
+    //TODO: Spawn item objects when blocks are moved
+    if(BUTTON_PUSH_STATE)
+    {
+        switch(dir)
+        {
+            case LEFT:
+                if((map_get_meta(LAYER_MIDDLE, player_entity.x+1,player_entity.y) & (TILE_PUSH_PULL_BLOCK)) && player_entity.x != 0)
+                {
+                    map_set_tile(LAYER_MIDDLE, player_entity.x, player_entity.y, map_get_tile(LAYER_MIDDLE, player_entity.x+1,player_entity.y));
+                    map_set_tile(LAYER_MIDDLE, player_entity.x+1, player_entity.y, TILE_NONE);
+                    return;
+                }
+                break;
+            case RIGHT:
+                if((map_get_meta(LAYER_MIDDLE, player_entity.x-1,player_entity.y) & (TILE_PUSH_PULL_BLOCK)) && player_entity.x != map_get_width()-1)
+                {
+                    map_set_tile(LAYER_MIDDLE, player_entity.x, player_entity.y, map_get_tile(LAYER_MIDDLE, player_entity.x-1,player_entity.y));
+                    map_set_tile(LAYER_MIDDLE, player_entity.x-1, player_entity.y, TILE_NONE);
+                    return;
+                }
+                break;
+            case UP:
+                if((map_get_meta(LAYER_MIDDLE,player_entity.x, player_entity.y+1) & (TILE_PUSH_PULL_BLOCK)) && player_entity.y != 0)
+                {
+                    map_set_tile(LAYER_MIDDLE, player_entity.x, player_entity.y, map_get_tile(LAYER_MIDDLE, player_entity.x,player_entity.y+1));
+                    map_set_tile(LAYER_MIDDLE, player_entity.x, player_entity.y+1, TILE_NONE);
+                    return;
+                }
+                break;
+            case DOWN:
+                if((map_get_meta(LAYER_MIDDLE,player_entity.x, player_entity.y-1) & (TILE_PUSH_PULL_BLOCK)) && player_entity.y != map_get_height()-1)
+                {
+                    map_set_tile(LAYER_MIDDLE, player_entity.x, player_entity.y, map_get_tile(LAYER_MIDDLE, player_entity.x,player_entity.y-1));
+                    map_set_tile(LAYER_MIDDLE, player_entity.x, player_entity.y-1, TILE_NONE);
+                    return;
+                }
+                break;
+        }
+    }
+}
+
 void player_goto_door_in()
 {
     player_entity.x = DOOR_IN_x;
@@ -233,11 +331,16 @@ void player_move(int dir)
 
     bool moved = true;
 
+    player_do_push(dir);
+
     switch(dir)
     {
         case LEFT:
             if(!player_collides(LEFT, player_entity.x,player_entity.y))
+            {
+                player_do_pull(LEFT);
                 player_entity.x--;
+            }
             else if(player_collides_event(LEFT, player_entity.x, player_entity.y))
             {
                 moved = false;
@@ -259,7 +362,10 @@ void player_move(int dir)
             break;
         case RIGHT:
             if(!player_collides(RIGHT, player_entity.x,player_entity.y))
+            {
+                player_do_pull(RIGHT);
                 player_entity.x++;
+            }
             else if(player_collides_event(RIGHT, player_entity.x, player_entity.y))
             {
                 moved = false;
@@ -281,7 +387,10 @@ void player_move(int dir)
             break;
         case UP:
             if(!player_collides(UP, player_entity.x,player_entity.y))
+            {
+                player_do_pull(UP);
                 player_entity.y--;
+            }
             else if(player_collides_event(UP, player_entity.x, player_entity.y))
             {
                 moved = false;
@@ -303,7 +412,10 @@ void player_move(int dir)
             break;
         case DOWN:
             if(!player_collides(DOWN, player_entity.x,player_entity.y))
+            {
+                player_do_pull(DOWN);
                 player_entity.y++;
+            }
             else if(player_collides_event(DOWN, player_entity.x, player_entity.y))
             {
                 moved = false;
