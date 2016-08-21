@@ -656,49 +656,57 @@ void update_world(double delta)
 
             if(MOUSE_Y < player_screen_y-8 && MOUSE_X > player_screen_x+32)
             {
-                player_face(UP_RIGHT);
+                if(MOUSE_MOVED)
+                    player_face(UP_RIGHT);
                 if(BUTTON_LCLICK_STATE)
                     player_move(UP_RIGHT);
             }
             else if(MOUSE_Y < player_screen_y-8 && MOUSE_X < player_screen_x)
             {
-                player_face(UP_LEFT);
+                if(MOUSE_MOVED)
+                    player_face(UP_LEFT);
                 if(BUTTON_LCLICK_STATE)
                     player_move(UP_LEFT);
             }
             else if(MOUSE_Y < player_screen_y-8 && MOUSE_X > player_screen_x)
             {
-                player_face(UP);
+                if(MOUSE_MOVED)
+                    player_face(UP);
                 if(BUTTON_LCLICK_STATE)
                     player_move(UP);
             }
             else if(MOUSE_Y < player_screen_y+32 && MOUSE_X < player_screen_x)
             {
-                player_face(LEFT);
+                if(MOUSE_MOVED)
+                    player_face(LEFT);
                 if(BUTTON_LCLICK_STATE)
                     player_move(LEFT);
             }
             else if(MOUSE_Y < player_screen_y+32 && MOUSE_X > player_screen_x+32)
             {
-                player_face(RIGHT);
+                if(MOUSE_MOVED)
+                    player_face(RIGHT);
                 if(BUTTON_LCLICK_STATE)
                     player_move(RIGHT);
             }
             if(MOUSE_Y > player_screen_y+8+32 && MOUSE_X > player_screen_x+32)
             {
-                player_face(DOWN_RIGHT);
+                if(MOUSE_MOVED)
+                    player_face(DOWN_RIGHT);
                 if(BUTTON_LCLICK_STATE)
                     player_move(DOWN_RIGHT);
             }
             else if(MOUSE_Y > player_screen_y+8+32 && MOUSE_X < player_screen_x)
             {
-                player_face(DOWN_LEFT);
+                if(MOUSE_MOVED)
+                    player_face(DOWN_LEFT);
                 if(BUTTON_LCLICK_STATE)
                     player_move(DOWN_LEFT);
             }
             else if(MOUSE_Y > player_screen_y+8+32 && MOUSE_X > player_screen_x)
             {
-                player_face(DOWN);
+                if(MOUSE_MOVED)
+                    player_face(DOWN);
                 if(BUTTON_LCLICK_STATE)
                     player_move(DOWN);
             }

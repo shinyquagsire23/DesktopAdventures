@@ -37,6 +37,7 @@ u8 BUTTON_FIRE_STATE;
 u8 BUTTON_LCLICK_STATE;
 u8 BUTTON_RCLICK_STATE;
 
+bool MOUSE_MOVED;
 int MOUSE_X = -1;
 int MOUSE_Y = -1;
 
@@ -114,6 +115,7 @@ void drop_item(int x, int y)
 
 void mouse_move(int x, int y)
 {
+    MOUSE_MOVED = true;
     MOUSE_X = x;
     MOUSE_Y = y;
 }
@@ -144,4 +146,5 @@ void reset_input_state()
     BUTTON_FIRE_STATE = 0;
     BUTTON_LCLICK_STATE = 0;
     BUTTON_RCLICK_STATE = 0;
+    MOUSE_MOVED = false;
 }
