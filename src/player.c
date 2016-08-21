@@ -445,7 +445,7 @@ void player_handle_walk_animation()
 
 void player_init()
 {
-    player_entity.health = chwp_data[0]->health;
+    player_entity.health = 300;
     player_inventory = calloc(256, sizeof(u16));
     player_inventory_count = 0;
 }
@@ -453,6 +453,15 @@ void player_init()
 void player_add_item_to_inv(u16 item)
 {
     player_inventory[player_inventory_count++] = item;
+}
+
+bool player_has_item(u16 item)
+{
+    for(int i = 0; i < player_inventory_count; i++)
+    {
+        if(player_inventory[i] == item) return true;
+    }
+    return false;
 }
 
 void player_update()

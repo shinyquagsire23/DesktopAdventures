@@ -406,6 +406,9 @@ void iact_update()
                     case IACT_TRIG_AllEnemiesDead:
                         conditions_met = !map_all_entities_active_visible();
                         break;
+                    case IACT_TRIG_HasItem:
+                        conditions_met = player_has_item(args[0]);
+                        break;
                 }
 
                 if(!conditions_met)

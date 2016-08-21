@@ -36,6 +36,7 @@ enum MAP_CHANGE_REASON
 } MAP_SWAP_REASON;
 
 void player_add_item_to_inv(u16 item);
+bool player_has_item(u16 item);
 
 bool player_collides(int dir, int x, int y);
 void player_face(int dir);
