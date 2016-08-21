@@ -59,7 +59,6 @@ obj_info ***object_info;
 u16 *object_info_qty = NULL;
 u16 num_entities = 0;
 
-u32 unknown;
 u16 width;
 u16 height;
 u8 flags;
@@ -94,14 +93,7 @@ void load_map(u16 map_id)
     location += 4; //IZON
 
     seek(location);
-
-    /*
-     * The unknown value can be either 0x1FA or 0x7AC. 0x7AC denotes
-     * that certain 0xFFFF values need replacement in the scripts or
-     * object info sections, specifically for quest items which can
-     * change within the map (ie 'Find Something Useful...').
-     */
-    unknown = read_long();
+    u32 len = read_long();
 
     width = read_short();
     height = read_short();
@@ -192,7 +184,7 @@ void load_map(u16 map_id)
             break;
     }
 
-    log("Loading map %i, %s, %s, %s, width %i, height %i\n", map_id, (unknown == 0x7AC ? "DYNAMIC" : "STATIC"), map_flags[flags], area_types[area_type], width, height);
+    log("Loading map %i, %s, %s, width %i, height %i\n", map_id, map_flags[flags], area_types[area_type], width, height);
     iact_set_trigger(IACT_TRIG_Enter, 0);
 
     load_izax(); //TODO: Indy IZAX is funky.
