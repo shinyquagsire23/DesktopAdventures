@@ -28,6 +28,7 @@
 #include "tile.h"
 #include "input.h"
 #include "assets.h"
+#include "sound.h"
 #include "objectinfo.h"
 
 int last_dir = -1;
@@ -37,6 +38,7 @@ bool player_position_updated = false;
 
 u16 *player_inventory;
 u16 player_inventory_count;
+u16 PLAYER_EQUIPPED_ITEM = -1;
 
 u16 player_experience = 0;
 
@@ -736,6 +738,19 @@ void player_init()
 
     if(is_yoda)
         player_entity.is_active_visible = false;
+}
+
+void player_equip_item(u16 inv_slot)
+{
+    PLAYER_EQUIPPED_ITEM = inv_slot;
+
+    //TODO: Do these transfer to Indy?
+    if(tile_metadata[player_inventory[PLAYER_EQUIPPED_ITEM]] & TILE_LIGHTSABER)
+        sound_play(0x1F);
+    else if(tile_metadata[player_inventory[PLAYER_EQUIPPED_ITEM]] & TILE_LIGHT_BLASTER || tile_metadata[player_inventory[PLAYER_EQUIPPED_ITEM]] & TILE_HEAVY_BLASTER)
+        sound_play(0x20);
+    else if(tile_metadata[player_inventory[PLAYER_EQUIPPED_ITEM]] & TILE_THE_FORCE)
+        sound_play(0x34);
 }
 
 void player_add_item_to_inv(u16 item)

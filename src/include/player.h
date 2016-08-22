@@ -35,6 +35,7 @@ enum MAP_CHANGE_REASON
     MAP_CHANGE_SCRIPT,
 } MAP_SWAP_REASON;
 
+void player_equip_item(u16 inv_slot);
 void player_add_item_to_inv(u16 item);
 void player_remove_item_from_inv(u16 item);
 bool player_has_item(u16 item);
@@ -51,6 +52,7 @@ entity player_entity;
 u16 player_experience;
 u16 *player_inventory;
 u16 player_inventory_count;
+u16 PLAYER_EQUIPPED_ITEM;
 bool player_position_updated;
 u16 PLAYER_MAP_CHANGE_TO;
 u8 PLAYER_MAP_CHANGE_REASON;

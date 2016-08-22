@@ -251,6 +251,11 @@ void handleMousePress()
             if (sdl_mouse_x - SCREEN_SHIFT_X > 0 && sdl_mouse_x - SCREEN_SHIFT_X < SCREEN_WIDTH &&
                 sdl_mouse_y - SCREEN_SHIFT_Y > 0 && sdl_mouse_y - SCREEN_SHIFT_Y < SCREEN_HEIGHT)
                 drop_item(sdl_mouse_x - SCREEN_SHIFT_X, sdl_mouse_y - SCREEN_SHIFT_Y);
+            else if(sdl_mouse_x > SCREEN_WIDTH + 16 + 17 + 79 && sdl_mouse_y > 237 + 19 && sdl_mouse_x < SCREEN_WIDTH + 16 + 17 + 79 + 32 && sdl_mouse_y < 237 + 19 + 32)
+            {
+                player_equip_item(CURRENT_ITEM_DRAGGED);
+                CURRENT_ITEM_DRAGGED = -1;
+            }
             else
             {
                 CURRENT_ITEM_DRAGGED = -1;
@@ -427,6 +432,10 @@ void render_post()
     buffer_render_outdent(SCREEN_WIDTH + 16 + 17 + 77, 236 + 18, 36,36, 0x808080, 0xFFFFFF);
     buffer_render_outdent(SCREEN_WIDTH + 16 + 17 + 78, 237 + 18, 34,34, 0x808080, 0xFFFFFF);
     buffer_render_outdent(SCREEN_WIDTH + 16 + 17 + 79, 237 + 19, 32,32, 0xFFFFFF, 0x808080);
+    if(PLAYER_EQUIPPED_ITEM != 0xFFFF)
+    {
+        buffer_render_tile(SCREEN_WIDTH + 16 + 17 + 79, 237 + 19, 255, player_inventory[PLAYER_EQUIPPED_ITEM]);
+    }
 
     //Scroll box
     buffer_render_outdent(SCREEN_WIDTH + 17 + 190, 6, 20,228, 0x808080, 0xFFFFFF);
