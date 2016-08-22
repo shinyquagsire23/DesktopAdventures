@@ -171,8 +171,11 @@ void load_map(u16 map_id)
         {
             case OBJ_ITEM:
             case OBJ_WEAPON:
-            case OBJ_PUZZLE_NPC:
-                map_overlay[object_info[id][i]->x + (object_info[id][i]->y * width)] = object_info[id][i]->visible ? object_info[id][i]->arg : TILE_NONE;
+                if(object_info[id][i]->visible && map_get_tile(LAYER_MIDDLE, object_info[id][i]->x, object_info[id][i]->y) == TILE_NONE)
+                {
+                    map_set_tile(LAYER_MIDDLE, object_info[id][i]->x, object_info[id][i]->y, object_info[id][i]->arg);
+                    object_info[id][i]->visible = false;
+                }
                 break;
             case OBJ_DOOR_OUT:
                 player_entity.x = object_info[id][i]->x;

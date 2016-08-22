@@ -142,64 +142,135 @@ bool player_collides_event(int dir, int x, int y)
     return false;
 }
 
-void player_do_push(int dir)
+bool player_do_push(int dir)
 {
-    //TODO: Spawn item objects when blocks are moved
     if(BUTTON_PUSH_STATE)
     {
         switch(dir)
         {
             case LEFT:
-                if((map_get_meta(LAYER_MIDDLE, player_entity.x-1,player_entity.y) & (TILE_PUSH_PULL_BLOCK)) && player_entity.x > 1)
+                if((map_get_meta(LAYER_MIDDLE, player_entity.x-1,player_entity.y) & (TILE_PUSH_PULL_BLOCK)) && player_entity.x > 1 && map_get_tile(LAYER_MIDDLE, player_entity.x-1,player_entity.y) != TILE_NONE)
                 {
                     if(map_get_tile(LAYER_MIDDLE, player_entity.x-2,player_entity.y) == TILE_NONE)
                     {
                         map_set_tile(LAYER_MIDDLE, player_entity.x-2, player_entity.y, map_get_tile(LAYER_MIDDLE, player_entity.x-1,player_entity.y));
+
+                        int object_index = 0;
+                        while(1)
+                        {
+                            obj_info *object = map_get_object(object_index++, player_entity.x-1, player_entity.y);
+                            if (object == NULL)
+                                break;
+
+                            if(!object->visible) continue;
+
+                            if(object->type == OBJ_ITEM || object->type == OBJ_WEAPON)
+                            {
+                                object->visible = false;
+                                map_set_tile(LAYER_MIDDLE, player_entity.x-1, player_entity.y, object->arg);
+                                return true;
+                            }
+                        }
+
                         map_set_tile(LAYER_MIDDLE, player_entity.x-1, player_entity.y, TILE_NONE);
-                        return;
+                        return true;
                     }
                 }
                 break;
             case RIGHT:
-                if((map_get_meta(LAYER_MIDDLE, player_entity.x+1,player_entity.y) & (TILE_PUSH_PULL_BLOCK)) && player_entity.x != map_get_width()-2)
+                if((map_get_meta(LAYER_MIDDLE, player_entity.x+1,player_entity.y) & (TILE_PUSH_PULL_BLOCK)) && player_entity.x != map_get_width()-2 && map_get_tile(LAYER_MIDDLE, player_entity.x+1,player_entity.y) != TILE_NONE)
                 {
                     if(map_get_tile(LAYER_MIDDLE, player_entity.x+2,player_entity.y) == TILE_NONE)
                     {
                         map_set_tile(LAYER_MIDDLE, player_entity.x+2, player_entity.y, map_get_tile(LAYER_MIDDLE, player_entity.x+1,player_entity.y));
+
+                        int object_index = 0;
+                        while(1)
+                        {
+                            obj_info *object = map_get_object(object_index++, player_entity.x+1, player_entity.y);
+                            if (object == NULL)
+                                break;
+
+                            if(!object->visible) continue;
+
+                            if(object->type == OBJ_ITEM || object->type == OBJ_WEAPON)
+                            {
+                                object->visible = false;
+                                map_set_tile(LAYER_MIDDLE, player_entity.x+1, player_entity.y, object->arg);
+                                return true;
+                            }
+                        }
+
                         map_set_tile(LAYER_MIDDLE, player_entity.x+1, player_entity.y, TILE_NONE);
-                        return;
+                        return true;
                     }
                 }
                 break;
             case UP:
-                if((map_get_meta(LAYER_MIDDLE,player_entity.x, player_entity.y-1) & (TILE_PUSH_PULL_BLOCK)) && player_entity.y > 1)
+                if((map_get_meta(LAYER_MIDDLE,player_entity.x, player_entity.y-1) & (TILE_PUSH_PULL_BLOCK)) && player_entity.y > 1 && map_get_tile(LAYER_MIDDLE, player_entity.x,player_entity.y-1) != TILE_NONE)
                 {
                     if(map_get_tile(LAYER_MIDDLE, player_entity.x,player_entity.y-2) == TILE_NONE)
                     {
                         map_set_tile(LAYER_MIDDLE, player_entity.x, player_entity.y-2, map_get_tile(LAYER_MIDDLE, player_entity.x,player_entity.y-1));
+
+                        int object_index = 0;
+                        while(1)
+                        {
+                            obj_info *object = map_get_object(object_index++, player_entity.x, player_entity.y-1);
+                            if (object == NULL)
+                                break;
+
+                            if(!object->visible) continue;
+
+                            if(object->type == OBJ_ITEM || object->type == OBJ_WEAPON)
+                            {
+                                object->visible = false;
+                                map_set_tile(LAYER_MIDDLE, player_entity.x, player_entity.y-1, object->arg);
+                                return true;
+                            }
+                        }
+
                         map_set_tile(LAYER_MIDDLE, player_entity.x, player_entity.y-1, TILE_NONE);
-                        return;
+                        return true;
                     }
                 }
                 break;
             case DOWN:
-                if((map_get_meta(LAYER_MIDDLE,player_entity.x, player_entity.y+1) & (TILE_PUSH_PULL_BLOCK)) && player_entity.y != map_get_height()-2)
+                if((map_get_meta(LAYER_MIDDLE,player_entity.x, player_entity.y+1) & (TILE_PUSH_PULL_BLOCK)) && player_entity.y != map_get_height()-2 && map_get_tile(LAYER_MIDDLE, player_entity.x,player_entity.y+1) != TILE_NONE)
                 {
                     if(map_get_tile(LAYER_MIDDLE, player_entity.x,player_entity.y+2) == TILE_NONE)
                     {
                         map_set_tile(LAYER_MIDDLE, player_entity.x, player_entity.y+2, map_get_tile(LAYER_MIDDLE, player_entity.x,player_entity.y+1));
+
+                        int object_index = 0;
+                        while(1)
+                        {
+                            obj_info *object = map_get_object(object_index++, player_entity.x, player_entity.y+1);
+                            if (object == NULL)
+                                break;
+
+                            if(!object->visible) continue;
+
+                            if(object->type == OBJ_ITEM || object->type == OBJ_WEAPON)
+                            {
+                                object->visible = false;
+                                map_set_tile(LAYER_MIDDLE, player_entity.x, player_entity.y+1, object->arg);
+                                return true;
+                            }
+                        }
+
                         map_set_tile(LAYER_MIDDLE, player_entity.x, player_entity.y+1, TILE_NONE);
-                        return;
+                        return true;
                     }
                 }
                 break;
         }
     }
+    return false;
 }
 
 void player_do_pull(int dir)
 {
-    //TODO: Spawn item objects when blocks are moved
     if(BUTTON_PUSH_STATE)
     {
         switch(dir)
@@ -208,6 +279,24 @@ void player_do_pull(int dir)
                 if((map_get_meta(LAYER_MIDDLE, player_entity.x+1,player_entity.y) & (TILE_PUSH_PULL_BLOCK)) && player_entity.x != 0)
                 {
                     map_set_tile(LAYER_MIDDLE, player_entity.x, player_entity.y, map_get_tile(LAYER_MIDDLE, player_entity.x+1,player_entity.y));
+
+                    int object_index = 0;
+                    while(1)
+                    {
+                        obj_info *object = map_get_object(object_index++, player_entity.x+1, player_entity.y);
+                        if (object == NULL)
+                            break;
+
+                        if(!object->visible) continue;
+
+                        if(object->type == OBJ_ITEM || object->type == OBJ_WEAPON)
+                        {
+                            object->visible = false;
+                            map_set_tile(LAYER_MIDDLE, player_entity.x+1, player_entity.y, object->arg);
+                            return;
+                        }
+                    }
+
                     map_set_tile(LAYER_MIDDLE, player_entity.x+1, player_entity.y, TILE_NONE);
                     return;
                 }
@@ -216,6 +305,24 @@ void player_do_pull(int dir)
                 if((map_get_meta(LAYER_MIDDLE, player_entity.x-1,player_entity.y) & (TILE_PUSH_PULL_BLOCK)) && player_entity.x != map_get_width()-1)
                 {
                     map_set_tile(LAYER_MIDDLE, player_entity.x, player_entity.y, map_get_tile(LAYER_MIDDLE, player_entity.x-1,player_entity.y));
+
+                    int object_index = 0;
+                    while(1)
+                    {
+                        obj_info *object = map_get_object(object_index++, player_entity.x-1, player_entity.y);
+                        if (object == NULL)
+                            break;
+
+                        if(!object->visible) continue;
+
+                        if(object->type == OBJ_ITEM || object->type == OBJ_WEAPON)
+                        {
+                            object->visible = false;
+                            map_set_tile(LAYER_MIDDLE, player_entity.x-1, player_entity.y, object->arg);
+                            return;
+                        }
+                    }
+
                     map_set_tile(LAYER_MIDDLE, player_entity.x-1, player_entity.y, TILE_NONE);
                     return;
                 }
@@ -224,6 +331,24 @@ void player_do_pull(int dir)
                 if((map_get_meta(LAYER_MIDDLE,player_entity.x, player_entity.y+1) & (TILE_PUSH_PULL_BLOCK)) && player_entity.y != 0)
                 {
                     map_set_tile(LAYER_MIDDLE, player_entity.x, player_entity.y, map_get_tile(LAYER_MIDDLE, player_entity.x,player_entity.y+1));
+
+                    int object_index = 0;
+                    while(1)
+                    {
+                        obj_info *object = map_get_object(object_index++, player_entity.x, player_entity.y+1);
+                        if (object == NULL)
+                            break;
+
+                        if(!object->visible) continue;
+
+                        if(object->type == OBJ_ITEM || object->type == OBJ_WEAPON)
+                        {
+                            object->visible = false;
+                            map_set_tile(LAYER_MIDDLE, player_entity.x, player_entity.y+1, object->arg);
+                            return;
+                        }
+                    }
+
                     map_set_tile(LAYER_MIDDLE, player_entity.x, player_entity.y+1, TILE_NONE);
                     return;
                 }
@@ -232,6 +357,24 @@ void player_do_pull(int dir)
                 if((map_get_meta(LAYER_MIDDLE,player_entity.x, player_entity.y-1) & (TILE_PUSH_PULL_BLOCK)) && player_entity.y != map_get_height()-1)
                 {
                     map_set_tile(LAYER_MIDDLE, player_entity.x, player_entity.y, map_get_tile(LAYER_MIDDLE, player_entity.x,player_entity.y-1));
+
+                    int object_index = 0;
+                    while(1)
+                    {
+                        obj_info *object = map_get_object(object_index++, player_entity.x, player_entity.y-1);
+                        if (object == NULL)
+                            break;
+
+                        if(!object->visible) continue;
+
+                        if(object->type == OBJ_ITEM || object->type == OBJ_WEAPON)
+                        {
+                            object->visible = false;
+                            map_set_tile(LAYER_MIDDLE, player_entity.x, player_entity.y-1, object->arg);
+                            return;
+                        }
+                    }
+
                     map_set_tile(LAYER_MIDDLE, player_entity.x, player_entity.y-1, TILE_NONE);
                     return;
                 }
@@ -285,7 +428,18 @@ void player_bump(int dir, int x, int y)
             break;
     }
 
-    iact_set_trigger(IACT_TRIG_BumpTile, 3, bump_x, bump_y, map_get_tile(LAYER_MIDDLE, bump_x, bump_y));
+    u32 meta = map_get_meta(LAYER_MIDDLE, bump_x, bump_y);
+    if(meta & TILE_ITEM)
+    {
+        u16 item = map_get_tile(LAYER_MIDDLE, bump_x, bump_y);
+        map_set_tile(LAYER_MIDDLE, bump_x, bump_y, TILE_NONE);
+
+        item_select_prompt(bump_x, bump_y, item);
+    }
+    else
+    {
+        iact_set_trigger(IACT_TRIG_BumpTile, 3, bump_x, bump_y, map_get_tile(LAYER_MIDDLE, bump_x, bump_y));
+    }
 }
 
 void player_stand(int x, int y)
@@ -346,14 +500,15 @@ void player_move(int dir)
 
     bool moved = true;
 
-    player_do_push(dir);
+    bool push = player_do_push(dir);
 
     switch(dir)
     {
         case LEFT:
             if(!player_collides(LEFT, player_entity.x,player_entity.y))
             {
-                player_do_pull(LEFT);
+                if(!push)
+                    player_do_pull(LEFT);
                 player_entity.x--;
             }
             else if(player_collides_event(LEFT, player_entity.x, player_entity.y))
@@ -378,7 +533,8 @@ void player_move(int dir)
         case RIGHT:
             if(!player_collides(RIGHT, player_entity.x,player_entity.y))
             {
-                player_do_pull(RIGHT);
+                if(!push)
+                    player_do_pull(RIGHT);
                 player_entity.x++;
             }
             else if(player_collides_event(RIGHT, player_entity.x, player_entity.y))
@@ -403,7 +559,8 @@ void player_move(int dir)
         case UP:
             if(!player_collides(UP, player_entity.x,player_entity.y))
             {
-                player_do_pull(UP);
+                if(!push)
+                    player_do_pull(UP);
                 player_entity.y--;
             }
             else if(player_collides_event(UP, player_entity.x, player_entity.y))
@@ -428,7 +585,8 @@ void player_move(int dir)
         case DOWN:
             if(!player_collides(DOWN, player_entity.x,player_entity.y))
             {
-                player_do_pull(DOWN);
+                if(!push)
+                    player_do_pull(DOWN);
                 player_entity.y++;
             }
             else if(player_collides_event(DOWN, player_entity.x, player_entity.y))
@@ -596,6 +754,7 @@ void player_remove_item_from_inv(u16 item)
             {
                 player_inventory[j] = player_inventory[j+1];
             }
+            player_inventory_count--;
             break;
         }
     }

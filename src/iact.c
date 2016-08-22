@@ -51,33 +51,63 @@ u16 active_triggers[0x24][8];
 void item_select_prompt(u16 x, u16 y, u16 item)
 {
     bool show = false;
+    int ticks = 0;
+
+    int center_shift_x = map_get_width() < SCREEN_TILE_WIDTH ? ((SCREEN_TILE_WIDTH - map_get_width()) / 2)*32 : 0;
+    int center_shift_y = map_get_height() < SCREEN_TILE_HEIGHT ? ((SCREEN_TILE_HEIGHT - map_get_height()) / 2)*32 : 0;
+
+    int item_screen_x = ((x - map_camera_x)*32) + center_shift_x;
+    int item_screen_y = ((y - map_camera_y)*32) + center_shift_y;
+
     while(1)
     {
-        int center_shift_x = map_get_width() < SCREEN_TILE_WIDTH ? ((SCREEN_TILE_WIDTH - map_get_width()) / 2)*32 : 0;
-        int center_shift_y = map_get_height() < SCREEN_TILE_HEIGHT ? ((SCREEN_TILE_HEIGHT - map_get_height()) / 2)*32 : 0;
+        if(!(BUTTON_LCLICK_STATE && MOUSE_X > item_screen_x && MOUSE_Y > item_screen_y && MOUSE_X < item_screen_x+32 && MOUSE_Y < item_screen_y+32))
+            break;
 
-        int item_screen_x = ((x - map_camera_x)*32) + center_shift_x;
-        int item_screen_y = ((y - map_camera_y)*32) + center_shift_y;
+        map_set_tile(LAYER_HIGH, x, y, show?item:TILE_NONE);
+        render_map();
 
+        if(ticks > (TARGET_TICK_FPS/2))
+        {
+            show = !show;
+            ticks = 0;
+        }
+
+        draw_screen();
+        reset_input_state();
+        update_input();
+        usleep(1000*(1000/60));
+        ticks++;
+    }
+
+    while(1)
+    {
         if(BUTTON_FIRE_STATE || (BUTTON_LCLICK_STATE && MOUSE_X > item_screen_x && MOUSE_Y > item_screen_y && MOUSE_X < item_screen_x+32 && MOUSE_Y < item_screen_y+32))
         {
             map_set_tile(LAYER_HIGH, x, y, TILE_NONE);
             render_map();
 
             player_add_item_to_inv(item);
-            break; //TODO: Scroll text
+            break;
         }
 
         map_set_tile(LAYER_HIGH, x, y, show?item:TILE_NONE);
         render_map();
 
-        show = !show;
+        if(ticks > (TARGET_TICK_FPS/2))
+        {
+            show = !show;
+            ticks = 0;
+        }
 
         draw_screen();
         reset_input_state();
         update_input();
-        usleep(1000*(1000/(TARGET_TICK_FPS/2)));
+        usleep(1000*(1000/60));
+        ticks++;
     }
+
+    usleep(1000*(1000/TARGET_TICK_FPS));
 }
 
 void read_iact()
