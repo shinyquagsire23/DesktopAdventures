@@ -54,7 +54,7 @@ enum IACT_CMDS
     IACT_CMD_HideAllEntities,
     IACT_CMD_SpawnItem,
     IACT_CMD_AddItemToInv,
-    IACT_CMD_DropItem,
+    IACT_CMD_RemoveItemFromInv,
     IACT_CMD_OpenShow_MAYBE,
     IACT_CMD_Unk1f,
     IACT_CMD_Unk20,

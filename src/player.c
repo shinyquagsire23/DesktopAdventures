@@ -585,6 +585,22 @@ void player_add_item_to_inv(u16 item)
     player_inventory[player_inventory_count++] = item;
 }
 
+void player_remove_item_from_inv(u16 item)
+{
+    for(int i = 0; i < player_inventory_count; i++)
+    {
+        if(player_inventory[i] == item)
+        {
+            player_inventory[i] = NULL;
+            for(int j = i; j < player_inventory_count; j++)
+            {
+                player_inventory[j] = player_inventory[j+1];
+            }
+            break;
+        }
+    }
+}
+
 bool player_has_item(u16 item)
 {
     for(int i = 0; i < player_inventory_count; i++)

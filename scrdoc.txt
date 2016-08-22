@@ -68,7 +68,7 @@ Script Commands:
 1a (HideAllEntities) - <nop> <nop> <nop> <nop> <nop> <strlen> { Hide all entities }
 1b (SpawnItem) - <item id> <x> <y> <nop> <nop> <nop> { Spawn item at coords }
 1c (AddItemToInv) - <item id> <nop> <nop> <nop> <nop> <nop> { Adds item to inventory }
-1d (DropItem) - <item id> <nop> <nop> <nop> <nop> <nop> { Drop item from cursor }
+1d (RemoveItemFromInv) - <item id> <nop> <nop> <nop> <nop> <nop> { Drop item from cursor }
 1e (Open?Show?) - 'Open'? 'Show'? Sets a bunch of values to 1. Used in map 52 on opening a box.
 1f - 
 20 - Never used.
