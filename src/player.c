@@ -27,16 +27,21 @@
 #include "iact.h"
 #include "tile.h"
 #include "input.h"
+#include "assets.h"
 #include "objectinfo.h"
 
 int last_dir = -1;
 int anim_count = 0;
 bool moving = false;
+bool player_position_updated = false;
 
 u16 *player_inventory;
 u16 player_inventory_count;
 
+u16 player_experience = 0;
+
 u8 PLAYER_MAP_CHANGE_REASON = 0;
+u16 PLAYER_MAP_CHANGE_TO = 0;
 u16 DOOR_IN_x = 0;
 u16 DOOR_IN_y = 0;
 u16 DOOR_IN_map = 0;
@@ -292,6 +297,8 @@ void player_stand(int x, int y)
         if(object == NULL)
             break;
 
+        if(!object->visible) continue;
+
         u32 obj_type = object->type;
 
         if (obj_type == OBJ_DOOR_IN)
@@ -308,9 +315,18 @@ void player_stand(int x, int y)
         else if (obj_type == OBJ_DOOR_OUT)
         {
             PLAYER_MAP_CHANGE_REASON = MAP_CHANGE_DOOR_OUT;
-
-            unload_map();
-            load_map(DOOR_IN_map);
+            PLAYER_MAP_CHANGE_TO = DOOR_IN_map;
+        }
+        else if(obj_type == OBJ_XWING_FROM)
+        {
+            PLAYER_MAP_CHANGE_REASON = MAP_CHANGE_XWING_FROM;
+            PLAYER_MAP_CHANGE_TO = object->arg;
+        }
+        else if(obj_type == OBJ_XWING_TO)
+        {
+            printf("xwing to\n");
+            PLAYER_MAP_CHANGE_REASON = MAP_CHANGE_XWING_TO;
+            PLAYER_MAP_CHANGE_TO = object->arg;
         }
     }
 
@@ -560,6 +576,9 @@ void player_init()
     player_entity.health = 300;
     player_inventory = calloc(256, sizeof(u16));
     player_inventory_count = 0;
+
+    if(is_yoda)
+        player_entity.is_active_visible = false;
 }
 
 void player_add_item_to_inv(u16 item)
@@ -580,4 +599,10 @@ void player_update()
 {
     player_handle_walk_animation();
     iact_set_trigger(IACT_TRIG_PlayerAtPos, 2, player_entity.x, player_entity.y);
+
+    if(player_position_updated)
+    {
+        player_stand(player_entity.x, player_entity.y);
+        player_position_updated = false;
+    }
 }

@@ -47,7 +47,9 @@ double world_timer = 0.0;
 u16 **map_tiles_low;
 u16 **map_tiles_middle;
 u16 **map_tiles_high;
-u16 *map_global_vars; //TODO: TempVar and RandVar are per-map as well.
+u16 *map_global_vars;
+u16 *map_temp_vars;
+u16 *map_rand_vars;
 bool **map_iact_flagonce;
 u16 *map_overlay;
 u32 map_camera_x = 0;
@@ -77,6 +79,8 @@ void map_init(u16 num_maps)
     map_tiles_high = calloc(num_maps*sizeof(u16*), 1);
 
     map_global_vars = calloc(num_maps*sizeof(u16), 1);
+    map_temp_vars = calloc(num_maps*sizeof(u16), 1);
+    map_rand_vars = calloc(num_maps*sizeof(u16), 1);
     map_iact_flagonce = calloc(num_maps*sizeof(bool*), 1);
 
     object_info = calloc(num_maps*sizeof(void*), 1);
@@ -174,6 +178,13 @@ void load_map(u16 map_id)
                 player_entity.x = object_info[id][i]->x;
                 player_entity.y = object_info[id][i]->y;
                 break;
+            case OBJ_SPAWN:
+                if(PLAYER_MAP_CHANGE_REASON == MAP_CHANGE_XWING_FROM || PLAYER_MAP_CHANGE_REASON == MAP_CHANGE_XWING_TO)
+                {
+                    player_entity.x = 0;object_info[id][i]->x;
+                    player_entity.y = 0;object_info[id][i]->y;
+                }
+                break;
         }
     }
 
@@ -186,6 +197,12 @@ void load_map(u16 map_id)
 
     log("Loading map %i, %s, %s, width %i, height %i\n", map_id, map_flags[flags], area_types[area_type], width, height);
     iact_set_trigger(IACT_TRIG_Enter, 0);
+
+    if((flags & MAP_FLAG_FROM_ANOTHER_MAP) || PLAYER_MAP_CHANGE_REASON == MAP_CHANGE_XWING_FROM || PLAYER_MAP_CHANGE_REASON == MAP_CHANGE_XWING_TO)
+    {
+            printf("vehicle! %x\n", map_get_temp_var());
+        iact_set_trigger(IACT_TRIG_EnterVehicle, 0);
+    }
 
     load_izax(); //TODO: Indy IZAX is funky.
 #ifndef _3DS
@@ -206,7 +223,6 @@ void unload_map()
     //These maps are not worth keeping in memory
     if(flags == MAP_FLAG_INTRO_SCREEN)
     {
-        log("freeing crap, %x\n", flags);
         free(map_tiles_low[id]);
         free(map_tiles_middle[id]);
         free(map_tiles_high[id]);
@@ -288,6 +304,11 @@ bool map_all_entities_active_visible()
         if(!entities[i]->is_active_visible) return false;
 
     return true;
+}
+
+bool map_is_loaded(u16 test_id)
+{
+    return map_tiles_low[test_id] == NULL;
 }
 
 void load_izax()
@@ -446,7 +467,8 @@ void render_map()
     if(player_entity.y >= map_camera_y &&
        player_entity.y < (map_camera_y + SCREEN_TILE_HEIGHT) &&
        player_entity.x >= map_camera_x &&
-       player_entity.x < (map_camera_x + SCREEN_TILE_WIDTH))
+       player_entity.x < (map_camera_x + SCREEN_TILE_WIDTH) &&
+       player_entity.is_active_visible)
     {
         tiles_middle[((player_entity.y - map_camera_y + center_shift_y)*SCREEN_TILE_WIDTH) + (player_entity.x - map_camera_x + center_shift_x)] = char_data[player_entity.char_id]->frames[player_entity.current_frame];
     }
@@ -497,6 +519,11 @@ u32 map_get_height()
 u16 map_get_id()
 {
     return id;
+}
+
+u16 map_get_num_objects()
+{
+    return object_info_qty[id];
 }
 
 obj_info *map_get_object_by_id(int index)
@@ -613,6 +640,26 @@ void map_set_global_var(u16 val)
     map_global_vars[id] = val;
 }
 
+u16 map_get_temp_var()
+{
+    return map_temp_vars[id];
+}
+
+void map_set_temp_var(u16 val)
+{
+    map_temp_vars[id] = val;
+}
+
+u16 map_get_rand_var()
+{
+    return map_rand_vars[id];
+}
+
+void map_set_rand_var(u16 val)
+{
+    map_rand_vars[id] = val;
+}
+
 bool map_get_iact_flagonce(int iact_id)
 {
     return map_iact_flagonce[id][iact_id];
@@ -625,13 +672,23 @@ void map_set_iact_flagonce(int iact_id, bool val)
 
 void update_world(double delta)
 {
-    if(PLAYER_MAP_CHANGE_REASON != MAP_CHANGE_NONE && PLAYER_MAP_CHANGE_REASON != MAP_CHANGE_SCRIPT)
+    if(PLAYER_MAP_CHANGE_TO)
     {
-        map_update_camera(true);
-
-        screen_transition_in();
-        PLAYER_MAP_CHANGE_REASON = MAP_CHANGE_NONE;
+        if(player_entity.is_active_visible && (PLAYER_MAP_CHANGE_REASON == MAP_CHANGE_XWING_TO || PLAYER_MAP_CHANGE_REASON == MAP_CHANGE_XWING_FROM))
+        {
+            PLAYER_MAP_CHANGE_TO = 0;
+            PLAYER_MAP_CHANGE_REASON = MAP_CHANGE_NONE;
+        }
+        else
+        {
+            unload_map();
+            load_map(PLAYER_MAP_CHANGE_TO);
+            PLAYER_MAP_CHANGE_TO = 0;
+        }
     }
+
+    if(PLAYER_MAP_CHANGE_REASON != MAP_CHANGE_NONE && PLAYER_MAP_CHANGE_REASON != MAP_CHANGE_SCRIPT)
+        PLAYER_MAP_CHANGE_REASON = MAP_CHANGE_NONE;
 
     //Limit our FPS so that each frame corresponds to a game tick for "Game Speed"
     world_timer += delta;
@@ -717,6 +774,9 @@ void update_world(double delta)
 
         player_update();
         iact_update();
+
+        if(SCREEN_FADE_LEVEL > 0)
+            SCREEN_FADE_LEVEL--;
 
         render_map();
         world_timer = 0.0;

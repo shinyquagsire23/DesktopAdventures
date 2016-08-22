@@ -105,6 +105,7 @@ enum IACT_TRIGGERS
     IACT_TRIG_ExperienceGt,
 } IACT_TRIGGER;
 
+u16 iact_trig_clear_exempt[0x24];
 void item_select_prompt(u16 x, u16 y, u16 item);
 
 void read_iact();

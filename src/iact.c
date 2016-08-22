@@ -45,9 +45,8 @@ void print_iact(u32 loc);
 char triggers[0x24][30] = { "FirstEnter", "Enter", "BumpTile", "DragItem", "Walk", "TempVarEq", "RandVarEq", "RandVarGt", "RandVarLs", "EnterVehicle", "CheckMapTile", "EnemyDead", "AllEnemiesDead", "HasItem", "HasEndItem", "Unk0f", "Unk10", "GameInProgress?", "GameCompleted?", "HealthLs", "HealthGt", "Unk15", "Unk16", "DragWrongItem", "PlayerAtPos", "GlobalVarEq", "GlobalVarLs", "GlobalVarGt", "ExperienceEq", "Unk1d", "Unk1e", "TempVarNe", "RandVarNe", "GlobalVarNe", "CheckMapTileVar", "ExperienceGt"};
 char commands[0x26][30] = { "SetMapTile", "ClearTile", "MoveMapTile", "DrawOverlayTile", "SayText", "ShowText", "RedrawTile", "RedrawTiles", "RenderChanges", "WaitTicks", "PlaySound", "Unk0b", "Random", "SetTempVar", "AddTempVar", "SetMapTileVar", "ReleaseCamera", "LockCamera", "SetPlayerPos", "MoveCamera", "FlagOnce", "ShowObject", "HideObject", "ShowEntity", "HideEntity", "ShowAllEntities", "HideAllEntities", "SpawnItem", "AddItemToInv", "DropItem", "Open?Show?", "Unk1f", "Unk20", "WarpToMap", "SetGlobalVar", "AddGlobalVar", "SetRandVar", "AddHealth"};
 
+u16 iact_trig_clear_exempt[0x24];
 u16 active_triggers[0x24][8];
-u16 IACT_RANDVAR = 0;
-u16 IACT_TEMPVAR = 0;
 
 void item_select_prompt(u16 x, u16 y, u16 item)
 {
@@ -224,11 +223,23 @@ void run_iact(u32 loc, int iact_id)
                 //TODO? This might be able to stay nopped as long as they don't abuse this command somehow.
                 break;
             case IACT_CMD_RenderChanges:
+                map_update_camera(false);
                 render_map();
                 draw_screen();
                 break;
             case IACT_CMD_WaitTicks:
-                usleep(1000*(1000/TARGET_TICK_FPS)*args[0]);
+                for(int i = 0; i < args[0]; i++)
+                {
+                    if(SCREEN_FADE_LEVEL > 0)
+                        SCREEN_FADE_LEVEL--;
+
+                    map_update_camera(false);
+                    render_map();
+                    draw_screen();
+
+                    usleep(1000*(1000/TARGET_TICK_FPS));
+                }
+
                 break;
             case IACT_CMD_PlaySound:
                 sound_play(args[0]);
@@ -239,23 +250,26 @@ void run_iact(u32 loc, int iact_id)
                 PLAYER_MAP_CHANGE_REASON = MAP_CHANGE_NONE;
                 break;
             case IACT_CMD_Random:
-                IACT_RANDVAR = (random() % args[0]) + 1;
+                map_set_rand_var((random() % args[0]) + 1);
                 break;
             case IACT_CMD_SetTempVar:
-                IACT_TEMPVAR = args[0];
+                map_set_temp_var(args[0]);
                 break;
             case IACT_CMD_AddTempVar:
-                IACT_TEMPVAR += args[0];
+                map_set_temp_var(map_get_temp_var() + args[0]);
                 break;
             case IACT_CMD_ReleaseCamera:
                 map_camera_locked = false;
+                player_entity.is_active_visible = false;
                 break;
             case IACT_CMD_LockCamera:
                 map_camera_locked = true;
+                player_entity.is_active_visible = true;
                 break;
             case IACT_CMD_SetPlayerPos:
                 player_entity.x = args[0];
                 player_entity.y = args[1];
+                player_position_updated = true;
                 break;
             case IACT_CMD_MoveCamera:
                 //TODO: Actual movement using first two args
@@ -266,10 +280,12 @@ void run_iact(u32 loc, int iact_id)
                 map_set_iact_flagonce(iact_id, true);
                 break;
             case IACT_CMD_ShowObject:
-                map_get_object_by_id(args[0])->visible = true;
+                if(args[0] < map_get_num_objects())
+                    map_get_object_by_id(args[0])->visible = true;
                 break;
             case IACT_CMD_HideObject:
-                map_get_object_by_id(args[0])->visible = false;
+                if(args[0] < map_get_num_objects())
+                    map_get_object_by_id(args[0])->visible = false;
                 break;
             case IACT_CMD_ShowEntity:
                 map_show_entity(args[0]);
@@ -304,7 +320,7 @@ void run_iact(u32 loc, int iact_id)
                 map_set_global_var(map_get_global_var() + args[0]);
                 break;
             case IACT_CMD_SetRandVar:
-                IACT_RANDVAR = args[0];
+                map_set_rand_var(args[0]);
                 break;
             case IACT_CMD_AddHealth:
                 player_entity.health += args[0];
@@ -351,27 +367,27 @@ void iact_update()
                 switch(command)
                 {
                     case IACT_TRIG_RandVarGt:
-                        if(IACT_RANDVAR > args[0])
+                        if(map_get_rand_var() > args[0])
                             conditions_met = true;
                         break;
                     case IACT_TRIG_RandVarLs:
-                        if(IACT_RANDVAR < args[0])
+                        if(map_get_rand_var() < args[0])
                             conditions_met = true;
                         break;
                     case IACT_TRIG_RandVarEq:
-                        if(IACT_RANDVAR == args[0])
+                        if(map_get_rand_var() == args[0])
                             conditions_met = true;
                         break;
                     case IACT_TRIG_RandVarNe:
-                        if(IACT_RANDVAR != args[0])
+                        if(map_get_rand_var() != args[0])
                             conditions_met = true;
                         break;
                     case IACT_TRIG_TempVarEq:
-                        if(IACT_TEMPVAR == args[0])
+                        if(map_get_temp_var() == args[0])
                             conditions_met = true;
                         break;
                     case IACT_TRIG_TempVarNe:
-                        if(IACT_TEMPVAR != args[0])
+                        if(map_get_temp_var() != args[0])
                             conditions_met = true;
                         break;
                     case IACT_TRIG_HealthGt:
@@ -392,6 +408,14 @@ void iact_update()
                         break;
                     case IACT_TRIG_GlobalVarNe:
                         if(map_get_global_var() != args[0])
+                            conditions_met = true;
+                        break;
+                    case IACT_TRIG_ExperienceEq:
+                        if(player_experience == args[0])
+                            conditions_met = true;
+                        break;
+                    case IACT_TRIG_ExperienceGt:
+                        if(player_experience > args[0])
                             conditions_met = true;
                         break;
                     case IACT_TRIG_CheckMapTile:
@@ -415,6 +439,28 @@ void iact_update()
                             if(args[0] == active_triggers[IACT_TRIG_DragItem][0+2] && args[1] == active_triggers[IACT_TRIG_DragItem][1+2] && args[2] == active_triggers[IACT_TRIG_DragItem][2+2] && args[3] == active_triggers[IACT_TRIG_DragItem][3+2] && args[4] != active_triggers[IACT_TRIG_DragItem][4+2])
                                 conditions_met = true;
                         }
+                        break;
+                    case IACT_TRIG_GameInProgress_MAYBE:
+                        conditions_met = true; //TODO
+                        break;
+                    case IACT_TRIG_GameCompleted_MAYBE:
+                        conditions_met = false; //TODO
+                        break;
+                    case IACT_TRIG_Unk0f:
+                        //TODO: This is a hack! Dagobah relies on this command to determine which planet is linked to each mission.
+                        //      This should be implemented along with random world generation.
+
+                        //Tatooine
+                        /*if(args[0] == 0x063c)
+                            conditions_met = true;*/
+
+                        //Ice Planet
+                        if(args[0] == 0x07c1)
+                            conditions_met = true;
+
+                        //Endor
+                        /*if(args[0] == 0x0651)
+                            conditions_met = true;*/
                         break;
                 }
 
@@ -448,7 +494,14 @@ void iact_update()
 
     for(int i = 0; i < 0x24; i++)
     {
+        if(iact_trig_clear_exempt[i]) continue;
+
         for(int j = 0; j < 8; j++)
             active_triggers[i][j] = 0;
+    }
+
+    for(int i = 0; i < 0x24; i++)
+    {
+        iact_trig_clear_exempt[i] = false;
     }
 }

@@ -39,6 +39,7 @@ void player_add_item_to_inv(u16 item);
 bool player_has_item(u16 item);
 
 bool player_collides(int dir, int x, int y);
+void player_stand(int x, int y);
 void player_face(int dir);
 void player_move(int dir);
 void player_goto_door_in();
@@ -46,8 +47,11 @@ void player_update();
 void player_init();
 
 entity player_entity;
+u16 player_experience;
 u16 *player_inventory;
 u16 player_inventory_count;
+bool player_position_updated;
+u16 PLAYER_MAP_CHANGE_TO;
 u8 PLAYER_MAP_CHANGE_REASON;
 int CURRENT_ITEM_DRAGGED;
 
