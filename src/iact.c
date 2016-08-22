@@ -450,17 +450,26 @@ void iact_update()
                         //TODO: This is a hack! Dagobah relies on this command to determine which planet is linked to each mission.
                         //      This should be implemented along with random world generation.
 
-                        //Tatooine
-                        /*if(args[0] == 0x063c)
-                            conditions_met = true;*/
+                        if(!load_demo)
+                        {
+                            //Tatooine
+                            /*if(args[0] == 0x063c)
+                                conditions_met = true;*/
 
-                        //Ice Planet
-                        if(args[0] == 0x07c1)
-                            conditions_met = true;
+                            //Ice Planet
+                            if (args[0] == 0x058b)
+                                conditions_met = true;
 
-                        //Endor
-                        /*if(args[0] == 0x0651)
-                            conditions_met = true;*/
+                            //Endor
+                            /*if(args[0] == 0x0651)
+                                conditions_met = true;*/
+                        }
+                        else
+                        {
+                            //Ice Planet
+                            if(args[0] == 0x058b)
+                                conditions_met = true;
+                        }
                         break;
                 }
 
