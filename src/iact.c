@@ -42,7 +42,7 @@
 
 void print_iact(u32 loc);
 
-char triggers[0x24][30] = { "FirstEnter", "Enter", "BumpTile", "DragItem", "Walk", "TempVarEq", "RandVarEq", "RandVarGt", "RandVarLs", "EnterVehicle", "CheckMapTile", "EnemyDead", "AllEnemiesDead", "HasItem", "HasEndItem", "Unk0f", "Unk10", "GameInProgress?", "GameCompleted?", "HealthLs", "HealthGt", "Unk15", "Unk16", "DragWrongItem", "PlayerAtPos", "GlobalVarEq", "GlobalVarLs", "GlobalVarGt", "ExperienceEq", "Unk1d", "Unk1e", "TempVarNe", "RandVarNe", "GlobalVarNe", "CheckMapTileVar", "ExperienceGt"};
+char triggers[0x24][30] = { "FirstEnter", "Enter", "BumpTile", "DragItem", "Walk", "TempVarEq", "RandVarEq", "RandVarGt", "RandVarLs", "EnterVehicle", "CheckMapTile", "EnemyDead", "AllEnemiesDead", "HasItem", "CheckEndItem", "CheckStartItem", "Unk10", "GameInProgress?", "GameCompleted?", "HealthLs", "HealthGt", "Unk15", "Unk16", "DragWrongItem", "PlayerAtPos", "GlobalVarEq", "GlobalVarLs", "GlobalVarGt", "ExperienceEq", "Unk1d", "Unk1e", "TempVarNe", "RandVarNe", "GlobalVarNe", "CheckMapTileVar", "ExperienceGt"};
 char commands[0x26][30] = { "SetMapTile", "ClearTile", "MoveMapTile", "DrawOverlayTile", "SayText", "ShowText", "RedrawTile", "RedrawTiles", "RenderChanges", "WaitTicks", "PlaySound", "Unk0b", "Random", "SetTempVar", "AddTempVar", "SetMapTileVar", "ReleaseCamera", "LockCamera", "SetPlayerPos", "MoveCamera", "FlagOnce", "ShowObject", "HideObject", "ShowEntity", "HideEntity", "ShowAllEntities", "HideAllEntities", "SpawnItem", "AddItemToInv", "DropItem", "Open?Show?", "Unk1f", "Unk20", "WarpToMap", "SetGlobalVar", "AddGlobalVar", "SetRandVar", "AddHealth"};
 
 u16 iact_trig_clear_exempt[0x24];
@@ -406,6 +406,10 @@ void iact_update()
                         if(map_get_global_var() < args[0])
                             conditions_met = true;
                         break;
+                    case IACT_TRIG_GlobalVarEq:
+                        if(map_get_global_var() == args[0])
+                            conditions_met = true;
+                        break;
                     case IACT_TRIG_GlobalVarNe:
                         if(map_get_global_var() != args[0])
                             conditions_met = true;
@@ -446,7 +450,7 @@ void iact_update()
                     case IACT_TRIG_GameCompleted_MAYBE:
                         conditions_met = false; //TODO
                         break;
-                    case IACT_TRIG_Unk0f:
+                    case IACT_TRIG_CheckStartItem:
                         //TODO: This is a hack! Dagobah relies on this command to determine which planet is linked to each mission.
                         //      This should be implemented along with random world generation.
 

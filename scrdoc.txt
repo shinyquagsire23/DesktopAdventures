@@ -14,8 +14,8 @@ Pre-Script Commands:
 0b (EnemyDead) - <enemy id> <nop> <nop> <nop> <nop> <nop> { Checks if enemy is dead }
 0c (AllEnemiesDead) - <nop> <nop> <nop> <nop> <nop> <nop> { Checks if all enemies are dead }
 0d (HasItem) - <item num> <nop> <nop> <nop> <nop> <nop> { Checks if an item is in the player's inventory, does something unknown if the item num is FFFF (gets item currently equipped?) }
-0e (HasEndItem) - <item num> <nop> <nop> <nop> <nop> <nop> { Checks if player has an ending item? }
-0f - Has start item?
+0e (CheckEndItem) - <item num> <nop> <nop> <nop> <nop> <nop> { Checks the world's end item }
+0f (CheckStartItem) - <item num> <nop> <nop> <nop> <nop> <nop> { Checks the world's start item }
 10 - Used in map 150, also in early maps in Indy with leaked text "Pick"
 11 (GameInProgress) - <nop> <nop> <nop> <nop> <nop> <nop> { Executes script if player has not beaten game yet? Never used. }
 12 (GameCompleted) - <nop> <nop> <nop> <nop> <nop> <nop> { Executes script is player has beaten game? }
