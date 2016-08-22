@@ -210,6 +210,10 @@ void run_iact(u32 loc, int iact_id)
                 map_set_tile(args[2], args[3], args[4], map_get_tile(args[2], args[0], args[1]));
                 map_set_tile(args[2], args[0], args[1], TILE_NONE);
                 break;
+            case IACT_CMD_DrawOverlayTile:
+                if(args[1] >= map_camera_y && args[0] >= map_camera_x && args[0]-map_camera_x < SCREEN_TILE_WIDTH && args[1]-map_camera_y < SCREEN_TILE_HEIGHT)
+                    tiles_high[(((args[1]-map_camera_y)+(map_get_height() < SCREEN_TILE_HEIGHT ? (SCREEN_TILE_HEIGHT - map_get_height()) / 2 : 0))*SCREEN_TILE_WIDTH)+(args[0]-map_camera_x)+(map_get_width() < SCREEN_TILE_WIDTH ? (SCREEN_TILE_WIDTH - map_get_width()) / 2 : 0)] = args[2];
+                break;
             case IACT_CMD_SayText: //TODO
                 log("Luke says: %s\n", string);
                 show_textbox(player_entity.x,player_entity.y,string);
@@ -220,22 +224,22 @@ void run_iact(u32 loc, int iact_id)
                 break;
             case IACT_CMD_RedrawTile:
             case IACT_CMD_RedrawTiles:
-                //TODO? This might be able to stay nopped as long as they don't abuse this command somehow.
+                render_map();
                 break;
             case IACT_CMD_RenderChanges:
-                map_update_camera(false);
-                render_map();
                 draw_screen();
                 break;
             case IACT_CMD_WaitTicks:
                 for(int i = 0; i < args[0]; i++)
                 {
                     if(SCREEN_FADE_LEVEL > 0)
+                    {
                         SCREEN_FADE_LEVEL--;
 
-                    map_update_camera(false);
-                    render_map();
-                    draw_screen();
+                        map_update_camera(false);
+                        render_map();
+                        draw_screen();
+                    }
 
                     usleep(1000*(1000/TARGET_TICK_FPS));
                 }
@@ -269,6 +273,10 @@ void run_iact(u32 loc, int iact_id)
             case IACT_CMD_SetPlayerPos:
                 player_entity.x = args[0];
                 player_entity.y = args[1];
+
+                if(map_camera_locked)
+                    map_update_camera(false);
+
                 player_position_updated = true;
                 break;
             case IACT_CMD_MoveCamera:
