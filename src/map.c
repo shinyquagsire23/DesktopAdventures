@@ -199,10 +199,7 @@ void load_map(u16 map_id)
     iact_set_trigger(IACT_TRIG_Enter, 0);
 
     if((flags & MAP_FLAG_FROM_ANOTHER_MAP) || PLAYER_MAP_CHANGE_REASON == MAP_CHANGE_XWING_FROM || PLAYER_MAP_CHANGE_REASON == MAP_CHANGE_XWING_TO)
-    {
-            printf("vehicle! %x\n", map_get_temp_var());
         iact_set_trigger(IACT_TRIG_EnterVehicle, 0);
-    }
 
     load_izax(); //TODO: Indy IZAX is funky.
 #ifndef _3DS

@@ -324,7 +324,6 @@ void player_stand(int x, int y)
         }
         else if(obj_type == OBJ_XWING_TO)
         {
-            printf("xwing to\n");
             PLAYER_MAP_CHANGE_REASON = MAP_CHANGE_XWING_TO;
             PLAYER_MAP_CHANGE_TO = object->arg;
         }
