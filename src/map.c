@@ -31,6 +31,7 @@
 #include "assets.h"
 #include "player.h"
 #include "useful.h"
+#include "palette.h"
 #include "character.h"
 #include "objectinfo.h"
 
@@ -804,6 +805,7 @@ void update_world(double delta)
             SCREEN_FADE_LEVEL--;
 
         render_map();
+        palette_animate();
         world_timer = 0.0;
     }
     draw_screen();

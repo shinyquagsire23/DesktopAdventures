@@ -43,7 +43,7 @@ set(SOURCE_FILES
     src/include/input.h
     src/input.c src/iact.c
     src/include/iact.h
-    src/pc/sound.c src/render_gl.c src/render_buffer.c src/font.c src/include/font.h)
+    src/pc/sound.c src/render_gl.c src/render_buffer.c src/font.c src/include/font.h src/palette.c)
 
 add_definitions(-DLITTLE_ENDIAN)
 add_definitions(-DPC_BUILD)
