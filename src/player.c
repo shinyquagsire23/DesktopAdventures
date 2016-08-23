@@ -271,14 +271,14 @@ bool player_do_push(int dir)
     return false;
 }
 
-void player_do_pull(int dir)
+bool player_do_pull(int dir)
 {
     if(BUTTON_PUSH_STATE)
     {
         switch(dir)
         {
             case LEFT:
-                if((map_get_meta(LAYER_MIDDLE, player_entity.x+1,player_entity.y) & (TILE_PUSH_PULL_BLOCK)) && player_entity.x != 0)
+                if((map_get_meta(LAYER_MIDDLE, player_entity.x+1,player_entity.y) & (TILE_PUSH_PULL_BLOCK)) && player_entity.x != 0 && map_get_tile(LAYER_MIDDLE, player_entity.x+1,player_entity.y) != TILE_NONE)
                 {
                     map_set_tile(LAYER_MIDDLE, player_entity.x, player_entity.y, map_get_tile(LAYER_MIDDLE, player_entity.x+1,player_entity.y));
 
@@ -295,16 +295,16 @@ void player_do_pull(int dir)
                         {
                             object->visible = false;
                             map_set_tile(LAYER_MIDDLE, player_entity.x+1, player_entity.y, object->arg);
-                            return;
+                            return true;
                         }
                     }
 
                     map_set_tile(LAYER_MIDDLE, player_entity.x+1, player_entity.y, TILE_NONE);
-                    return;
+                    return true;
                 }
                 break;
             case RIGHT:
-                if((map_get_meta(LAYER_MIDDLE, player_entity.x-1,player_entity.y) & (TILE_PUSH_PULL_BLOCK)) && player_entity.x != map_get_width()-1)
+                if((map_get_meta(LAYER_MIDDLE, player_entity.x-1,player_entity.y) & (TILE_PUSH_PULL_BLOCK)) && player_entity.x != map_get_width()-1 && map_get_tile(LAYER_MIDDLE, player_entity.x-1,player_entity.y) != TILE_NONE)
                 {
                     map_set_tile(LAYER_MIDDLE, player_entity.x, player_entity.y, map_get_tile(LAYER_MIDDLE, player_entity.x-1,player_entity.y));
 
@@ -321,16 +321,16 @@ void player_do_pull(int dir)
                         {
                             object->visible = false;
                             map_set_tile(LAYER_MIDDLE, player_entity.x-1, player_entity.y, object->arg);
-                            return;
+                            return true;
                         }
                     }
 
                     map_set_tile(LAYER_MIDDLE, player_entity.x-1, player_entity.y, TILE_NONE);
-                    return;
+                    return true;
                 }
                 break;
             case UP:
-                if((map_get_meta(LAYER_MIDDLE,player_entity.x, player_entity.y+1) & (TILE_PUSH_PULL_BLOCK)) && player_entity.y != 0)
+                if((map_get_meta(LAYER_MIDDLE,player_entity.x, player_entity.y+1) & (TILE_PUSH_PULL_BLOCK)) && player_entity.y != 0 && map_get_tile(LAYER_MIDDLE, player_entity.x,player_entity.y+1) != TILE_NONE)
                 {
                     map_set_tile(LAYER_MIDDLE, player_entity.x, player_entity.y, map_get_tile(LAYER_MIDDLE, player_entity.x,player_entity.y+1));
 
@@ -347,16 +347,16 @@ void player_do_pull(int dir)
                         {
                             object->visible = false;
                             map_set_tile(LAYER_MIDDLE, player_entity.x, player_entity.y+1, object->arg);
-                            return;
+                            return true;
                         }
                     }
 
                     map_set_tile(LAYER_MIDDLE, player_entity.x, player_entity.y+1, TILE_NONE);
-                    return;
+                    return true;
                 }
                 break;
             case DOWN:
-                if((map_get_meta(LAYER_MIDDLE,player_entity.x, player_entity.y-1) & (TILE_PUSH_PULL_BLOCK)) && player_entity.y != map_get_height()-1)
+                if((map_get_meta(LAYER_MIDDLE,player_entity.x, player_entity.y-1) & (TILE_PUSH_PULL_BLOCK)) && player_entity.y != map_get_height()-1 && map_get_tile(LAYER_MIDDLE, player_entity.x,player_entity.y-1) != TILE_NONE)
                 {
                     map_set_tile(LAYER_MIDDLE, player_entity.x, player_entity.y, map_get_tile(LAYER_MIDDLE, player_entity.x,player_entity.y-1));
 
@@ -373,16 +373,17 @@ void player_do_pull(int dir)
                         {
                             object->visible = false;
                             map_set_tile(LAYER_MIDDLE, player_entity.x, player_entity.y-1, object->arg);
-                            return;
+                            return true;
                         }
                     }
 
                     map_set_tile(LAYER_MIDDLE, player_entity.x, player_entity.y-1, TILE_NONE);
-                    return;
+                    return true;
                 }
                 break;
         }
     }
+    return false;
 }
 
 void player_goto_door_in()
@@ -431,7 +432,7 @@ void player_bump(int dir, int x, int y)
     }
 
     u32 meta = map_get_meta(LAYER_MIDDLE, bump_x, bump_y);
-    if(meta & TILE_ITEM)
+    if(meta & (TILE_ITEM | TILE_WEAPON))
     {
         u16 item = map_get_tile(LAYER_MIDDLE, bump_x, bump_y);
         map_set_tile(LAYER_MIDDLE, bump_x, bump_y, TILE_NONE);
@@ -495,6 +496,8 @@ void player_face(int dir)
 
 void player_move(int dir)
 {
+    if(player_entity.attacking) return;
+
     if(dir != last_dir)
         anim_count = 0;
 
@@ -502,6 +505,7 @@ void player_move(int dir)
 
     bool moved = true;
 
+    bool pull = false;
     bool push = player_do_push(dir);
 
     switch(dir)
@@ -510,7 +514,7 @@ void player_move(int dir)
             if(!player_collides(LEFT, player_entity.x,player_entity.y))
             {
                 if(!push)
-                    player_do_pull(LEFT);
+                    pull = player_do_pull(LEFT);
                 player_entity.x--;
             }
             else if(player_collides_event(LEFT, player_entity.x, player_entity.y))
@@ -536,7 +540,7 @@ void player_move(int dir)
             if(!player_collides(RIGHT, player_entity.x,player_entity.y))
             {
                 if(!push)
-                    player_do_pull(RIGHT);
+                    pull =player_do_pull(RIGHT);
                 player_entity.x++;
             }
             else if(player_collides_event(RIGHT, player_entity.x, player_entity.y))
@@ -562,7 +566,7 @@ void player_move(int dir)
             if(!player_collides(UP, player_entity.x,player_entity.y))
             {
                 if(!push)
-                    player_do_pull(UP);
+                    pull =player_do_pull(UP);
                 player_entity.y--;
             }
             else if(player_collides_event(UP, player_entity.x, player_entity.y))
@@ -588,7 +592,7 @@ void player_move(int dir)
             if(!player_collides(DOWN, player_entity.x,player_entity.y))
             {
                 if(!push)
-                    player_do_pull(DOWN);
+                    pull =player_do_pull(DOWN);
                 player_entity.y++;
             }
             else if(player_collides_event(DOWN, player_entity.x, player_entity.y))
@@ -680,6 +684,9 @@ void player_move(int dir)
             break;
     }
 
+    if(push || pull)
+        sound_play(1);
+
     last_dir = dir;
     if(!moved)
     {
@@ -693,6 +700,8 @@ void player_move(int dir)
 
 void player_handle_walk_animation()
 {
+    player_entity.char_id = 0;
+
     if(moving)
         anim_count = (anim_count+1)%4;
     else
@@ -728,6 +737,50 @@ void player_handle_walk_animation()
             break;
     }
     moving = 0;
+}
+
+void player_handle_attack_animation()
+{
+    player_entity.extend_dir = last_dir;
+    bool is_gun = false;
+
+    if(tile_metadata[player_inventory[PLAYER_EQUIPPED_ITEM]] & TILE_LIGHTSABER)
+        player_entity.extend_offset = 1;
+    else if(tile_metadata[player_inventory[PLAYER_EQUIPPED_ITEM]] & TILE_LIGHT_BLASTER || tile_metadata[player_inventory[PLAYER_EQUIPPED_ITEM]] & TILE_HEAVY_BLASTER || tile_metadata[player_inventory[PLAYER_EQUIPPED_ITEM]] & TILE_THE_FORCE)
+    {
+        player_entity.extend_offset++;
+        is_gun = true;
+    }
+
+    switch(last_dir)
+    {
+        case LEFT:
+            player_entity.current_frame = CHAR_ATTACK_LEFT_ANIM[anim_count];
+            player_entity.extend_frame = is_gun ? FRAME_WEAPON_PROJECTILE_LEFT : CHAR_ATTACK_EXTEND_LEFT_ANIM[anim_count];
+            break;
+        case RIGHT:
+            player_entity.current_frame = CHAR_ATTACK_RIGHT_ANIM[anim_count];
+            player_entity.extend_frame = is_gun ? FRAME_WEAPON_PROJECTILE_RIGHT : CHAR_ATTACK_EXTEND_RIGHT_ANIM[anim_count];
+            break;
+        case UP:
+        case UP_LEFT:
+        case UP_RIGHT:
+            player_entity.current_frame = CHAR_ATTACK_UP_ANIM[anim_count];
+            player_entity.extend_frame = is_gun ? FRAME_WEAPON_PROJECTILE_UP : CHAR_ATTACK_EXTEND_UP_ANIM[anim_count];
+            break;
+        case DOWN:
+        case DOWN_LEFT:
+        case DOWN_RIGHT:
+            player_entity.current_frame = CHAR_ATTACK_DOWN_ANIM[anim_count];
+            player_entity.extend_frame = is_gun ? FRAME_WEAPON_PROJECTILE_DOWN : CHAR_ATTACK_EXTEND_DOWN_ANIM[anim_count];
+            break;
+        default:
+            break;
+    }
+
+    anim_count++;
+    if(anim_count >= 4)
+        player_entity.attacking = false;
 }
 
 void player_init()
@@ -786,8 +839,67 @@ bool player_has_item(u16 item)
 
 void player_update()
 {
-    player_handle_walk_animation();
+    if(player_entity.attacking)
+        player_handle_attack_animation();
+    else
+        player_handle_walk_animation();
+
     iact_set_trigger(IACT_TRIG_PlayerAtPos, 2, player_entity.x, player_entity.y);
+
+    if(BUTTON_FIRE_STATE && PLAYER_EQUIPPED_ITEM != 0xFFFF && !player_entity.attacking)
+    {
+        for(int i = 0; i < 0x100; i++)
+        {
+            if(char_data[i]->frames[FRAME_WEAPON_ICON] == player_inventory[PLAYER_EQUIPPED_ITEM])
+            {
+                bool continue_attack = true;
+                switch(last_dir)
+                {
+                    case LEFT:
+                        if(player_entity.x == 0)
+                        {
+                            continue_attack = false;
+                        }
+                        break;
+                    case RIGHT:
+                        if(player_entity.x == map_get_width()-1)
+                        {
+                            continue_attack = false;
+                        }
+                        break;
+                    case UP:
+                    case UP_LEFT:
+                    case UP_RIGHT:
+                        if(player_entity.y == 0)
+                        {
+                            continue_attack = false;
+                        }
+                        break;
+                    case DOWN:
+                    case DOWN_LEFT:
+                    case DOWN_RIGHT:
+                        if(player_entity.y == map_get_height()-1)
+                        {
+                            continue_attack = false;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+
+                if(!continue_attack) break;
+
+                anim_count = 0;
+                player_entity.attacking = true;
+                player_entity.char_id = i;
+                player_entity.extend_offset = 0;
+
+                player_handle_attack_animation();
+                sound_play(chwp_data[i]->id_2);
+                break;
+            }
+        }
+    }
 
     if(player_position_updated)
     {

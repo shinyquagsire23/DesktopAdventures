@@ -87,6 +87,7 @@ void item_select_prompt(u16 x, u16 y, u16 item)
             map_set_tile(LAYER_HIGH, x, y, TILE_NONE);
             render_map();
 
+            sound_play(3);
             player_add_item_to_inv(item);
             break;
         }

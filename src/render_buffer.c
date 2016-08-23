@@ -143,6 +143,10 @@ void render(int x_shift, int y_shift)
                     render_texture((32 * x)+x_shift, (32 * y)+y_shift, 32, 32, 255, texture_buffers[tiles_middle[(y * SCREEN_TILE_WIDTH) + x]]);
                 }
 
+                if (tiles_middle_overlay[(y * SCREEN_TILE_WIDTH) + x] != 0xFFFF) {
+                    render_texture((32 * x)+x_shift, (32 * y)+y_shift, 32, 32, 255, texture_buffers[tiles_middle_overlay[(y * SCREEN_TILE_WIDTH) + x]]);
+                }
+
                 if (tiles_high[(y * SCREEN_TILE_WIDTH) + x] != 0xFFFF) {
                     render_texture((32 * x)+x_shift, (32 * y)+y_shift, 32, 32, 255, texture_buffers[tiles_high[(y * SCREEN_TILE_WIDTH) + x]]);
                 }

@@ -446,6 +446,7 @@ void render_map()
     {
             tiles_low[i] = TILE_NONE;
             tiles_middle[i] = TILE_NONE;
+            tiles_middle_overlay[i] = TILE_NONE;
             tiles_high[i] = TILE_NONE;
             tiles_overlay[i] = TILE_NONE;
     }
@@ -470,7 +471,31 @@ void render_map()
        player_entity.x < (map_camera_x + SCREEN_TILE_WIDTH) &&
        player_entity.is_active_visible)
     {
-        tiles_middle[((player_entity.y - map_camera_y + center_shift_y)*SCREEN_TILE_WIDTH) + (player_entity.x - map_camera_x + center_shift_x)] = char_data[player_entity.char_id]->frames[player_entity.current_frame];
+        tiles_middle_overlay[((player_entity.y - map_camera_y + center_shift_y)*SCREEN_TILE_WIDTH) + (player_entity.x - map_camera_x + center_shift_x)] = char_data[player_entity.char_id]->frames[player_entity.current_frame];
+        if(player_entity.attacking)
+        {
+            switch (player_entity.extend_dir)
+            {
+                case LEFT:
+                    tiles_middle_overlay[((player_entity.y - map_camera_y + center_shift_y) * SCREEN_TILE_WIDTH) + (player_entity.x - map_camera_x + center_shift_x - player_entity.extend_offset)] = char_data[player_entity.char_id]->frames[player_entity.extend_frame];
+                    break;
+                case RIGHT:
+                    tiles_middle_overlay[((player_entity.y - map_camera_y + center_shift_y) * SCREEN_TILE_WIDTH) + (player_entity.x - map_camera_x + center_shift_x + player_entity.extend_offset)] = char_data[player_entity.char_id]->frames[player_entity.extend_frame];
+                    break;
+                case UP:
+                case UP_LEFT:
+                case UP_RIGHT:
+                    tiles_middle_overlay[((player_entity.y - map_camera_y + center_shift_y - player_entity.extend_offset) * SCREEN_TILE_WIDTH) + (player_entity.x - map_camera_x + center_shift_x)] = char_data[player_entity.char_id]->frames[player_entity.extend_frame];
+                    break;
+                case DOWN:
+                case DOWN_LEFT:
+                case DOWN_RIGHT:
+                    tiles_middle_overlay[((player_entity.y - map_camera_y + center_shift_y + player_entity.extend_offset) * SCREEN_TILE_WIDTH) + (player_entity.x - map_camera_x + center_shift_x)] = char_data[player_entity.char_id]->frames[player_entity.extend_frame];
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     for(int i = 0; i < num_entities; i++)

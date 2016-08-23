@@ -34,6 +34,7 @@ void render_flip_buffers();
 
 unsigned short tiles_low[0x100 * 0x100];
 unsigned short tiles_middle[0x100 * 0x100];
+unsigned short tiles_middle_overlay[0x100 * 0x100];
 unsigned short tiles_high[0x100 * 0x100];
 unsigned short tiles_overlay[0x100 * 0x100];
 

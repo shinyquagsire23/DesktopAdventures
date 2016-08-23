@@ -29,9 +29,13 @@ typedef struct entity
     u16 x;
     u16 y;
     u16 current_frame;
+    u16 extend_frame;
+    u8  extend_dir;
+    u8  extend_offset;
     u16 item;
     u16 num_items;
     u16 health;
+    bool attacking;
     bool is_active_visible;
 } entity;
 
@@ -103,7 +107,15 @@ enum CHAR_FRAME
 
     //Sprites for weapon, attacking.
     //Extend is used for whips (Indianna Jones) and Sabers (Luke)
-    FRAME_WEAPON_ICON = 10,
+    FRAME_WEAPON_PROJECTILE_UP = 0,
+    FRAME_WEAPON_PROJECTILE_DOWN,
+    FRAME_WEAPON_PROJECTILE_UP_LEFT,
+    FRAME_WEAPON_PROJECTILE_LEFT,
+    FRAME_WEAPON_PROJECTILE_DOWN_LEFT,
+    FRAME_WEAPON_PROJECTILE_UP_RIGHT,
+    FRAME_WEAPON_PROJECTILE_RIGHT,
+
+    FRAME_WEAPON_ICON = 7,
     FRAME_ATTACK_UP_1,
     FRAME_ATTACK_DOWN_1,
     FRAME_ATTACK_EXTEND_UP_2,
@@ -130,6 +142,15 @@ const u8 CHAR_WALK_UP_LEFT_ANIM[4];
 const u8 CHAR_WALK_DOWN_LEFT_ANIM[4];
 const u8 CHAR_WALK_UP_RIGHT_ANIM[4];
 const u8 CHAR_WALK_DOWN_RIGHT_ANIM[4];
+
+const u8 CHAR_ATTACK_UP_ANIM[4];
+const u8 CHAR_ATTACK_DOWN_ANIM[4];
+const u8 CHAR_ATTACK_LEFT_ANIM[4];
+const u8 CHAR_ATTACK_RIGHT_ANIM[4];
+const u8 CHAR_ATTACK_EXTEND_UP_ANIM[4];
+const u8 CHAR_ATTACK_EXTEND_DOWN_ANIM[4];
+const u8 CHAR_ATTACK_EXTEND_LEFT_ANIM[4];
+const u8 CHAR_ATTACK_EXTEND_RIGHT_ANIM[4];
 
 enum CHAR_DIRECTION
 {
