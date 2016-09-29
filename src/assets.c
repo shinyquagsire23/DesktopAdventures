@@ -28,6 +28,7 @@
 #include "tile.h"
 #include "sound.h"
 #include "tname.h"
+#include "world.h"
 #include "puzzle.h"
 #include "screen.h"
 #include "useful.h"
@@ -56,7 +57,7 @@ izon_data **zone_data;
 
 u32 yodesk_seek = 0;
 
-u8 load_demo = 0;
+u8 load_demo = 1;
 u8 is_yoda = 1;
 u16 ipuznum = 0;
 
@@ -72,6 +73,12 @@ void load_resources()
     char *file_to_load = is_yoda ? (load_demo ? "YodaDemo.dta" : "YODESK.DTA") : "DESKTOP.DAW";
 
     yodesk_fileptr = fopen(file_to_load, "rb");
+
+    if(!yodesk_fileptr)
+    {
+        printf("Failed to load '%s'!\n", file_to_load);
+    }
+
     fseek(yodesk_fileptr, 0, SEEK_END);
     yodesk_size = ftell(yodesk_fileptr);
     rewind(yodesk_fileptr);
@@ -141,6 +148,7 @@ void load_resources()
                 zone_data[j] = (izon_data*)calloc(sizeof(izon_data), sizeof(u8));
 
             log("%i maps in DAT\n", NUM_MAPS);
+            //world_init();
             map_init(NUM_MAPS);
         }
         else if(!strncmp(tag, "IZON", 4)) //Index of ZONE
@@ -249,6 +257,7 @@ void load_resources()
                 //so this works.
                 seek(tag_seek);
                 u32 remaining_iacts = zone_data[izon_count - 1]->num_iacts+1;
+                zone_data[izon_count - 1]->num_iacts = 0;
                 u32 iact_index = 1;
                 while (remaining_iacts > 0)
                 {
@@ -257,6 +266,7 @@ void load_resources()
                     {
                         zone_data[izon_count-1]->iact_offsets[iact_index++] = get_location()-sizeof(u32);
                         remaining_iacts--;
+                        zone_data[izon_count - 1]->num_iacts++;
 
                         if(remaining_iacts == 0 && is_yoda)
                         {
@@ -520,10 +530,10 @@ void load_resources()
                 if(e == 0)
                     continue;
 
-                //if(is_yoda)
-                //	log("%x: %x %x %x %x \"%s\" \"%s\" \"%s\" \"%s\", %s (%x), %s (%x)\n", j, e->unk1, e->unk2, e->unk3, e->unk4, e->string1, e->string2, e->string3, e->string4, tile_names[e->item_a], e->item_a, tile_names[e->item_b], e->item_b);
-                //else
-                //	log("%x: %x %x %x \"%s\" \"%s\" \"%s\" \"%s\", %s (%x)\n", j, e->unk1, e->unk2, e->unk4, e->string1, e->string2, e->string3, e->string4, tile_names[e->item_a], e->item_a);
+                /*if(is_yoda)
+                	log("%x: %x %x %x %x \"%s\" \"%s\" \"%s\" \"%s\", %s (%x %x), %s (%x, %x)\n", j, e->unk1, e->unk2, e->unk3, e->unk4, e->string1, e->string2, e->string3, e->string4, tile_names[e->item_a], e->item_a, tile_metadata[e->item_b], tile_names[e->item_b], e->item_b, tile_metadata[e->item_b]);
+                else
+                	log("%x: %x %x %x \"%s\" \"%s\" \"%s\" \"%s\", %s (%x)\n", j, e->unk1, e->unk2, e->unk4, e->string1, e->string2, e->string3, e->string4, tile_names[e->item_a], e->item_a);*/
             }
             log("Found ENDF at %x\n", tag_seek);
             break;

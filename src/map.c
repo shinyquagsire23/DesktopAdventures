@@ -182,13 +182,6 @@ void load_map(u16 map_id)
                 player_entity.x = object_info[id][i]->x;
                 player_entity.y = object_info[id][i]->y;
                 break;
-            case OBJ_SPAWN:
-                if(PLAYER_MAP_CHANGE_REASON == MAP_CHANGE_XWING_FROM || PLAYER_MAP_CHANGE_REASON == MAP_CHANGE_XWING_TO)
-                {
-                    player_entity.x = 0;object_info[id][i]->x;
-                    player_entity.y = 0;object_info[id][i]->y;
-                }
-                break;
         }
     }
 
@@ -199,7 +192,7 @@ void load_map(u16 map_id)
             break;
     }
 
-    log("Loading map %i, %s, %s, width %i, height %i\n", map_id, map_flags[flags], area_types[area_type], width, height);
+    log("Loading map %i (%x), %s, %s, width %i, height %i\n", map_id, zone_data[map_id]->izon_offset, map_flags[flags], area_types[area_type], width, height);
     iact_set_trigger(IACT_TRIG_Enter, 0);
 
     if((flags & MAP_FLAG_FROM_ANOTHER_MAP) || PLAYER_MAP_CHANGE_REASON == MAP_CHANGE_XWING_FROM || PLAYER_MAP_CHANGE_REASON == MAP_CHANGE_XWING_TO)
@@ -270,6 +263,33 @@ void add_new_entity(u16 id, u16 x, u16 y, u16 frame, u16 item, u16 num_items)
     e->health = chwp_data[id]->health;
 
     entities[num_entities++] = e;
+}
+
+void map_show_object(u16 id)
+{
+    if(id < map_get_num_objects())
+    {
+        map_get_object_by_id(id)->visible = true;
+
+        if (map_get_object_by_id(id)->type == OBJ_SPAWN)
+        {
+            map_set_tile(LAYER_MIDDLE, map_get_object_by_id(id)->x, map_get_object_by_id(id)->y, map_get_object_by_id(id)->arg);
+        }
+    }
+}
+
+void map_hide_object(u16 id)
+{
+    if(id < map_get_num_objects())
+    {
+        map_get_object_by_id(id)->visible = false;
+
+        if (map_get_object_by_id(id)->type == OBJ_SPAWN)
+        {
+            if (map_get_tile(LAYER_MIDDLE, map_get_object_by_id(id)->x, map_get_object_by_id(id)->y) == map_get_object_by_id(id)->arg)
+                map_set_tile(LAYER_MIDDLE, map_get_object_by_id(id)->x, map_get_object_by_id(id)->y, TILE_NONE);
+        }
+    }
 }
 
 void map_show_entity(u16 index)
@@ -416,6 +436,20 @@ void load_izax()
     for(int i = 0; i < third_section->num_entries; i++)
     {
         log("   end item: %s\n", tile_names[third_section->entries[i].item]);
+    }
+
+    //Fill in spawn items
+    for(int i = 0; i < map_get_num_objects(); i++)
+    {
+        if(map_get_object_by_id(i)->type == OBJ_SPAWN)
+        {
+            if(map_get_object_by_id(i)->arg == 0xFFFF)
+            {
+                map_get_object_by_id(i)->arg = third_section->entries[random_val() % third_section->num_entries].item;
+            }
+
+            map_show_object(i);
+        }
     }
 
     free(first_section);
@@ -658,12 +692,12 @@ void map_update_camera(bool redraw)
 
 u16 map_get_global_var()
 {
-    return map_global_vars[id];
+    return map_global_vars[0];
 }
 
 void map_set_global_var(u16 val)
 {
-    map_global_vars[id] = val;
+    map_global_vars[0] = val;
 }
 
 u16 map_get_temp_var()

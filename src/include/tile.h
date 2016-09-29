@@ -46,7 +46,7 @@
 #define TILE_KEYCARD						BIT(16)
 #define TILE_PUZZLE_ITEM_1					BIT(17)
 #define TILE_PUZZLE_ITEM_2					BIT(18)
-#define TILE_PUZZLE_ITEM_3					BIT(19)
+#define TILE_PUZZLE_ITEM_SEED_END			BIT(19)
 #define TILE_LOCATOR						BIT(20)
 #define TILE_HEALTH_PACK					BIT(22)
 

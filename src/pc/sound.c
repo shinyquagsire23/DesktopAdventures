@@ -20,6 +20,7 @@
 
 #include "sound.h"
 
+#ifndef __EMSCRIPTEN__
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>
 
@@ -72,3 +73,9 @@ void sound_exit()
     free(wave);
     Mix_CloseAudio();
 }
+
+#else
+    void sound_init(){}
+    void sound_play(u16 id){}
+    void sound_exit(){}
+#endif

@@ -18,16 +18,18 @@
  *  License along with this library; if not, see <http://www.gnu.org/licenses/>
  */
 
-#include <stdio.h>
+#include "world.h"
+
 #include <stdlib.h>
-#include <SDL2/SDL.h>
 
-#ifndef MAIN_H_
-#define MAIN_H_
+u16 *world_map;
 
-void handleKeyDown();
-void Quit(int returnCode);
-void handleKeyPress( SDL_Keysym *keysym );
-void redraw_swap_buffers();
+void world_init()
+{
+    world_map = calloc(0x20*0x20*sizeof(u16), 1);
+}
 
-#endif /* MAIN_H_ */
+void world_generate()
+{
+
+}

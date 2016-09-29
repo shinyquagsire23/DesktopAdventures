@@ -26,7 +26,6 @@
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
-#include <SDL_opengl.h>
 #include <tname.h>
 
 #include "player.h"
@@ -39,21 +38,33 @@
 #include "font.h"
 #include "map.h"
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
+
 #define TRUE  1
 #define FALSE 0
 
 int initGL();
 int resizeWindow(int width, int height);
+void null_loop_iter();
+void loop_iter();
+
+void render(int x, int y);
+void render_pre();
+void render_post();
+void render_flip_buffers();
 
 SDL_Window* displayWindow;
 SDL_Renderer* displayRenderer;
 SDL_RendererInfo displayRendererInfo;
 SDL_Event event;
+clock_t last_time;
 
 // Our opengl context handle
 SDL_GLContext mainContext;
 
-u16 current_map = 0;
+u16 current_map = 79;
 int done = FALSE;
 int sdl_mouse_x = 0;
 int sdl_mouse_y = 0;
@@ -64,75 +75,68 @@ int main(int argc, char **argv)
 {
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 
-    SDL_CreateWindowAndRenderer(SCREEN_WIDTH+232, SCREEN_HEIGHT+16, SDL_WINDOW_OPENGL, &displayWindow, &displayRenderer);
+    SDL_CreateWindowAndRenderer(SCREEN_WIDTH+232, SCREEN_HEIGHT+16, 0, &displayWindow, &displayRenderer);
     SDL_GetRendererInfo(displayRenderer, &displayRendererInfo);
     SDL_SetRenderDrawBlendMode(displayRenderer, SDL_BLENDMODE_BLEND);
-
-    if ((displayRendererInfo.flags & SDL_RENDERER_ACCELERATED) == 0 ||
-        (displayRendererInfo.flags & SDL_RENDERER_TARGETTEXTURE) == 0)
-    {
-        fprintf( stderr, "Video init failed: %s\n", SDL_GetError());
-        Quit(1);
-    }
 
     SCREEN_SHIFT_X = 8;
     SCREEN_SHIFT_Y = 8;
 
+#ifdef __EMSCRIPTEN__
+    emscripten_set_main_loop(null_loop_iter, 60, 1);
+#endif
+
     srand(time(NULL));
-    initGL();
     sound_init();
     resizeWindow(SCREEN_WIDTH, SCREEN_HEIGHT);
     load_resources();
 
-    clock_t last_time = clock();
+    last_time = clock();
+
+#ifdef __EMSCRIPTEN__
+    emscripten_set_main_loop(loop_iter, 60, 1);
+#else
     while (!done)
     {
-        clock_t time = clock();
-        double delta = (double)(time - last_time)/(CLOCKS_PER_SEC/1000.0);
-        last_time = time;
-
-        reset_input_state();
-        update_input();
-
-        update_world(delta);
+        loop_iter();
     }
+#endif
 
     sound_exit();
     Quit(0);
     return (0);
 }
 
-int initGL()
+void null_loop_iter()
 {
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 1);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 5);
-    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    render_pre();
+    render(SCREEN_SHIFT_X, SCREEN_SHIFT_Y);
+    render_post();
+    render_flip_buffers();
+}
 
-    mainContext = SDL_GL_CreateContext(displayWindow);
+void loop_iter()
+{
+    clock_t time = clock();
+    double delta = (double)(time - last_time)/(CLOCKS_PER_SEC/1000.0);
+    last_time = time;
 
-    glEnable( GL_TEXTURE_2D);
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glEnable (GL_BLEND);
-    glShadeModel(GL_SMOOTH);
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    reset_input_state();
+    update_input();
 
-    return 1;
+    update_world(delta);
+
+#ifdef __EMSCRIPTEN__
+    if (done) {
+ 	        emscripten_cancel_main_loop();
+ 	    }
+#endif
 }
 
 int resizeWindow(int width, int height)
 {
     if (height == 0)
         height = 1;
-
-    glViewport(0, 0, (GLsizei) width, (GLsizei) height);
-    glMatrixMode( GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(0, 288, 288, 0, -1, 1);
-    glMatrixMode( GL_MODELVIEW);
-    glLoadIdentity();
 
     return ( TRUE);
 }
@@ -294,6 +298,7 @@ void buffer_plot_pixel(int x, int y, u8 r, u8 g, u8 b, u8 a)
 void render_flip_buffers()
 {
     SDL_GL_SwapWindow(displayWindow);
+    SDL_RenderPresent(displayRenderer);
 }
 
 void Quit(int returnCode)

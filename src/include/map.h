@@ -143,6 +143,8 @@ void map_set_rand_var(u16 val);
 bool map_get_iact_flagonce(int iact_id);
 void map_set_iact_flagonce(int iact_id, bool val);
 
+void map_show_object(u16 id);
+void map_hide_object(u16 id);
 void map_show_entity(u16 index);
 void map_hide_entity(u16 index);
 void map_show_all_entities();

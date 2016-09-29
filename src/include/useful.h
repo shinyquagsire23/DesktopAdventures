@@ -23,6 +23,7 @@
 
 #ifdef PC_BUILD
     #include <stdint.h>
+    #define random_val() rand()
     typedef uint8_t u8;
     typedef uint16_t u16;
     typedef uint32_t u32;
@@ -50,7 +51,7 @@
 #elif defined _3DS
     #include <3ds.h>
     #include <stdarg.h>
-    #define random() rand()
+    #define random_val() rand()
 
     static inline void log(const char *fmt, ...)
     {
@@ -77,7 +78,11 @@
         OSSleepTicks((usec/1000/1000) * (OSGetSystemInfo()->clockSpeed / 4));
         return 0;
     }
-    #define random() 1 //https://xkcd.com/221 (TODO)
+    #define random_val() 1 //https://xkcd.com/221 (TODO)
+#endif
+
+#ifdef __EMSCRIPTEN__
+int usleep(unsigned);
 #endif
 
 #define MIN(a,b) (((a)<(b))?(a):(b))

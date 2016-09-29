@@ -18,16 +18,12 @@
  *  License along with this library; if not, see <http://www.gnu.org/licenses/>
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <SDL2/SDL.h>
+#ifndef WORLD_H
+#define WORLD_H
 
-#ifndef MAIN_H_
-#define MAIN_H_
+#include "useful.h"
 
-void handleKeyDown();
-void Quit(int returnCode);
-void handleKeyPress( SDL_Keysym *keysym );
-void redraw_swap_buffers();
+void world_init();
+void world_generate();
 
-#endif /* MAIN_H_ */
+#endif WORLD_H

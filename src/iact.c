@@ -116,7 +116,7 @@ void read_iact()
     log("Reading IACT data, %u IACTs\n", zone_data[map_get_id()]->num_iacts);
     for(int i = 0; i < zone_data[map_get_id()]->num_iacts; i++)
     {
-        //print_iact(zone_data[map_get_id()]->iact_offsets[i]);
+        print_iact(zone_data[map_get_id()]->iact_offsets[i]);
     }
 }
 
@@ -139,7 +139,7 @@ void print_iact(u32 loc)
         *(u16*)(pos_str+2) = args[4];
         *(u16*)(pos_str+4) = args[5];
 
-        log("        %s, %04x, %04x, %04x, %04x, %04x, %04x, %s\n", triggers[command], args[0], args[1], args[2], args[3], args[4], args[5], pos_str);
+        log("        %s, %04x, %04x, %04x, %04x, %04x, %04x, %06s\n", triggers[command], args[0], args[1], args[2], args[3], args[4], args[5], pos_str);
     }
     u16 iactItemCount2 = read_short();
     log("    Script: commands %d\n", iactItemCount2);
@@ -156,7 +156,7 @@ void print_iact(u32 loc)
         *(u16*)(pos_str+2) = args[3];
         *(u16*)(pos_str+4) = args[4];
 
-        log("        %s, %04x, %04x, %04x, %04x, %04x, %04x, %s\n", commands[command], args[0], args[1], args[2], args[3], args[4], strlen, pos_str);
+        log("        %s, %04x, %04x, %04x, %04x, %04x, %04x, %06s\n", commands[command], args[0], args[1], args[2], args[3], args[4], strlen, pos_str);
         if (strlen)
         {
             char* str = malloc(strlen+1);
@@ -285,7 +285,7 @@ void run_iact(u32 loc, int iact_id)
                 PLAYER_MAP_CHANGE_REASON = MAP_CHANGE_NONE;
                 break;
             case IACT_CMD_Random:
-                map_set_rand_var((random() % args[0]) + 1);
+                map_set_rand_var((random_val() % args[0]) + 1);
                 break;
             case IACT_CMD_SetTempVar:
                 map_set_temp_var(args[0]);
@@ -319,12 +319,10 @@ void run_iact(u32 loc, int iact_id)
                 map_set_iact_flagonce(iact_id, true);
                 break;
             case IACT_CMD_ShowObject:
-                if(args[0] < map_get_num_objects())
-                    map_get_object_by_id(args[0])->visible = true;
+                map_show_object(args[0]);
                 break;
             case IACT_CMD_HideObject:
-                if(args[0] < map_get_num_objects())
-                    map_get_object_by_id(args[0])->visible = false;
+                map_hide_object(args[0]);
                 break;
             case IACT_CMD_ShowEntity:
                 map_show_entity(args[0]);
@@ -503,12 +501,12 @@ void iact_update()
                                 conditions_met = true;*/
 
                             //Ice Planet
-                            if (args[0] == 0x058b)
-                                conditions_met = true;
+                            /*if (args[0] == 0x058b)
+                                conditions_met = true;*/
 
                             //Endor
-                            /*if(args[0] == 0x0651)
-                                conditions_met = true;*/
+                            if(args[0] == 0x0651)
+                                conditions_met = true;
                         }
                         else
                         {
