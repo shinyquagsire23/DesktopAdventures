@@ -1,7 +1,7 @@
 #include "useful.h"
 /*  DesktopAdventures, A reimplementation of the Desktop Adventures game engine
  *
- *  DesktopAventures is the legal property of its developers, whose names
+ *  DesktopAdventures is the legal property of its developers, whose names
  *  can be found in the AUTHORS file distributed with this source
  *  distribution.
  *

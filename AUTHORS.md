@@ -4,7 +4,7 @@ Copyright (c) 2015 by the following contributors:
 - Max Thomas (shinyquagsire23) <mtinc2@gmail.com>
 - Dmitry Marakasov (AMDmi3) <amdmi3@amdmi3.ru>
 
-DesktopAventures is the legal property of its developers, whose names
+DesktopAdventures is the legal property of its developers, whose names
 can be found in the AUTHORS file distributed with this source
 distribution.
 
