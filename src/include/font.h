@@ -1,3 +1,6 @@
+#ifndef FONT_H
+#define FONT_H
+
 // Font data for Coder's Crux 12pt, by NAL
 
 typedef struct
@@ -26,3 +29,5 @@ FONT_CHAR_INFO deskAdvFontDescriptors[];
 u8 deskAdvInvFontBitmaps[];
 FONT_INFO deskAdvInvFontInfo;
 FONT_CHAR_INFO deskAdvInvFontDescriptors[];
+
+#endif

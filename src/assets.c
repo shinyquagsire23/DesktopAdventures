@@ -57,7 +57,7 @@ izon_data **zone_data;
 
 u32 yodesk_seek = 0;
 
-u8 load_demo = 1;
+u8 load_demo = 0;
 u8 is_yoda = 1;
 u16 ipuznum = 0;
 
@@ -68,15 +68,28 @@ u16 ipuznum = 0;
     #define log(f_, ...) OSReport((f_), __VA_ARGS__)
 #endif
 
+#ifdef DAT_IN_EXEC
+#define DAT_IN_RAM
+extern u8 *yodesk_bin;
+extern u32 yodesk_bin_size;
+#endif
+
 void load_resources()
 {
     char *file_to_load = is_yoda ? (load_demo ? "YodaDemo.dta" : "YODESK.DTA") : "DESKTOP.DAW";
 
+#ifdef DAT_IN_EXEC
+    log("%s is compiled in\n", file_to_load);
+    yodesk_data = &yodesk_bin;
+    yodesk_size = yodesk_bin_size;
+#else
     yodesk_fileptr = fopen(file_to_load, "rb");
 
     if(!yodesk_fileptr)
     {
+        log("Failed to load '%s'!\n", file_to_load);
         printf("Failed to load '%s'!\n", file_to_load);
+        while(1){}
     }
 
     fseek(yodesk_fileptr, 0, SEEK_END);
@@ -87,7 +100,7 @@ void load_resources()
     yodesk_data = malloc(yodesk_size);
     fread(yodesk_data, yodesk_size, sizeof(u8), yodesk_fileptr);
 #endif
-
+#endif
     log("%s loaded, %lx bytes large\n", file_to_load, yodesk_size);
 
     u16 izon_count = 0;
