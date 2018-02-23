@@ -10,7 +10,7 @@
 #include "font.h"
 
 // Character bitmaps for Coder's Crux 12pt
-u8 deskAdvFontBitmaps[] =
+const u8 deskAdvFontBitmaps[] =
 {
 	// @0 '!' (1 pixels wide)
 	0x80, // #
@@ -1049,7 +1049,7 @@ u8 deskAdvFontBitmaps[] =
 
 // Character descriptors for Coder's Crux 12pt
 // { [Char width in bits], [Offset into deskAdvFontCharBitmaps in bytes] }
-FONT_CHAR_INFO deskAdvFontDescriptors[] =
+const  FONT_CHAR_INFO deskAdvFontDescriptors[] =
 {
 	{1, 0}, 		// ! 
 	{3, 9}, 		// " 
@@ -1148,9 +1148,9 @@ FONT_CHAR_INFO deskAdvFontDescriptors[] =
 };
 
 // Font information for Coder's Crux 12pt
-FONT_INFO deskAdvFontFontInfo =
+const FONT_INFO deskAdvFontFontInfo =
 {
-	9, //  Character height
+	DESKADV_FONT_FONT_HEIGHT, //  Character height
 	'!', //  Start character
 	'~', //  End character
 	2, //  Width, in pixels, of space character
@@ -1165,7 +1165,7 @@ FONT_INFO deskAdvFontFontInfo =
 //  Font data for Pixel Arial 11 6pt
 // 
 
-u8 deskAdvInvFontBitmaps[] =
+const u8 deskAdvInvFontBitmaps[] =
 {
 	// @0 '!' (1 pixels wide)
 	0x80, // #
@@ -2296,7 +2296,7 @@ u8 deskAdvInvFontBitmaps[] =
 	0x00, //      
 };
 
-FONT_CHAR_INFO deskAdvInvFontDescriptors[] =
+const FONT_CHAR_INFO deskAdvInvFontDescriptors[] =
 {
 	{1, 0}, 		// ! 
 	{3, 10}, 		// " 
@@ -2395,9 +2395,9 @@ FONT_CHAR_INFO deskAdvInvFontDescriptors[] =
 };
 
 // Font information for Pixel Arial 11 6pt
-FONT_INFO deskAdvInvFontInfo =
+const FONT_INFO deskAdvInvFontInfo =
 {
-	10, //  Character height
+	DESKADV_INV_FONT_HEIGHT, //  Character height
 	'!', //  Start character
 	'~', //  End character
 	2, //  Width, in pixels, of space character

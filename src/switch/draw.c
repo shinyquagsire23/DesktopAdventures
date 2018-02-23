@@ -25,6 +25,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "useful.h"
+
 u32 screenWidth, screenHeight;
 
 u32 getScreenWidth()
@@ -60,15 +62,16 @@ void fillScreen(char r,char g,char b,char a)
 //Rendering in 
 void drawPixel(int x, int y, char r, char g, char b, char a)
 {
-	uint32_t num = (a << 24) | (b << 16) | (g << 8) | r;
-	
 	u32* frameBuf = (u32*) gfxGetFramebuffer(&screenWidth, &screenHeight);
+	
+	if (x < 0 || y < 0 || x >= screenWidth || y >= screenHeight) return;
+	
+	uint32_t num = (a << 24) | (b << 16) | (g << 8) | r;
 	frameBuf[(y * screenWidth) + x] = num;
 }
 
 void drawLine(int x1, int y1, int x2, int y2, char r, char g, char b, char a)
 {
-
 	int x, y;
 	if (x1 == x2){
 		if (y1 < y2) for (y = y1; y <= y2; y++) drawPixel(x1, y, r, g, b, a);

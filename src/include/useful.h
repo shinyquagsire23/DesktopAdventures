@@ -106,6 +106,9 @@ int usleep(unsigned);
 
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
+#define CLAMP(x, low, high)  (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
+#define CONTAINED(x, x1, x2) (x > x1 && x < x2)
+#define CONTAINED_2D(x, y, x1, y1, x2, y2) (CONTAINED(x,x1,x2) && CONTAINED(y,y1,y2))
 
 #define SCREEN_TILE_WIDTH (SCREEN_WIDTH / 32)
 #define SCREEN_TILE_HEIGHT (SCREEN_HEIGHT / 32)

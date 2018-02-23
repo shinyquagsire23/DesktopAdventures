@@ -69,7 +69,7 @@ int render_char(int x, int y, char c)
     int offset = deskAdvFontDescriptors[c-deskAdvFontFontInfo.start_char].offset;
     for(int i = 0; i < deskAdvFontDescriptors[c-deskAdvFontFontInfo.start_char].width; i++)
     {
-        for(int j = 0; j < deskAdvFontFontInfo.height; j++)
+        for(int j = 0; j < DESKADV_FONT_FONT_HEIGHT; j++)
         {
             if(deskAdvFontBitmaps[offset+j] & (1<<(7-i)))
                 buffer_plot_pixel(x+i,y+j,0,0,0,255);
@@ -87,7 +87,7 @@ void render_text(int x, int y, char *text)
         y += 32;
     for(int i = 0; i < 288; i++)
     {
-        for(int j = 0; j < deskAdvFontFontInfo.height; j++)
+        for(int j = 0; j < DESKADV_FONT_FONT_HEIGHT; j++)
         {
             buffer_plot_pixel(x+i,y+j,255,255,255,255);
         }
@@ -97,11 +97,11 @@ void render_text(int x, int y, char *text)
     {
         if(x > 280)
         {
-            x = 0;
+            x = SCREEN_SHIFT_X;
             y += 10;
             for(int i = 0; i < 288; i++)
             {
-                for(int j = 0; j < deskAdvFontFontInfo.height+1; j++)
+                for(int j = 0; j < DESKADV_FONT_FONT_HEIGHT+1; j++)
                 {
                     buffer_plot_pixel(x+i,y+j-1,255,255,255,255);
                 }

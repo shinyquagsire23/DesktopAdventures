@@ -22,12 +22,15 @@ typedef struct
 }
 FONT_INFO;
 
-u8 deskAdvFontBitmaps[];
-FONT_INFO deskAdvFontFontInfo;
-FONT_CHAR_INFO deskAdvFontDescriptors[];
+#define DESKADV_FONT_FONT_HEIGHT (9)
+#define DESKADV_INV_FONT_HEIGHT (10)
 
-u8 deskAdvInvFontBitmaps[];
-FONT_INFO deskAdvInvFontInfo;
-FONT_CHAR_INFO deskAdvInvFontDescriptors[];
+const u8 deskAdvFontBitmaps[];
+const FONT_INFO deskAdvFontFontInfo;
+const FONT_CHAR_INFO deskAdvFontDescriptors[];
+
+const u8 deskAdvInvFontBitmaps[];
+const FONT_INFO deskAdvInvFontInfo;
+const FONT_CHAR_INFO deskAdvInvFontDescriptors[];
 
 #endif

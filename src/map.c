@@ -608,6 +608,8 @@ obj_info *map_get_object(int index, int x, int y)
 
 u16 map_get_tile(u8 layer, int x, int y)
 {
+    if (x >= width || y >= height || x < 0 || y < 0) return 0;
+
     switch(layer)
     {
         case LAYER_LOW:
@@ -629,6 +631,8 @@ u16 map_get_tile(u8 layer, int x, int y)
 
 void map_set_tile(u8 layer, int x, int y, u16 tile)
 {
+    if (x >= width || y >= height || x < 0 || y < 0) return 0;
+
     switch(layer)
     {
         case LAYER_LOW:
@@ -649,22 +653,25 @@ void map_set_tile(u8 layer, int x, int y, u16 tile)
 
 u32 map_get_meta(u8 layer, int x, int y)
 {
+    u16 tile = map_get_tile(layer, x, y);
+    if (x >= width || y >= height || x < 0 || y < 0 || tile == 0xffff) return TILE_MIDDLE_LAYER_COLLIDING;
+
     switch(layer)
     {
         case LAYER_LOW:
-            return tile_metadata[map_tiles_low[id][(y*width)+x]];
+            return tile_metadata[tile];
         case LAYER_MIDDLE:
             for(int i = 0; i < num_entities; i++)
             {
                 if(entities[i]->x == x && entities[i]->y == y)
                     return TILE_MIDDLE_LAYER_COLLIDING | TILE_GAME_OBJECT;
             }
-            return tile_metadata[map_tiles_middle[id][(y*width)+x]];
+            return tile_metadata[tile];
         case LAYER_HIGH:
-            return tile_metadata[map_tiles_high[id][(y*width)+x]];
+            return tile_metadata[tile];
         default:
         case LAYER_OVERLAY:
-            return tile_metadata[map_overlay[(y*width)+x]];
+            return tile_metadata[tile];
     }
 }
 
