@@ -631,7 +631,7 @@ u16 map_get_tile(u8 layer, int x, int y)
 
 void map_set_tile(u8 layer, int x, int y, u16 tile)
 {
-    if (x >= width || y >= height || x < 0 || y < 0) return 0;
+    if (x >= width || y >= height || x < 0 || y < 0) return;
 
     switch(layer)
     {
