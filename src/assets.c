@@ -74,7 +74,7 @@ extern u8 *yodesk_bin;
 extern u32 yodesk_bin_size;
 #endif
 
-void load_resources()
+bool load_resources()
 {
     char *file_to_load = is_yoda ? (load_demo ? "YodaDemo.dta" : "YODESK.DTA") : "DESKTOP.DAW";
 
@@ -89,7 +89,7 @@ void load_resources()
     {
         log("Failed to load '%s'!\n", file_to_load);
         printf("Failed to load '%s'!\n", file_to_load);
-        while(1){}
+        return false;
     }
 
     fseek(yodesk_fileptr, 0, SEEK_END);
@@ -572,6 +572,8 @@ void load_resources()
     init_screen();
     render_map();
     ASSETS_LOADING = 0;
+
+    return true;
 }
 
 void load_texture(u16 width, u32 data_loc, u32 texture_num)

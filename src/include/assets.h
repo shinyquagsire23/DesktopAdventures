@@ -26,7 +26,7 @@
     GLuint texture[0x2001];
 #endif
 
-void load_resources();
+bool load_resources();
 void load_texture(u16 width, u32 data_loc, u32 texture_num);
 
 void seek(u32 location);

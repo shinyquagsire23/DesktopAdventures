@@ -61,9 +61,6 @@ SDL_RendererInfo displayRendererInfo;
 SDL_Event event;
 clock_t last_time;
 
-// Our opengl context handle
-SDL_GLContext mainContext;
-
 u16 current_map = 79;
 int done = FALSE;
 int sdl_mouse_x = 0;
@@ -89,7 +86,12 @@ int main(int argc, char **argv)
     srand(time(NULL));
     sound_init();
     resizeWindow(SCREEN_WIDTH, SCREEN_HEIGHT);
-    load_resources();
+    if (!load_resources())
+    {
+        sound_exit();
+        Quit(0);
+        return -1;
+    }
 
     last_time = clock();
 
@@ -297,7 +299,7 @@ void buffer_plot_pixel(int x, int y, u8 r, u8 g, u8 b, u8 a)
 
 void render_flip_buffers()
 {
-    SDL_GL_SwapWindow(displayWindow);
+    SDL_UpdateWindowSurface(displayWindow);
     SDL_RenderPresent(displayRenderer);
 }
 
