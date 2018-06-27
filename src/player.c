@@ -817,7 +817,7 @@ void player_remove_item_from_inv(u16 item)
     {
         if(player_inventory[i] == item)
         {
-            player_inventory[i] = NULL;
+            player_inventory[i] = 0;
             for(int j = i; j < player_inventory_count; j++)
             {
                 player_inventory[j] = player_inventory[j+1];

@@ -36,4 +36,20 @@ typedef struct ui_render_target
     struct ui_render_target* parent;
 } ui_render_target;
 
+
+void ui_get_target_bounds(ui_render_target* target, int* x1, int* y1, int* x2, int* y2);
+void ui_render_target_clear(ui_render_target* target, u8 r, u8 g, u8 b, u8 a);
+
+void ui_init(int x, int y, int w, int h, bool windowOnly);
+void ui_update();
+void ui_render();
+
+void ui_set_mouse_abs(int x, int y);
+void ui_add_mouse_abs(int x, int y);
+void ui_mouse_left_down();
+void ui_set_mouse_left(bool val);
+void ui_touch_down();
+void ui_touch_up();
+void ui_set_draw_scale(int scale);
+
 #endif // DESKADV_UI_H

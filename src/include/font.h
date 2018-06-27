@@ -17,20 +17,20 @@ typedef struct
     char start_char; // Start character.
     char end_char; // End character.
     char space_width; // Space width
-    FONT_CHAR_INFO *p_character_descriptor; // Character decriptor array.
-    u8 *p_character_bitmaps; // Character bitmap array.
+    const FONT_CHAR_INFO *p_character_descriptor; // Character decriptor array.
+    const u8 *p_character_bitmaps; // Character bitmap array.
 }
 FONT_INFO;
 
 #define DESKADV_FONT_FONT_HEIGHT (9)
 #define DESKADV_INV_FONT_HEIGHT (10)
 
-const u8 deskAdvFontBitmaps[];
+const u8 deskAdvFontBitmaps[846];
 const FONT_INFO deskAdvFontFontInfo;
-const FONT_CHAR_INFO deskAdvFontDescriptors[];
+const FONT_CHAR_INFO deskAdvFontDescriptors[94];
 
-const u8 deskAdvInvFontBitmaps[];
+const u8 deskAdvInvFontBitmaps[980];
 const FONT_INFO deskAdvInvFontInfo;
-const FONT_CHAR_INFO deskAdvInvFontDescriptors[];
+const FONT_CHAR_INFO deskAdvInvFontDescriptors[94];
 
 #endif

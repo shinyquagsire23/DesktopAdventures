@@ -26,4 +26,4 @@
 void world_init();
 void world_generate();
 
-#endif WORLD_H
+#endif // WORLD_H

@@ -37,6 +37,7 @@
 #include "input.h"
 #include "font.h"
 #include "map.h"
+#include "ui.h"
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
@@ -321,7 +322,7 @@ void update_input()
             case SDL_FINGERMOTION:
             case SDL_FINGERDOWN:
             case SDL_FINGERUP:
-                handleTouchEvent(&event);
+                handleTouchEvent((SDL_TouchFingerEvent*)&event);
                 break;
             case SDL_QUIT:
                 done = TRUE;

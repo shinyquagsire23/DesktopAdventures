@@ -20,12 +20,19 @@
 #include "ui.h"
 
 #include <stdio.h>
+#include <string.h>
 #include "font.h"
 #include "palette.h"
 #include "player.h"
 #include "screen.h"
 #include "tname.h"
 #include "assets.h"
+#include "input.h"
+
+void drawFillRect(int x1, int y1, int x2, int y2, char r, char g, char b, char a);
+void drawPixel(int x, int y, char r, char g, char b, char a);
+void fillScreen(char r, char g, char b, char a);
+void render_set_target(ui_render_target* target);
 
 int inventory_scroll = 0;
 int draw_scale = 1;
@@ -58,7 +65,7 @@ void ui_get_target_bounds(ui_render_target* target, int* x1, int* y1, int* x2, i
     ui_render_target* iter = target;
     
     // Check cached values
-    u32 c = (target->x | target->y << 32) ^ (target->w | target->h << 32);
+    u32 c = (target->x | (u64)target->y << 32) ^ (target->w | (u64)target->h << 32);
     if (target->parent)
         c ^= target->parent->c;
 
@@ -114,7 +121,7 @@ void ui_get_target_bounds(ui_render_target* target, int* x1, int* y1, int* x2, i
 
 void ui_render_target_clear(ui_render_target* target, u8 r, u8 g, u8 b, u8 a)
 {
-    u32 x1, x2, y1, y2;
+    int x1, x2, y1, y2;
     ui_get_target_bounds(target, &x1, &y1, &x2, &y2);
     
     drawFillRect(x1 * draw_scale, y1 * draw_scale, x2 * draw_scale, y2 * draw_scale, r, g, b, a);
@@ -320,7 +327,7 @@ void ui_update()
     last_x = ABS_MOUSE_X;
     last_y = ABS_MOUSE_Y;
     
-    u32 game_x, game_y;
+    int game_x, game_y;
     ui_get_target_bounds(&game_target, &game_x, &game_y, NULL, NULL);
     if (CURRENT_ITEM_DRAGGED != -1)
         mouse_move(-1,-1);
@@ -339,7 +346,7 @@ void ui_update()
         if (TOUCH_UP)
             TOUCH_UP = false;
 
-        u32 window_contents_x, window_contents_y;
+        int window_contents_x, window_contents_y;
         ui_get_target_bounds(&window_content_target, &window_contents_x, &window_contents_y, NULL, NULL);
 
         if(CURRENT_ITEM_DRAGGED != -1)
@@ -364,7 +371,7 @@ void ui_update()
             for(int i = 0; i < 7; i++)
             {
                 if(!player_inventory) break;
-                if(player_inventory[i+inventory_scroll] == NULL) break;
+                if(player_inventory[i+inventory_scroll] == 0) break;
 
                 int item_render_x = SCREEN_WIDTH + 19;
                 int item_render_y = 8 + (i * 32);
@@ -418,7 +425,7 @@ void ui_render()
     for(int i = 0; i < 7; i++)
     {
         if(!player_inventory) break;
-        if(player_inventory[i+inventory_scroll] == NULL) break;
+        if(player_inventory[i+inventory_scroll] == 0) break;
 
         int item_render_x = SCREEN_WIDTH + 19;
         int item_render_y = 8 + (i * 32);

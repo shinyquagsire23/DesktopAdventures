@@ -96,7 +96,7 @@ void drop_item(int x, int y)
     {
         if(map_get_tile(LAYER_MIDDLE, item_actual_tile_x, item_actual_tile_y) == TILE_NONE)
         {
-            if(!map_get_tile(LAYER_LOW, item_actual_tile_x, item_actual_tile_y) == TILE_NONE)
+            if(map_get_tile(LAYER_LOW, item_actual_tile_x, item_actual_tile_y) != TILE_NONE)
             {
                 iact_set_trigger(IACT_TRIG_DragItem, 5, item_actual_tile_x, item_actual_tile_y, LAYER_LOW, map_get_tile(LAYER_LOW, item_actual_tile_x, item_actual_tile_y), player_inventory[CURRENT_ITEM_DRAGGED]);
             }
