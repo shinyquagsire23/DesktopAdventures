@@ -26,10 +26,18 @@
 #include "screen.h"
 #include "palette.h"
 #include "font.h"
+#include "ui.h"
 
 void buffer_clear_screen(u8 r, u8 g, u8 b, u8 a);
-void buffer_plot_pixel(int x, int y, u8 r, u8 g, u8 b, u8 a);
+void buffer_plot_pixel(ui_render_target* target, int x, int y, u8 r, u8 g, u8 b, u8 a);
 void buffer_flip_buffers();
+
+ui_render_target *render_target;
+
+void render_set_target(ui_render_target* target)
+{
+    render_target = target;
+}
 
 void render_texture(int x, int y, int width, int height, u8 alpha, void *buffer)
 {
@@ -57,7 +65,7 @@ void render_texture(int x, int y, int width, int height, u8 alpha, void *buffer)
             r = (u8) (indy_palette[(index * 4) + 2]);
         }
 
-        buffer_plot_pixel(x+(i%width),y+(i/height),r,g,b,alpha);
+        buffer_plot_pixel(render_target, x+(i%width),y+(i/height),r,g,b,alpha);
     }
 }
 
@@ -72,7 +80,7 @@ int render_char(int x, int y, char c)
         for(int j = 0; j < DESKADV_FONT_FONT_HEIGHT; j++)
         {
             if(deskAdvFontBitmaps[offset+j] & (1<<(7-i)))
-                buffer_plot_pixel(x+i,y+j,0,0,0,255);
+                buffer_plot_pixel(render_target, x+i,y+j,0,0,0,255);
         }
     }
     return deskAdvFontDescriptors[c-deskAdvFontFontInfo.start_char].width+1;
@@ -80,7 +88,7 @@ int render_char(int x, int y, char c)
 
 void render_text(int x, int y, char *text)
 {
-    x = SCREEN_SHIFT_X;
+    x = 0;
     if(y >= 288/2)
         y -= 32;
     else
@@ -89,7 +97,7 @@ void render_text(int x, int y, char *text)
     {
         for(int j = 0; j < DESKADV_FONT_FONT_HEIGHT; j++)
         {
-            buffer_plot_pixel(x+i,y+j,255,255,255,255);
+            buffer_plot_pixel(render_target, x+i,y+j,255,255,255,255);
         }
     }
 
@@ -97,13 +105,13 @@ void render_text(int x, int y, char *text)
     {
         if(x > 280)
         {
-            x = SCREEN_SHIFT_X;
+            x = 0;
             y += 10;
             for(int i = 0; i < 288; i++)
             {
                 for(int j = 0; j < DESKADV_FONT_FONT_HEIGHT+1; j++)
                 {
-                    buffer_plot_pixel(x+i,y+j-1,255,255,255,255);
+                    buffer_plot_pixel(render_target, x+i,y+j-1,255,255,255,255);
                 }
             }
         }
@@ -127,7 +135,7 @@ void render(int x_shift, int y_shift)
         {
             for(int j = 0; j < 16; j++)
             {
-                buffer_plot_pixel(x_center+x_shift+bar_x+i,y_center+y_shift+bar_y+j,0,0,128,255);
+                buffer_plot_pixel(render_target, x_center+x_shift+bar_x+i,y_center+y_shift+bar_y+j,0,0,128,255);
             }
         }
     }

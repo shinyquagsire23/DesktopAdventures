@@ -46,6 +46,8 @@ set(SOURCE_FILES
     src/include/sound.h
     src/include/tile.h
     src/include/tname.h
+    src/ui.c
+    src/include/ui.h
     src/include/useful.h
     src/include/input.h
     src/input.c src/iact.c

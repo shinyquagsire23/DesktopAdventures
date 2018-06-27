@@ -67,7 +67,7 @@ int draw_screen()
     SCREEN_FADE_LEVEL = MIN(SCREEN_FADE_LEVEL, (SCREEN_TILE_WIDTH/2)+1);
 
     render_pre();
-    render(SCREEN_SHIFT_X, SCREEN_SHIFT_Y);
+    render(0, 0);
     render_post();
     render_flip_buffers();
     return 1;
